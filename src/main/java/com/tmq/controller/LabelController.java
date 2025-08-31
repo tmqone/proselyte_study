@@ -9,7 +9,7 @@ public interface LabelController extends GenericController<Label> {
     List<Label> getAll();
     Optional<Label> getByName(String name);
     Optional<Label> getById(String id);
-    boolean save(Label label);
-    boolean update(Label label);
-    boolean delete(Label label);
+    boolean save(String name);
+    boolean update(String name, String id);
+    boolean delete(String name);
 }

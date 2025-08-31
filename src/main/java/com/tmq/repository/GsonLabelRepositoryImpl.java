@@ -32,6 +32,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         return INSTANCE;
     }
 
+    @Override
     public List<Label> findAll() {
         Type listType = new TypeToken<ArrayList<Label>>() {}.getType();
 
@@ -71,7 +72,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
             writeToFile(List.of(label), FILE, gson);
             return true;
         } else {
-
             allLabels.stream()
                     .filter(value -> value.getName().equalsIgnoreCase(label.getName()))
                     .filter(value -> value.getStatus() == Status.ACTIVE)
@@ -80,8 +80,8 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
                         throw new ObjectExistsException(value.getName() + " already exists");
                     });
 
-            Long id = allLabels.stream().mapToLong(Label::getId).max().getAsLong();
-            label.setId(id + 1L);
+            Long newId = allLabels.stream().mapToLong(Label::getId).max().getAsLong() + 1;
+            label.setId(newId);
             allLabels.add(label);
             writeToFile(allLabels, FILE, gson);
             return true;
@@ -105,8 +105,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
             if (indexes.size() > 1) {
                 throw new ObjectNotFoundException("More than one active label with same id");
             }
-
-            label.setStatus(Status.ACTIVE);
             allLabels.set(indexes.getFirst(), label);
             writeToFile(allLabels, FILE, gson);
             return true;

@@ -1,5 +1,6 @@
 package com.tmq.view;
 
+import com.tmq.Main;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

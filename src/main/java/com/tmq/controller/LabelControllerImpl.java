@@ -7,6 +7,7 @@ import com.tmq.model.Label;
 import com.tmq.model.Status;
 import com.tmq.repository.GsonLabelRepositoryImpl;
 import com.tmq.repository.LabelRepository;
+import com.tmq.validator.InputValidator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,7 @@ import java.util.Optional;
 public class LabelControllerImpl implements LabelController {
     private static final LabelControllerImpl INSTANCE = new LabelControllerImpl();
     private static final LabelRepository REPOSITORY = GsonLabelRepositoryImpl.getInstance();
+    private final InputValidator inputValidator = new InputValidator();
 
     public static LabelControllerImpl getInstance() {
         return INSTANCE;
@@ -29,6 +31,7 @@ public class LabelControllerImpl implements LabelController {
 
     public Optional<Label> getByName(String name) {
         try {
+            if (!inputValidator.validate(name)) { return Optional.empty();}
             return Optional.of(REPOSITORY.findByName(name));
         } catch (ObjectNotFoundException e){
             return Optional.empty();
@@ -37,15 +40,22 @@ public class LabelControllerImpl implements LabelController {
 
     public Optional<Label> getById(String id) {
         try {
+            if (!inputValidator.validateLongString(id)) {
+                return Optional.empty();
+            }
             return Optional.of(REPOSITORY.findById(Long.parseLong(id)));
         } catch (ObjectNotFoundException e){
             return Optional.empty();
         }
     }
 
-    public boolean save(Label label) {
+    public boolean save(String name) {
         try {
-            return REPOSITORY.save(label);
+            if (!inputValidator.validate(name)) {
+                return false;
+            }
+
+            return REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
         } catch (ObjectExistsException e){
             return false;
         } catch (IOException e) {
@@ -54,10 +64,14 @@ public class LabelControllerImpl implements LabelController {
     }
 
     @Override
-    public boolean update(Label label) {
+    public boolean update(String name, String id) {
         try {
-            return REPOSITORY.update(label);
-        } catch (ObjectExistsException | ObjectNotFoundException e){
+            if (!inputValidator.validate(name) && !inputValidator.validateLongString(id)) {
+                return false;
+            }
+            return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
+
+        } catch (ObjectExistsException | ObjectNotFoundException | NumberFormatException e){
             return false;
         } catch (IOException e) {
             throw new GenericExceptionHandler(e.getMessage());
@@ -65,11 +79,15 @@ public class LabelControllerImpl implements LabelController {
     }
 
     @Override
-    public boolean delete(Label label) {
+    public boolean delete(String id) {
         try {
-            label = REPOSITORY.findById(label.getId());
+            if (!inputValidator.validateLongString(id)){
+                return false;
+            }
+            Label label = REPOSITORY.findById(Long.parseLong(id));
+            label.setStatus(Status.DELETED);
             return REPOSITORY.delete(label);
-        } catch (ObjectNotFoundException e){
+        } catch (ObjectNotFoundException | NumberFormatException e){
             return false;
         } catch (IOException e) {
             throw new GenericExceptionHandler(e.getMessage());

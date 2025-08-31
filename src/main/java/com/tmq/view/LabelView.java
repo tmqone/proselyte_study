@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -16,8 +17,6 @@ public class LabelView implements GenericView {
     private static final LabelView INSTANCE = new LabelView();
     private final Scanner scanner = new Scanner(System.in);
     private final LabelController labelController = LabelControllerImpl.getInstance();
-    private final InputValidator inputValidator = new InputValidator();
-    private final MainView mainView = MainView.getInstance();
 
     public static LabelView getInstance() {
         return INSTANCE;
@@ -30,7 +29,7 @@ public class LabelView implements GenericView {
 
     @Override
     public void exit() {
-        mainView.start();
+        MainView.getInstance().start();
     }
 
     @Override
@@ -90,15 +89,7 @@ public class LabelView implements GenericView {
     private void deleteTag() {
         System.out.print("Введите номер тэга: ");
         String id = scanner.nextLine();
-        if (inputValidator.validateLongString(id)){
-            Label label = Label.builder().id(Long.parseLong(id)).build();
-
-            if (labelController.delete(label)){
-                System.out.println("Тэг был удалён");
-            } else {
-                System.out.println("Произошла ошибка при удалении");
-            }
-        }
+        System.out.println(labelController.delete(id) ? "Тэг был удалён\n" : "Произошла ошибка при удалении\n");
     }
 
     private void updateTag() {
@@ -106,56 +97,39 @@ public class LabelView implements GenericView {
         String id = scanner.nextLine();
         System.out.print("Введите новое название тэга: ");
         String name = scanner.nextLine();
-
-        if(inputValidator.validateLongString(id) && inputValidator.validate(name)){
-            if (labelController.update(Label.builder().id(Long.parseLong(id)).name(name).build())) {
-                System.out.println("Тэг изменен");
-            } else {
-                System.out.println("Произошла ошибка при изменении");
-            }
-        }
+        System.out.println(labelController.update(name, id) ? "Тэг изменен\n" : "Произошла ошибка при изменении\n");
     }
 
     private void createTag() {
         System.out.print("Введите название тэга: ");
         String name = scanner.nextLine();
-
-        if(inputValidator.validate(name)){
-            if (labelController.save(Label.builder().name(name).status(Status.ACTIVE).build())) {
-                System.out.println("Тэг сохранен");
-            } else {
-                System.out.println("Произошла ошибка при сохранении");
-            }
-        }
+        System.out.println(labelController.save(name) ? "Тэг сохранен\n" : "Произошла ошибка при сохранении\n");
     }
 
     private void findById() {
         System.out.print("Введите ID тэга: ");
         String id = scanner.nextLine();
-        if (inputValidator.validateLongString(id)){
-            labelController.getById(id).ifPresentOrElse(
-                    x -> System.out.println(x.getId() + ". " + x.getName()),
-                    () -> System.out.println("Пусто..."));
-        }
+        labelController.getById(id)
+                .ifPresentOrElse(x -> System.out.printf("%d. %s\n", x.getId(), x.getName()),
+                        () -> System.out.println("Пусто..."));
+
     }
 
     private void findByName() {
         System.out.print("Введите название тэга: ");
         String name = scanner.nextLine();
 
-        if(inputValidator.validate(name)){
-            labelController.getByName(name)
-                    .ifPresentOrElse(x -> System.out.println(x.getId() + ". " + x.getName()),
-                            () -> System.out.println("Пусто..."));
-        }
+        labelController.getByName(name)
+                .ifPresentOrElse(x -> System.out.printf("%d. %s\n", x.getId(), x.getName()),
+                        () -> System.out.println("Пусто..."));
     }
 
     private void findAll() {
-        List<Label> labels = labelController.getAll();
-        if (labels.isEmpty()) {
-            System.out.println("Пусто...");
-        } else {
-            labels.forEach(x -> System.out.println(x.getId() + ". " + x.getName()));
-        }
+        Optional.of(labelController.getAll())
+                .filter(list -> !list.isEmpty())
+                .ifPresentOrElse(
+                        list -> list.forEach(x -> System.out.printf("%d. %s\n", x.getId(), x.getName())),
+                        () -> System.out.println("Пусто...")
+                );
     }
 }
