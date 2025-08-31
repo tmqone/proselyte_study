@@ -2,6 +2,9 @@ package com.tmq.repository;
 
 import com.tmq.model.Label;
 
-public interface LabelRepository extends GenericRepository<Label, Long> {
+import java.util.List;
+import java.util.Optional;
 
+public interface LabelRepository extends GenericRepository<Label, Long> {
+    Optional<Label> findByName(String name);
 }

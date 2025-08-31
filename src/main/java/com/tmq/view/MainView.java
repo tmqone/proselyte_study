@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class MainView implements GenericView {
     private final Scanner scanner = new Scanner(System.in);
     private final LabelView labelView = LabelView.getInstance();
+    private final PostView postView = PostView.getInstance();
     private static final MainView INSTANCE = new MainView();
 
     public static MainView getInstance() {
@@ -40,9 +41,12 @@ public class MainView implements GenericView {
 
     public void chooseOption() {
         switch (scanner.nextInt()) {
-            case 1, 2:
+            case 1:
                 System.out.println("Функционал не реализован");
                 showMenu();
+                break;
+            case 2:
+                postView.start();
                 break;
             case 3:
                 labelView.start();

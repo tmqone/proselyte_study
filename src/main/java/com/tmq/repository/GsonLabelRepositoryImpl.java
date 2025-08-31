@@ -38,6 +38,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
 
         try (FileReader reader = new FileReader(FILE)) {
             List<Label> labels = gson.fromJson(reader, listType);
+            if (labels == null) return Collections.emptyList();
             return labels.stream()
                     .filter(label -> label.getStatus() == Status.ACTIVE)
                     .collect(Collectors.toList());
@@ -47,24 +48,35 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    public Label findById(Long id) {
-        return findAll().stream()
-                .filter(label -> label.getId().equals(id))
-                .findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+    public List<Label> findAllWithDeleted() {
+        Type listType = new TypeToken<ArrayList<Label>>() {}.getType();
+        try (FileReader reader = new FileReader(FILE)) {
+            List<Label> labels = gson.fromJson(reader, listType);
+            if (labels == null) return Collections.emptyList();
+            return labels.stream()
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            throw new GenericExceptionHandler(e.getMessage());
+        }
     }
 
     @Override
-    public Label findByName(String name) {
+    public Optional<Label> findById(Long id) {
+        return findAll().stream()
+                .filter(label -> label.getId().equals(id))
+                .findFirst();
+    }
+
+    @Override
+    public Optional<Label> findByName(String name) {
         return findAll().stream()
                 .filter(label -> label.getName().equalsIgnoreCase(name))
-                .findFirst()
-                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+                .findFirst();
     }
 
     @Override
     public boolean save(Label label) throws IOException {
-        List<Label> allLabels = findAll();
+        List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             label.setId(1L);
             writeToFile(List.of(label), FILE, gson);
@@ -94,7 +106,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         } else {
             List<Integer> indexes = IntStream.range(0, allLabels.size())
                     .filter(index -> allLabels.get(index).getId().equals(label.getId()))
-                    .filter(index -> allLabels.get(index).getStatus() == Status.ACTIVE)
                     .boxed().toList();
 
             if (indexes.isEmpty()) {
@@ -111,13 +122,12 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
 
     @Override
     public boolean delete(Label label) throws IOException {
-        List<Label> allLabels = findAll();
+        List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
         } else {
             int i = IntStream.range(0, allLabels.size())
                     .filter(index -> allLabels.get(index).getId().equals(label.getId()))
-                    .filter(index -> allLabels.get(index).getStatus() == Status.ACTIVE)
                     .findFirst()
                     .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
             allLabels.get(i).setStatus(Status.DELETED);

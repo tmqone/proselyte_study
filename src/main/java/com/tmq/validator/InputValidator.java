@@ -14,7 +14,7 @@ public class InputValidator {
 
     public boolean validateLongString(String number){
         try {
-            Long.parseLong(number.trim());
+            Long.parseLong(number);
         } catch (NumberFormatException e) {
             System.out.println("Некорректный ввод");
             return false;

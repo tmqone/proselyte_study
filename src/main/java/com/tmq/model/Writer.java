@@ -1,12 +1,13 @@
 package com.tmq.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
+@Getter
+@Setter
+@EqualsAndHashCode @ToString
 @Builder
 public class Writer {
     private Long id;
