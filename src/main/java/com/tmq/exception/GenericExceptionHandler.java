@@ -21,7 +21,7 @@ public class GenericExceptionHandler extends RuntimeException {
       try {
         FILE.createNewFile();
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        throw new GenericExceptionHandler(e.getMessage());
       }
     }
   }
@@ -31,11 +31,13 @@ public class GenericExceptionHandler extends RuntimeException {
     logStackTrace(FILE);
   }
 
-  void logStackTrace(File FILE) throws IOException {
-    try (FileWriter fileWriter = new FileWriter(FILE, true)) {
+  void logStackTrace(File file) throws IOException {
+    try (FileWriter fileWriter = new FileWriter(file, true)) {
+      fileWriter.append(getLocalizedMessage()).append("\n");
       for (StackTraceElement stackTraceElement : getStackTrace()) {
         fileWriter.append(stackTraceElement.toString()).append("\n");
       }
+      fileWriter.append((char) Character.LINE_SEPARATOR);
     } catch (IOException e) {
       throw new IOException(e);
     }

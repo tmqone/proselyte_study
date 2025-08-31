@@ -1,11 +1,11 @@
 package com.tmq.util;
 
+import com.tmq.exception.GenericExceptionHandler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilesUtil {
@@ -24,7 +24,7 @@ public class FilesUtil {
             new File(FilesPath.POST.getFilePath()).createNewFile();
             new File(FilesPath.WRITER.getFilePath()).createNewFile();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new GenericExceptionHandler(e.getMessage());
         }
     }
 }

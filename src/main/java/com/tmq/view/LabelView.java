@@ -1,6 +1,5 @@
 package com.tmq.view;
 
-import com.tmq.Main;
 import com.tmq.controller.LabelController;
 import com.tmq.controller.LabelControllerImpl;
 import com.tmq.model.Label;
@@ -114,7 +113,7 @@ public class LabelView implements GenericView {
             } else {
                 System.out.println("Произошла ошибка при изменении");
             }
-        };
+        }
     }
 
     private void createTag() {

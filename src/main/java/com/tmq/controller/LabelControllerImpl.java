@@ -4,6 +4,7 @@ import com.tmq.exception.GenericExceptionHandler;
 import com.tmq.exception.ObjectExistsException;
 import com.tmq.exception.ObjectNotFoundException;
 import com.tmq.model.Label;
+import com.tmq.model.Status;
 import com.tmq.repository.GsonLabelRepositoryImpl;
 import com.tmq.repository.LabelRepository;
 import lombok.AccessLevel;
