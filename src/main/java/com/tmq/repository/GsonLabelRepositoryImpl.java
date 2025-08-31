@@ -2,16 +2,17 @@ package com.tmq.repository;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tmq.Main;
 import com.tmq.exception.ObjectExistsException;
 import com.tmq.exception.ObjectNotFoundException;
 import com.tmq.model.Label;
 import com.tmq.model.Status;
+import com.tmq.util.FilesPath;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,42 +24,31 @@ import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class GsonLabelRepositoryImpl implements LabelRepository  {
-    private static final File PATH = new File(System.getProperty("user.home") + "\\.tmq\\postingApp");
-    private static final File FILE = new File(PATH + "\\labels.json");
+    private static final File FILE = new File(FilesPath.LABEL.getFilePath());
     private static final GsonLabelRepositoryImpl INSTANCE = new GsonLabelRepositoryImpl();
     private static final Gson gson = new Gson();
-
-    static {
-        if (!PATH.exists()) {
-            PATH.mkdirs();
-        }
-
-        if (!FILE.exists()) {
-            try {
-                boolean newFile = FILE.createNewFile();
-                System.out.println(newFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     public static GsonLabelRepositoryImpl getInstance() {
         return INSTANCE;
     }
 
-    @SneakyThrows
     public List<Label> findAll() {
         Type listType = new TypeToken<ArrayList<Label>>() {}.getType();
-        List<Label> labels = gson.fromJson(new FileReader(FILE), listType);
-        return Optional.ofNullable(labels)
-                .filter(value -> !value.isEmpty())
-                .filter(value -> value.removeIf(label -> label.getStatus() == Status.DELETED))
-                .orElse(Collections.emptyList());
+
+        try (FileReader reader = new FileReader(FILE)) {
+            List<Label> labels = gson.fromJson(reader, listType);
+            return Optional.ofNullable(labels)
+                    .filter(value -> !value.isEmpty())
+                    .filter(value -> value.removeIf(label -> label.getStatus() == Status.DELETED))
+                    .orElse(Collections.emptyList());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    @SneakyThrows
     public Label findById(Long id) {
         return findAll().stream()
                 .filter(label -> label.getId().equals(id))
@@ -67,7 +57,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
                 .orElseThrow(() -> new ObjectNotFoundException("Label not found"));
     }
 
-    @SneakyThrows
     @Override
     public Label findByName(String name) {
         return findAll().stream()
@@ -78,8 +67,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    @SneakyThrows
-    public boolean save(Label label) {
+    public boolean save(Label label) throws IOException {
         List<Label> allLabels = findAll();
         if (allLabels == null || allLabels.isEmpty()) {
             label.setId(1L);
@@ -104,8 +92,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    @SneakyThrows
-    public boolean update(Label label){
+    public boolean update(Label label) throws IOException {
         List<Label> allLabels = findAll();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new ObjectNotFoundException("Label not found");
@@ -129,8 +116,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    @SneakyThrows
-    public boolean delete(Label label) {
+    public boolean delete(Label label) throws IOException {
         List<Label> allLabels = findAll();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new ObjectNotFoundException("Label not found");
@@ -145,7 +131,4 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
             return true;
         }
     }
-
-
-
 }

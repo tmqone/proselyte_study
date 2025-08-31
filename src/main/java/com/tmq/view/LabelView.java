@@ -91,7 +91,7 @@ public class LabelView implements GenericView {
     private void deleteTag() {
         System.out.print("Введите номер тэга: ");
         String id = scanner.nextLine();
-        if (inputValidator.validate(id)){
+        if (inputValidator.validateLongString(id)){
             Label label = Label.builder().id(Long.parseLong(id)).build();
 
             if (labelController.delete(label)){
@@ -108,7 +108,7 @@ public class LabelView implements GenericView {
         System.out.print("Введите новое название тэга: ");
         String name = scanner.nextLine();
 
-        if(inputValidator.validate(Long.parseLong(id), name)){
+        if(inputValidator.validateLongString(id) && inputValidator.validate(name)){
             if (labelController.update(Label.builder().id(Long.parseLong(id)).name(name).build())) {
                 System.out.println("Тэг изменен");
             } else {
@@ -133,7 +133,7 @@ public class LabelView implements GenericView {
     private void findById() {
         System.out.print("Введите ID тэга: ");
         String id = scanner.nextLine();
-        if (inputValidator.validate(id)){
+        if (inputValidator.validateLongString(id)){
             labelController.getById(id).ifPresentOrElse(
                     x -> System.out.println(x.getId() + ". " + x.getName()),
                     () -> System.out.println("Пусто..."));

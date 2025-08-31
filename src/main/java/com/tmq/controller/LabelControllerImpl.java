@@ -1,5 +1,6 @@
 package com.tmq.controller;
 
+import com.tmq.exception.GenericExceptionHandler;
 import com.tmq.exception.ObjectExistsException;
 import com.tmq.exception.ObjectNotFoundException;
 import com.tmq.model.Label;
@@ -8,6 +9,7 @@ import com.tmq.repository.LabelRepository;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +47,8 @@ public class LabelControllerImpl implements LabelController {
             return REPOSITORY.save(label);
         } catch (ObjectExistsException e){
             return false;
+        } catch (IOException e) {
+            throw new GenericExceptionHandler(e.getMessage());
         }
     }
 
@@ -54,6 +58,8 @@ public class LabelControllerImpl implements LabelController {
             return REPOSITORY.update(label);
         } catch (ObjectExistsException | ObjectNotFoundException e){
             return false;
+        } catch (IOException e) {
+            throw new GenericExceptionHandler(e.getMessage());
         }
     }
 
@@ -64,6 +70,8 @@ public class LabelControllerImpl implements LabelController {
             return REPOSITORY.delete(label);
         } catch (ObjectNotFoundException e){
             return false;
+        } catch (IOException e) {
+            throw new GenericExceptionHandler(e.getMessage());
         }
     }
 }

@@ -12,9 +12,9 @@ public interface GenericRepository<T, ID>{
     List<T> findAll();
     T findById(ID id) throws ObjectNotFoundException;
     T findByName(String name);
-    boolean save(T t);
-    boolean update(T t);
-    boolean delete(T t);
+    boolean save(T t) throws IOException;
+    boolean update(T t) throws IOException;
+    boolean delete(T t) throws IOException;
 
     default void writeToFile(List<T> list, File file, Gson gson) throws IOException {
         String jsonString = gson.toJson(list);

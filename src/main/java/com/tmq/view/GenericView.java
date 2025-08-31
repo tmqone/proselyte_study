@@ -3,7 +3,7 @@ package com.tmq.view;
 import java.util.Scanner;
 
 public interface GenericView {
-    Scanner SCANNER = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
 
     void start();
     void exit();
@@ -17,6 +17,6 @@ public interface GenericView {
 
     default void waitForInput(){
         System.out.println("Нажмите Enter, чтобы продолжить...");
-        SCANNER.nextLine();
+        scanner.nextLine();
     }
 }
