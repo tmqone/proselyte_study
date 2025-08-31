@@ -2,13 +2,8 @@ package com.tmq.view;
 
 import com.tmq.controller.LabelController;
 import com.tmq.controller.LabelControllerImpl;
-import com.tmq.model.Label;
-import com.tmq.model.Status;
-import com.tmq.validator.InputValidator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 

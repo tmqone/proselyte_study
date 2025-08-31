@@ -12,6 +12,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,7 +27,8 @@ public class LabelControllerImpl implements LabelController {
     }
 
     public List<Label> getAll() {
-        return REPOSITORY.findAll();
+        List<Label> labels = REPOSITORY.findAll();
+        return labels == null ? Collections.emptyList() : labels;
     }
 
     public Optional<Label> getByName(String name) {
@@ -66,7 +68,7 @@ public class LabelControllerImpl implements LabelController {
     @Override
     public boolean update(String name, String id) {
         try {
-            if (!inputValidator.validate(name) && !inputValidator.validateLongString(id)) {
+            if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
                 return false;
             }
             return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
