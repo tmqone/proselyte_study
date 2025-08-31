@@ -38,6 +38,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
 
         try (FileReader reader = new FileReader(FILE)) {
             List<Label> labels = gson.fromJson(reader, listType);
+            if (labels == null) throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
             return labels.stream()
                     .filter(label -> label.getStatus() == Status.ACTIVE)
                     .collect(Collectors.toList());
@@ -50,7 +51,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     public Label findById(Long id) {
         return findAll().stream()
                 .filter(label -> label.getId().equals(id))
-                .filter(label -> label.getStatus() == Status.ACTIVE)
                 .findFirst()
                 .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
     }

@@ -23,6 +23,7 @@ public class FilesUtil {
             new File(FilesPath.LABEL.getFilePath()).createNewFile();
             new File(FilesPath.POST.getFilePath()).createNewFile();
             new File(FilesPath.WRITER.getFilePath()).createNewFile();
+            new File(FilesPath.LOG.getFilePath()).createNewFile();
         } catch (IOException e) {
             throw new GenericExceptionHandler(e.getMessage());
         }

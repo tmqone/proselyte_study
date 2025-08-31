@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InputValidator {
     public boolean validate(String name){
-        if (name == null || name.isEmpty()) {
+        if (name == null || name.trim().isEmpty()) {
             System.out.println("Некорректный ввод");
             return false;
         }
@@ -14,7 +14,7 @@ public class InputValidator {
 
     public boolean validateLongString(String number){
         try {
-            Long.parseLong(number);
+            Long.parseLong(number.trim());
         } catch (NumberFormatException e) {
             System.out.println("Некорректный ввод");
             return false;
