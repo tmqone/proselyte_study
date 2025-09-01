@@ -18,7 +18,9 @@ public class PostControllerImpl implements PostController {
     private static final PostRepository REPOSITORY = GsonPostRepositoryImpl.getInstance();
     private static final LabelControllerImpl LABEL_CONTROLLER = LabelControllerImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
-    private static final String NOT_FOUND_MESSAGE = "Label not found";
+    private static final String NOT_FOUND_MESSAGE = "Тэг не найден";
+    private static final String NOT_CORRECT_INPUT = "Некорретный ввод";
+    private static final String ALREADY_EXISTS_MESSAGE = "Некорретный ввод";
 
     public static PostControllerImpl getInstance() {
         return INSTANCE;
@@ -41,21 +43,18 @@ public class PostControllerImpl implements PostController {
         }
     }
 
-    public Optional<Post> getById(String id) {
+    public Post getById(String id) {
         id = id.trim();
-        try {
-            if (!inputValidator.validateLongString(id)) {
-                return Optional.empty();
-            }
-            return Optional.of(REPOSITORY.findById(Long.parseLong(id)))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-        } catch (ObjectNotFoundException e) {
-            return Optional.empty();
+        if (!inputValidator.validateLongString(id)) {
+            throw new GenericExceptionHandler(NOT_FOUND_MESSAGE);
         }
+        return REPOSITORY.findById(Long.parseLong(id))
+                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+
     }
 
     public boolean save(String title, String labels, String content) {
-        if(!validateInput(title, labels, content)) return false;
+        if (!validateInput(title, labels, content)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
         List<Label> labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
         try {
             return REPOSITORY.save(Post.builder()
@@ -64,9 +63,7 @@ public class PostControllerImpl implements PostController {
                     .content(content)
                     .status(Status.ACTIVE).build());
         } catch (ObjectExistsException e) {
-            return false;
-        } catch (IOException e) {
-            throw new GenericExceptionHandler(e.getMessage());
+            throw new GenericExceptionHandler(ALREADY_EXISTS_MESSAGE);
         }
     }
 
@@ -96,9 +93,7 @@ public class PostControllerImpl implements PostController {
                     .id(Long.parseLong(id))
                     .status(Status.ACTIVE).build());
 
-        } catch (ObjectExistsException | ObjectNotFoundException | NumberFormatException e) {
-            return false;
-        } catch (IOException e) {
+        } catch (ObjectExistsException | ObjectNotFoundException e) {
             throw new GenericExceptionHandler(e.getMessage());
         }
     }
@@ -110,33 +105,33 @@ public class PostControllerImpl implements PostController {
             if (!inputValidator.validateLongString(id)) {
                 return false;
             }
-            Post post = REPOSITORY.findById(Long.parseLong(id))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-            post.setStatus(Status.DELETED);
-            return REPOSITORY.delete(post);
-        } catch (ObjectNotFoundException | NumberFormatException e) {
-            return false;
-        } catch (IOException e) {
-            throw new GenericExceptionHandler(e.getMessage());
+            return REPOSITORY.delete(Post.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
+        } catch (ObjectNotFoundException e) {
+            throw new GenericExceptionHandler(NOT_FOUND_MESSAGE);
         }
     }
 
     public List<Post> getByLabels(String tags) {
         tags = tags.trim();
-        List<String> tagsList = Arrays.stream(tags.split(",")).toList();
-        if (!validateInput(tags)) return Collections.emptyList();
+        List<String> tagsList = Arrays.stream(tags.split("\\s*,\\s*")).toList();
+        if (!validateInput(tags)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
 
-        List<Post> posts = getAll();
-        Iterator<Post> iterator = posts.iterator();
+        List<Post> allPosts = getAll();
+        Iterator<String> allTagsIterator = tagsList.iterator();
 
-        while (iterator.hasNext()) {
-            Post nextPost = iterator.next();
-            List<Label> labelList = nextPost.getLabels();
-            for (Label label : labelList) {
-                if (!tagsList.contains(label.getName())) iterator.remove();
+        //TODO Доработать функционал по поиску тэгов.
+        while (allTagsIterator.hasNext()) {
+            String tag = allTagsIterator.next();
+            Iterator<Post> allPostsIterator = allPosts.iterator();
+            while (allPostsIterator.hasNext()) {
+                Post post = allPostsIterator.next();
+                List<Label> currentPostLabels = post.getLabels();
+                for (int i = 0; i < currentPostLabels.size(); i++) {
+                    if (currentPostLabels.get(i).getName().equals(tag)) break;
+                    if (!currentPostLabels.get(i).getName().equals(tag) && i == currentPostLabels.size() - 1) allPostsIterator.remove();
+                }
             }
         }
-
-        return posts;
+        return allPosts;
     }
 }

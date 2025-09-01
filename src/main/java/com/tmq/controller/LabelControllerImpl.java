@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,7 +20,8 @@ public class LabelControllerImpl implements LabelController {
     private static final LabelControllerImpl INSTANCE = new LabelControllerImpl();
     private static final LabelRepository REPOSITORY = GsonLabelRepositoryImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
-    private static final String NOT_FOUND_MESSAGE = "Label not found";
+    private static final String NOT_FOUND_MESSAGE = "Тэг не найден";
+    private static final String NOT_CORRECT_INPUT = "Некорретный ввод";
 
     public static LabelControllerImpl getInstance() {
         return INSTANCE;
@@ -31,44 +31,32 @@ public class LabelControllerImpl implements LabelController {
         return REPOSITORY.findAll();
     }
 
-    public Optional<Label> getByName(String name) {
+    public Label getByName(String name) {
         name = name.trim();
-        try {
-            if (!inputValidator.validate(name)) {
-                return Optional.empty();
-            }
-            return Optional.of(REPOSITORY.findByName(name))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-        } catch (ObjectNotFoundException e) {
-            return Optional.empty();
+        if (!inputValidator.validate(name)) {
+            throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
         }
+        return REPOSITORY.findByName(name)
+                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+
     }
 
-    public Optional<Label> getById(String id) {
+    public Label getById(String id) {
         id = id.trim();
-        try {
-            if (!inputValidator.validateLongString(id)) {
-                return Optional.empty();
-            }
-            return Optional.of(REPOSITORY.findById(Long.parseLong(id)))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-        } catch (ObjectNotFoundException e) {
-            return Optional.empty();
-        }
+        if (!inputValidator.validateLongString(id)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
+
+        return REPOSITORY.findById(Long.parseLong(id))
+                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
     }
 
     public boolean save(String name) {
         name = name.trim();
         try {
-            if (!inputValidator.validate(name)) {
-                return false;
-            }
+            if (!inputValidator.validate(name)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
 
             return REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
         } catch (ObjectExistsException e) {
-            return false;
-        } catch (IOException e) {
-            throw new GenericExceptionHandler(e.getMessage());
+            throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
         }
     }
 
@@ -78,13 +66,11 @@ public class LabelControllerImpl implements LabelController {
         id = id.trim();
         try {
             if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
-                return false;
+                throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
             }
             return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
 
-        } catch (ObjectExistsException | ObjectNotFoundException | NumberFormatException e) {
-            return false;
-        } catch (IOException e) {
+        } catch (ObjectExistsException | ObjectNotFoundException e) {
             throw new GenericExceptionHandler(e.getMessage());
         }
     }
@@ -94,21 +80,16 @@ public class LabelControllerImpl implements LabelController {
         id = id.trim();
         try {
             if (!inputValidator.validateLongString(id)) {
-                return false;
+                throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
             }
-            Label label = REPOSITORY.findById(Long.parseLong(id))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-            label.setStatus(Status.DELETED);
-            return REPOSITORY.delete(label);
-        } catch (ObjectNotFoundException | NumberFormatException e) {
-            return false;
-        } catch (IOException e) {
-            throw new GenericExceptionHandler(e.getMessage());
+            return REPOSITORY.delete(Label.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
+        } catch (ObjectNotFoundException e) {
+            throw new GenericExceptionHandler(NOT_FOUND_MESSAGE);
         }
     }
 
     public List<Label> getAndSaveLabels(String labels) {
-        String[] labelsTrimmed = labels.split(",\\s");
+        String[] labelsTrimmed = labels.split("\\s*,\\s*");
         List<String> labelsToSave = new ArrayList<>();
 
         for (String s : labelsTrimmed) {
@@ -118,33 +99,17 @@ public class LabelControllerImpl implements LabelController {
         }
 
         labelsToSave.forEach(label -> {
-            try {
-                REPOSITORY.save(Label.builder()
-                        .name(label)
-                        .status(Status.ACTIVE)
-                        .id(findLastId())
-                        .build());
-            } catch (IOException e) {
-                throw new GenericExceptionHandler(e.getMessage());
-            }
+            REPOSITORY.save(Label.builder()
+                    .name(label)
+                    .status(Status.ACTIVE)
+                    .build());
         });
 
         return IntStream.range(0, labelsTrimmed.length)
                 .mapToObj(x -> Label.builder()
-                        .name(labelsTrimmed[x])
-                        .id(getByName(labelsTrimmed[x])
-                                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE)).getId())
-                        .status(Status.ACTIVE).build())
+                        .status(Status.ACTIVE)
+                        .id(getByName(labelsTrimmed[x]).getId())
+                        .name(labelsTrimmed[x]).build())
                 .toList();
-    }
-
-    public Long findLastId() {
-        try {
-            return REPOSITORY.findAll().stream()
-                    .max(Comparator.comparing(Label::getId))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE)).getId();
-        } catch (ObjectNotFoundException e) {
-            return 1L;
-        }
     }
 }

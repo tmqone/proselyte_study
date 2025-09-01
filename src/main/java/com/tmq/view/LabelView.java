@@ -2,6 +2,9 @@ package com.tmq.view;
 
 import com.tmq.controller.LabelController;
 import com.tmq.controller.LabelControllerImpl;
+import com.tmq.exception.GenericExceptionHandler;
+import com.tmq.exception.ObjectNotFoundException;
+import com.tmq.model.Label;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import java.util.Optional;
@@ -104,19 +107,23 @@ public class LabelView implements GenericView {
     private void findById() {
         System.out.print("Введите ID тэга: ");
         String id = scanner.nextLine();
-        labelController.getById(id)
-                .ifPresentOrElse(x -> System.out.printf("%d. %s\n", x.getId(), x.getName()),
-                        () -> System.out.println("Пусто..."));
-
+        try {
+            Label label = labelController.getById(id);
+            System.out.printf("%d. %s\n", label.getId(), label.getName());
+        } catch (GenericExceptionHandler e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void findByName() {
         System.out.print("Введите название тэга: ");
         String name = scanner.nextLine();
-
-        labelController.getByName(name)
-                .ifPresentOrElse(x -> System.out.printf("%d. %s\n", x.getId(), x.getName()),
-                        () -> System.out.println("Пусто..."));
+        try {
+            Label label = labelController.getByName(name);
+            System.out.printf("%d. %s\n", label.getId(), label.getName());
+        } catch (GenericExceptionHandler e){
+            System.out.println(e.getMessage());
+        }
     }
 
     private void findAll() {

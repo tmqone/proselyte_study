@@ -71,7 +71,7 @@ public class GsonPostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    public boolean save(Post post) throws IOException {
+    public boolean save(Post post) {
         List<Post> posts = findAllWithDeleted();
         if (posts == null || posts.isEmpty()) {
             post.setId(1L);
@@ -87,7 +87,7 @@ public class GsonPostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    public boolean update(Post post) throws IOException {
+    public boolean update(Post post) {
         List<Post> posts = findAll();
         if (posts == null || posts.isEmpty()) {
             throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
@@ -109,7 +109,7 @@ public class GsonPostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    public boolean delete(Post post) throws IOException {
+    public boolean delete(Post post) {
         List<Post> posts = findAllWithDeleted();
         if (posts == null || posts.isEmpty()) {
             throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);

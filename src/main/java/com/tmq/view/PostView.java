@@ -2,8 +2,11 @@ package com.tmq.view;
 
 import com.tmq.controller.PostController;
 import com.tmq.controller.PostControllerImpl;
+import com.tmq.exception.GenericExceptionHandler;
+import com.tmq.model.Label;
 import com.tmq.model.Post;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -133,15 +136,25 @@ public class PostView implements GenericView {
     private void findById() {
         System.out.print("Введите ID поста: ");
         String id = scanner.nextLine();
-        postController.getById(id)
-                .ifPresentOrElse(this::printPost, () -> System.out.println("Пусто..."));
+        try {
+            Post post = postController.getById(id);
+            printPost(post);
+        } catch (GenericExceptionHandler e){
+            System.out.println(e.getMessage());
+        }
 
     }
 
     private void printPost(Post post) {
         System.out.println("-----------------------------------------------------------------------------------------");
         System.out.printf("Название:%s\nСодержание:%s\nid=%d\nТэги:", post.getTitle(), post.getContent(), post.getId());
-        post.getLabels().stream().forEach(label -> System.out.printf("%s", label.getName()));
+        for (int i = 0; i < post.getLabels().size(); i++) {
+            if (i <= post.getLabels().size() - 2) {
+                System.out.printf("%s,", post.getLabels().get(i).getName());
+            } else {
+                System.out.printf("%s", post.getLabels().get(i).getName());
+            }
+        }
         System.out.println();
         System.out.println("-----------------------------------------------------------------------------------------");
     }

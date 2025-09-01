@@ -70,12 +70,12 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     @Override
     public Optional<Label> findByName(String name) {
         return findAll().stream()
-                .filter(label -> label.getName().equalsIgnoreCase(name))
+                .filter(label -> label.getName().equals(name))
                 .findFirst();
     }
 
     @Override
-    public boolean save(Label label) throws IOException {
+    public boolean save(Label label) {
         List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             label.setId(1L);
@@ -83,7 +83,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
             return true;
         } else {
             allLabels.stream()
-                    .filter(value -> value.getName().equalsIgnoreCase(label.getName()))
+                    .filter(value -> value.getName().equals(label.getName()))
                     .filter(value -> value.getStatus() == Status.ACTIVE)
                     .findAny()
                     .ifPresent(value -> {
@@ -99,7 +99,7 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    public boolean update(Label label) throws IOException {
+    public boolean update(Label label) {
         List<Label> allLabels = findAll();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
@@ -120,8 +120,9 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         }
     }
 
+    //TODO Если лейбл был удален через меню лейблов, то он должен быть и удален в постах
     @Override
-    public boolean delete(Label label) throws IOException {
+    public boolean delete(Label label) {
         List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
