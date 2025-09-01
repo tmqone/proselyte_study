@@ -11,8 +11,7 @@ import com.tmq.repository.PostRepository;
 import com.tmq.validator.InputValidator;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class PostControllerImpl implements PostController {
     private static final PostControllerImpl INSTANCE = new PostControllerImpl();
@@ -29,17 +28,16 @@ public class PostControllerImpl implements PostController {
         return REPOSITORY.findAll();
     }
 
-    //TODO Контроллер должен возращать > 1 значения если они есть
     public List<Post> getByName(String name) {
         name = name.trim();
         try {
             if (!validateInput(name)) {
-                return Optional.empty();
+                return Collections.emptyList();
             }
-            return Optional.of(REPOSITORY.findByName(name))
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+            return REPOSITORY.findByName(name).stream()
+                    .toList();
         } catch (ObjectNotFoundException e) {
-            return Optional.empty();
+            return Collections.emptyList();
         }
     }
 
@@ -57,7 +55,7 @@ public class PostControllerImpl implements PostController {
     }
 
     public boolean save(String title, String labels, String content) {
-        validateInput(title, labels, content);
+        if(!validateInput(title, labels, content)) return false;
         List<Label> labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
         try {
             return REPOSITORY.save(Post.builder()
@@ -121,5 +119,24 @@ public class PostControllerImpl implements PostController {
         } catch (IOException e) {
             throw new GenericExceptionHandler(e.getMessage());
         }
+    }
+
+    public List<Post> getByLabels(String tags) {
+        tags = tags.trim();
+        List<String> tagsList = Arrays.stream(tags.split(",")).toList();
+        if (!validateInput(tags)) return Collections.emptyList();
+
+        List<Post> posts = getAll();
+        Iterator<Post> iterator = posts.iterator();
+
+        while (iterator.hasNext()) {
+            Post nextPost = iterator.next();
+            List<Label> labelList = nextPost.getLabels();
+            for (Label label : labelList) {
+                if (!tagsList.contains(label.getName())) iterator.remove();
+            }
+        }
+
+        return posts;
     }
 }

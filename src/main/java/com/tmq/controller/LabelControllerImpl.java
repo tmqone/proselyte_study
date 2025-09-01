@@ -108,7 +108,7 @@ public class LabelControllerImpl implements LabelController {
     }
 
     public List<Label> getAndSaveLabels(String labels) {
-        String[] labelsTrimmed = labels.split(",");
+        String[] labelsTrimmed = labels.split(",\\s");
         List<String> labelsToSave = new ArrayList<>();
 
         for (String s : labelsTrimmed) {

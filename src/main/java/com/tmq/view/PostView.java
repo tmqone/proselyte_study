@@ -3,6 +3,8 @@ package com.tmq.view;
 import com.tmq.controller.PostController;
 import com.tmq.controller.PostControllerImpl;
 import com.tmq.model.Post;
+
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -51,6 +53,13 @@ public class PostView implements GenericView {
                 findAll();
                 break;
 
+            case "2":
+                break;
+
+            case "3":
+                findByTags();
+                break;
+
             case "4":
                 findByName();
                 break;
@@ -79,6 +88,18 @@ public class PostView implements GenericView {
         }
         waitForInput();
         showMenu();
+    }
+
+    private void findByTags() {
+        System.out.print("Введите тэги через запятую: ");
+        String labels = scanner.nextLine();
+        List<Post> postsList = postController.getByLabels(labels);
+
+        if (postsList.isEmpty()) {
+            System.out.println("Пусто...");
+        } else {
+            postsList.forEach(this::printPost);
+        }
     }
 
     private void deletePost() {
@@ -125,13 +146,16 @@ public class PostView implements GenericView {
         System.out.println("-----------------------------------------------------------------------------------------");
     }
 
-    //TODO Вью должно отображать > 1 значения если они есть
     private void findByName() {
         System.out.print("Введите название поста: ");
         String name = scanner.nextLine();
 
-        postController.getByName(name)
-                .ifPresentOrElse(x -> printPost(x), () -> System.out.println("Пусто..."));
+        List<Post> posts = postController.getByName(name);
+        if (posts.isEmpty()) {
+            System.out.println("Пусто...");
+        } else {
+            posts.forEach(post -> printPost(post));
+        }
     }
 
     private void findAll() {

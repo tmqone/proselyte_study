@@ -13,4 +13,5 @@ public interface PostController extends GenericController<Post> {
     boolean save(String name, String label, String content);
     boolean update(String id, String title, String labels, String content);
     boolean delete(String name);
+    List<Post> getByLabels(String label);
 }
