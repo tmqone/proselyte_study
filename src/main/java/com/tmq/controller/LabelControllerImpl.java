@@ -4,19 +4,21 @@ import com.tmq.exception.GenericExceptionHandler;
 import com.tmq.exception.ObjectExistsException;
 import com.tmq.exception.ObjectNotFoundException;
 import com.tmq.model.Label;
+import com.tmq.model.Post;
 import com.tmq.model.Status;
 import com.tmq.repository.GsonLabelRepositoryImpl;
+import com.tmq.repository.GsonPostRepositoryImpl;
 import com.tmq.repository.LabelRepository;
 import com.tmq.validator.InputValidator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LabelControllerImpl implements LabelController {
+    private static final GsonPostRepositoryImpl POST_REPOSITORY = GsonPostRepositoryImpl.getInstance();
     private static final LabelControllerImpl INSTANCE = new LabelControllerImpl();
     private static final LabelRepository REPOSITORY = GsonLabelRepositoryImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
@@ -111,5 +113,19 @@ public class LabelControllerImpl implements LabelController {
                         .id(getByName(labelsTrimmed[x]).getId())
                         .name(labelsTrimmed[x]).build())
                 .toList();
+    }
+
+    public List<Label> getActiveLabels(List<Label> labelList){
+        try {
+            Iterator<Label> iterator = labelList.iterator();
+            while (iterator.hasNext()) {
+                Label next = iterator.next();
+                REPOSITORY
+                        .findById(next.getId()).ifPresentOrElse(label -> {}, iterator::remove);
+            }
+            return labelList;
+        } catch (ObjectNotFoundException e){
+            return Collections.emptyList();
+        }
     }
 }

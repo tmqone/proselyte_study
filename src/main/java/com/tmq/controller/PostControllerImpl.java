@@ -27,7 +27,12 @@ public class PostControllerImpl implements PostController {
     }
 
     public List<Post> getAll() {
-        return REPOSITORY.findAll();
+        List<Post> posts = REPOSITORY.findAll();
+        for (Post post : posts) {
+            post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels()));
+        }
+        posts.forEach(REPOSITORY::update);
+        return posts;
     }
 
     public List<Post> getByName(String name) {
@@ -54,8 +59,10 @@ public class PostControllerImpl implements PostController {
     }
 
     public boolean save(String title, String labels, String content) {
-        if (!validateInput(title, labels, content)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
-        List<Label> labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
+        if (!validateInput(title, content)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
+        labels = labels.trim();
+        List<Label> labelList = Collections.emptyList();
+        if (!labels.isEmpty()) labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
         try {
             return REPOSITORY.save(Post.builder()
                     .title(title)
@@ -82,7 +89,7 @@ public class PostControllerImpl implements PostController {
         content = content.trim();
 
         try {
-            if (!validateInput(title, labels, content) || !inputValidator.validateLongString(id)) {
+            if (!validateInput(title, content) || !inputValidator.validateLongString(id)) {
                 return false;
             }
             return REPOSITORY.update(Post
@@ -119,7 +126,6 @@ public class PostControllerImpl implements PostController {
         List<Post> allPosts = getAll();
         Iterator<String> allTagsIterator = tagsList.iterator();
 
-        //TODO Доработать функционал по поиску тэгов.
         while (allTagsIterator.hasNext()) {
             String tag = allTagsIterator.next();
             Iterator<Post> allPostsIterator = allPosts.iterator();
@@ -134,4 +140,6 @@ public class PostControllerImpl implements PostController {
         }
         return allPosts;
     }
+
+
 }
