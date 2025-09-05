@@ -12,6 +12,7 @@ import com.tmq.validator.InputValidator;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PostControllerImpl implements PostController {
     private static final PostControllerImpl INSTANCE = new PostControllerImpl();
@@ -28,9 +29,7 @@ public class PostControllerImpl implements PostController {
 
     public List<Post> getAll() {
         List<Post> posts = REPOSITORY.findAll();
-        for (Post post : posts) {
-            post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels()));
-        }
+        posts.forEach(post -> post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels())));
         posts.forEach(REPOSITORY::update);
         return posts;
     }
@@ -41,8 +40,10 @@ public class PostControllerImpl implements PostController {
             if (!validateInput(name)) {
                 return Collections.emptyList();
             }
-            return REPOSITORY.findByName(name).stream()
-                    .toList();
+            List<Post> posts = REPOSITORY.findByName(name).stream().toList();
+            posts.forEach(post -> post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels())));
+            posts.forEach(REPOSITORY::update);
+            return posts;
         } catch (ObjectNotFoundException e) {
             return Collections.emptyList();
         }
@@ -53,9 +54,11 @@ public class PostControllerImpl implements PostController {
         if (!inputValidator.validateLongString(id)) {
             throw new GenericExceptionHandler(NOT_FOUND_MESSAGE);
         }
-        return REPOSITORY.findById(Long.parseLong(id))
+        Post post = REPOSITORY.findById(Long.parseLong(id))
                 .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
-
+        post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels()));
+        REPOSITORY.update(post);
+        return post;
     }
 
     public boolean save(String title, String labels, String content) {
@@ -82,7 +85,7 @@ public class PostControllerImpl implements PostController {
     }
 
     @Override
-    public boolean update(String id, String title, String labels, String content) {
+    public boolean update(String title, String id, String labels, String content) {
         id = id.trim();
         title = title.trim();
         labels = labels.trim();
@@ -132,6 +135,10 @@ public class PostControllerImpl implements PostController {
             while (allPostsIterator.hasNext()) {
                 Post post = allPostsIterator.next();
                 List<Label> currentPostLabels = post.getLabels();
+                if (currentPostLabels.isEmpty()) {
+                    allPostsIterator.remove();
+                    continue;
+                }
                 for (int i = 0; i < currentPostLabels.size(); i++) {
                     if (currentPostLabels.get(i).getName().equals(tag)) break;
                     if (!currentPostLabels.get(i).getName().equals(tag) && i == currentPostLabels.size() - 1) allPostsIterator.remove();

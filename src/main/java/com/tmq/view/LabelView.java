@@ -87,7 +87,12 @@ public class LabelView implements GenericView {
     private void deleteTag() {
         System.out.print("Введите номер тэга: ");
         String id = scanner.nextLine();
-        System.out.println(labelController.delete(id) ? "Тэг был удалён\n" : "Произошла ошибка при удалении\n");
+        try {
+            labelController.delete(id);
+            System.out.println("Тэг был удалён");
+        } catch (ObjectNotFoundException e){
+            System.out.println("Произошла ошибка при удалении");
+        }
     }
 
     private void updateTag() {
@@ -95,7 +100,12 @@ public class LabelView implements GenericView {
         String id = scanner.nextLine();
         System.out.print("Введите новое название тэга: ");
         String name = scanner.nextLine();
-        System.out.println(labelController.update(name, id) ? "Тэг изменен\n" : "Произошла ошибка при изменении\n");
+        try {
+            labelController.update(name, id);
+            System.out.println("Тэг был удалён");
+        } catch (ObjectNotFoundException e){
+            System.out.println("Произошла ошибка при удалении");
+        }
     }
 
     private void createTag() {
