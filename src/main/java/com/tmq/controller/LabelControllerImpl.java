@@ -1,13 +1,9 @@
 package com.tmq.controller;
 
-import com.tmq.exception.GenericExceptionHandler;
-import com.tmq.exception.ObjectExistsException;
-import com.tmq.exception.ObjectNotFoundException;
+import com.tmq.exception.*;
 import com.tmq.model.Label;
-import com.tmq.model.Post;
 import com.tmq.model.Status;
 import com.tmq.repository.GsonLabelRepositoryImpl;
-import com.tmq.repository.GsonPostRepositoryImpl;
 import com.tmq.repository.LabelRepository;
 import com.tmq.validator.InputValidator;
 import lombok.AccessLevel;
@@ -18,12 +14,9 @@ import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class LabelControllerImpl implements LabelController {
-    private static final GsonPostRepositoryImpl POST_REPOSITORY = GsonPostRepositoryImpl.getInstance();
     private static final LabelControllerImpl INSTANCE = new LabelControllerImpl();
     private static final LabelRepository REPOSITORY = GsonLabelRepositoryImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
-    private static final String NOT_FOUND_MESSAGE = "Тэг не найден";
-    private static final String NOT_CORRECT_INPUT = "Некорретный ввод";
 
     public static LabelControllerImpl getInstance() {
         return INSTANCE;
@@ -36,58 +29,44 @@ public class LabelControllerImpl implements LabelController {
     public Label getByName(String name) {
         name = name.trim();
         if (!inputValidator.validate(name)) {
-            throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
+            throw new NotCorrectInputException();
         }
         return REPOSITORY.findByName(name)
-                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+                .orElseThrow(LabelNotFoundException::new);
 
     }
 
     public Label getById(String id) {
         id = id.trim();
-        if (!inputValidator.validateLongString(id)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
+        if (!inputValidator.validateLongString(id)) throw new NotCorrectInputException();
 
         return REPOSITORY.findById(Long.parseLong(id))
-                .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+                .orElseThrow(LabelNotFoundException::new);
     }
 
     public boolean save(String name) {
         name = name.trim();
-        try {
-            if (!inputValidator.validate(name)) throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
-
-            return REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
-        } catch (ObjectExistsException e) {
-            throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
-        }
+        if (!inputValidator.validate(name)) throw new NotCorrectInputException();
+        return REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
     }
 
     @Override
     public boolean update(String name, String id) {
         name = name.trim();
         id = id.trim();
-        try {
-            if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
-                throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
-            }
-            return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
-
-        } catch (ObjectExistsException | ObjectNotFoundException e) {
-            throw new GenericExceptionHandler(e.getMessage());
+        if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
+            throw new NotCorrectInputException();
         }
+        return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
     }
 
     @Override
     public boolean delete(String id) {
         id = id.trim();
-        try {
-            if (!inputValidator.validateLongString(id)) {
-                throw new GenericExceptionHandler(NOT_CORRECT_INPUT);
-            }
-            return REPOSITORY.delete(Label.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
-        } catch (ObjectNotFoundException e) {
-            throw new GenericExceptionHandler(NOT_FOUND_MESSAGE);
+        if (!inputValidator.validateLongString(id)) {
+            throw new NotCorrectInputException();
         }
+        return REPOSITORY.delete(Label.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
     }
 
     public List<Label> getAndSaveLabels(String labels) {
@@ -115,16 +94,17 @@ public class LabelControllerImpl implements LabelController {
                 .toList();
     }
 
-    public List<Label> getActiveLabels(List<Label> labelList){
+    public List<Label> getActiveLabels(List<Label> labelList) {
         try {
             Iterator<Label> iterator = labelList.iterator();
             while (iterator.hasNext()) {
                 Label next = iterator.next();
                 REPOSITORY
-                        .findById(next.getId()).ifPresentOrElse(label -> {}, iterator::remove);
+                        .findById(next.getId()).ifPresentOrElse(label -> {
+                        }, iterator::remove);
             }
             return labelList;
-        } catch (ObjectNotFoundException e){
+        } catch (LabelNotFoundException e) {
             return Collections.emptyList();
         }
     }

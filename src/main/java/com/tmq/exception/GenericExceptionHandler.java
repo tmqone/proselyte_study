@@ -1,6 +1,7 @@
 package com.tmq.exception;
 
 import com.tmq.util.FilesPath;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -14,9 +15,17 @@ public class GenericExceptionHandler extends RuntimeException {
 
   private static final File FILE = new File(FilesPath.LOG.getFilePath());
 
-  @SneakyThrows
   public GenericExceptionHandler(String message) {
     super(message);
+    try {
+      logStackTrace(FILE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  public GenericExceptionHandler() throws IOException {
+    super();
     logStackTrace(FILE);
   }
 
@@ -32,7 +41,7 @@ public class GenericExceptionHandler extends RuntimeException {
       }
       fileWriter.append((char) Character.LINE_SEPARATOR);
     } catch (IOException e) {
-      throw new IOException(e);
+      throw new RuntimeException(e);
     }
   }
 

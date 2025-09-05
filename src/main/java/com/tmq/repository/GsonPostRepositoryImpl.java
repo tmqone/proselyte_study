@@ -3,7 +3,7 @@ package com.tmq.repository;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.tmq.exception.GenericExceptionHandler;
-import com.tmq.exception.ObjectNotFoundException;
+import com.tmq.exception.PostNotFoundException;
 import com.tmq.model.Post;
 import com.tmq.model.Status;
 import com.tmq.util.FilesPath;
@@ -23,7 +23,6 @@ public class GsonPostRepositoryImpl implements PostRepository{
     private static final File FILE = new File(FilesPath.POST.getFilePath());
     private static final GsonPostRepositoryImpl INSTANCE = new GsonPostRepositoryImpl();
     private static final Gson gson = new Gson();
-    private static final String NOT_FOUND_MESSAGE = "Post not found";
 
     public static GsonPostRepositoryImpl getInstance() {
         return INSTANCE;
@@ -90,17 +89,17 @@ public class GsonPostRepositoryImpl implements PostRepository{
     public boolean update(Post post) {
         List<Post> posts = findAll();
         if (posts == null || posts.isEmpty()) {
-            throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+            throw new PostNotFoundException();
         } else {
             List<Integer> indexes = IntStream.range(0, posts.size())
                     .filter(index -> posts.get(index).getId().equals(post.getId()))
                     .boxed().toList();
 
             if (indexes.isEmpty()) {
-                throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+                throw new PostNotFoundException();
             }
             if (indexes.size() > 1) {
-                throw new ObjectNotFoundException("More than one active post with same id");
+                throw new PostNotFoundException();
             }
             posts.set(indexes.getFirst(), post);
             writeToFile(posts, FILE, gson);
@@ -112,12 +111,12 @@ public class GsonPostRepositoryImpl implements PostRepository{
     public boolean delete(Post post) {
         List<Post> posts = findAllWithDeleted();
         if (posts == null || posts.isEmpty()) {
-            throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+            throw new PostNotFoundException();
         } else {
             int i = IntStream.range(0, posts.size())
                     .filter(index -> posts.get(index).getId().equals(post.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+                    .orElseThrow(PostNotFoundException::new);
             posts.get(i).setStatus(Status.DELETED);
             writeToFile(posts, FILE, gson);
             return true;

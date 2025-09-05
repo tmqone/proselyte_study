@@ -2,7 +2,7 @@ package com.tmq.view;
 
 import com.tmq.controller.PostController;
 import com.tmq.controller.PostControllerImpl;
-import com.tmq.exception.GenericExceptionHandler;
+import com.tmq.exception.*;
 import com.tmq.model.Label;
 import com.tmq.model.Post;
 
@@ -50,44 +50,54 @@ public class PostView implements GenericView {
 
     @Override
     public void chooseOption() {
-        System.out.print("Введите цифру: ");
-        switch (scanner.nextLine()) {
-            case "1":
-                findAll();
-                break;
+        try {
+            System.out.print("Введите цифру: ");
+            switch (scanner.nextLine()) {
+                case "1":
+                    findAll();
+                    break;
 
-            case "2":
-                break;
+                case "2":
+                    break;
 
-            case "3":
-                findByTags();
-                break;
+                case "3":
+                    findByTags();
+                    break;
 
-            case "4":
-                findByName();
-                break;
+                case "4":
+                    findByName();
+                    break;
 
-            case "5":
-                findById();
-                break;
+                case "5":
+                    findById();
+                    break;
 
-            case "6":
-                createPost();
-                break;
+                case "6":
+                    createPost();
+                    break;
 
-            case "7":
-                updatePost();
-                break;
+                case "7":
+                    updatePost();
+                    break;
 
-            case "8":
-                deletePost();
-                break;
+                case "8":
+                    deletePost();
+                    break;
 
-            case "0":
-                exit();
-                break;
-            default:
-                System.out.println("Некорректный ввод");
+                case "0":
+                    exit();
+                    break;
+                default:
+                    System.out.println("Некорректный ввод");
+            }
+        } catch (PostNotFoundException e) {
+            System.out.println("Пост не найден");
+        } catch (PostExistsException e) {
+            System.out.println("Пост уже существует");
+        } catch (NotCorrectInputException e) {
+            System.out.println("Некорректный ввод");
+        } catch (GenericExceptionHandler e) {
+            System.out.println("Произошла ошибка");
         }
         waitForInput();
         showMenu();
@@ -97,7 +107,6 @@ public class PostView implements GenericView {
         System.out.print("Введите тэги через запятую: ");
         String labels = scanner.nextLine();
         List<Post> postsList = postController.getByLabels(labels);
-
         if (postsList.isEmpty()) {
             System.out.println("Пусто...");
         } else {
@@ -136,12 +145,8 @@ public class PostView implements GenericView {
     private void findById() {
         System.out.print("Введите ID поста: ");
         String id = scanner.nextLine();
-        try {
-            Post post = postController.getById(id);
-            printPost(post);
-        } catch (GenericExceptionHandler e){
-            System.out.println(e.getMessage());
-        }
+        Post post = postController.getById(id);
+        printPost(post);
 
     }
 

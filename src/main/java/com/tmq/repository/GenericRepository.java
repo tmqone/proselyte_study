@@ -2,8 +2,6 @@ package com.tmq.repository;
 
 import com.google.gson.Gson;
 import com.tmq.exception.GenericExceptionHandler;
-import com.tmq.exception.ObjectNotFoundException;
-import com.tmq.model.Label;
 
 import java.io.File;
 import java.io.FileWriter;

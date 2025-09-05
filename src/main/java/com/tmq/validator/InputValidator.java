@@ -13,6 +13,8 @@ public class InputValidator {
 
     public boolean validateLongString(String number){
         try {
+            if (number == null || number.isEmpty()) return false;
+            number = number.trim();
             Long.parseLong(number);
         } catch (NumberFormatException e) {
             return false;

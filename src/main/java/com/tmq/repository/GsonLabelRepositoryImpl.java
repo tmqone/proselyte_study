@@ -2,9 +2,7 @@ package com.tmq.repository;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.tmq.exception.GenericExceptionHandler;
-import com.tmq.exception.ObjectExistsException;
-import com.tmq.exception.ObjectNotFoundException;
+import com.tmq.exception.*;
 import com.tmq.model.Label;
 import com.tmq.model.Status;
 import com.tmq.util.FilesPath;
@@ -26,7 +24,6 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     private static final File FILE = new File(FilesPath.LABEL.getFilePath());
     private static final GsonLabelRepositoryImpl INSTANCE = new GsonLabelRepositoryImpl();
     private static final Gson gson = new Gson();
-    private static final String NOT_FOUND_MESSAGE = "Label not found";
 
     public static GsonLabelRepositoryImpl getInstance() {
         return INSTANCE;
@@ -80,39 +77,38 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         if (allLabels == null || allLabels.isEmpty()) {
             label.setId(1L);
             writeToFile(List.of(label), FILE, gson);
-            return true;
         } else {
             allLabels.stream()
                     .filter(value -> value.getName().equals(label.getName()))
                     .filter(value -> value.getStatus() == Status.ACTIVE)
                     .findAny()
                     .ifPresent(value -> {
-                        throw new ObjectExistsException(value.getName() + " already exists");
+                        throw new LabelExistsException(value.getName() + " already exists");
                     });
 
             Long newId = allLabels.stream().mapToLong(Label::getId).max().getAsLong() + 1;
             label.setId(newId);
             allLabels.add(label);
             writeToFile(allLabels, FILE, gson);
-            return true;
         }
+        return true;
     }
 
     @Override
     public boolean update(Label label) {
         List<Label> allLabels = findAll();
         if (allLabels == null || allLabels.isEmpty()) {
-            throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+            throw new LabelNotFoundException();
         } else {
             List<Integer> indexes = IntStream.range(0, allLabels.size())
                     .filter(index -> allLabels.get(index).getId().equals(label.getId()))
                     .boxed().toList();
 
             if (indexes.isEmpty()) {
-                throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+                throw new LabelNotFoundException();
             }
             if (indexes.size() > 1) {
-                throw new ObjectNotFoundException("More than one active label with same id");
+                throw new LabelNotFoundException("More than one active label with same id");
             }
             allLabels.set(indexes.getFirst(), label);
             writeToFile(allLabels, FILE, gson);
@@ -120,17 +116,16 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         }
     }
 
-    //TODO Если лейбл был удален через меню лейблов, то он должен быть и удален в постах
     @Override
     public boolean delete(Label label) {
         List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
-            throw new ObjectNotFoundException(NOT_FOUND_MESSAGE);
+            throw new LabelNotFoundException();
         } else {
             int i = IntStream.range(0, allLabels.size())
                     .filter(index -> allLabels.get(index).getId().equals(label.getId()))
                     .findFirst()
-                    .orElseThrow(() -> new ObjectNotFoundException(NOT_FOUND_MESSAGE));
+                    .orElseThrow(LabelNotFoundException::new);
             allLabels.get(i).setStatus(Status.DELETED);
             writeToFile(allLabels, FILE, gson);
             return true;

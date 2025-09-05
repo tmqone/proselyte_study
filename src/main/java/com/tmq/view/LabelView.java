@@ -2,11 +2,11 @@ package com.tmq.view;
 
 import com.tmq.controller.LabelController;
 import com.tmq.controller.LabelControllerImpl;
-import com.tmq.exception.GenericExceptionHandler;
-import com.tmq.exception.ObjectNotFoundException;
+import com.tmq.exception.*;
 import com.tmq.model.Label;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -49,36 +49,45 @@ public class LabelView implements GenericView {
     @Override
     public void chooseOption() {
         System.out.print("Введите цифру: ");
-        switch (scanner.nextLine()) {
-            case "1":
-                findAll();
-                break;
+        try {
+            switch (scanner.nextLine()) {
+                case "1":
+                    findAll();
+                    break;
 
-            case "2":
-                findByName();
-                break;
+                case "2":
+                    findByName();
+                    break;
 
-            case "3":
-                findById();
-                break;
+                case "3":
+                    findById();
+                    break;
 
-            case "4":
-                createTag();
-                break;
+                case "4":
+                    createTag();
+                    break;
 
-            case "5":
-                updateTag();
-                break;
+                case "5":
+                    updateTag();
+                    break;
 
-            case "6":
-                deleteTag();
-                break;
+                case "6":
+                    deleteTag();
+                    break;
 
-            case "7":
-                exit();
-                break;
-            default:
-                System.out.println("Некорректный ввод");
+                case "7":
+                    exit();
+                    break;
+                default:
+                    System.out.println("Некорректный ввод");}
+        } catch (LabelNotFoundException e) {
+            System.out.println("Тэг не найден");
+        } catch (LabelExistsException e) {
+            System.out.println("Тэг уже существует");
+        } catch (NotCorrectInputException e) {
+            System.out.println("Некорректный ввод");
+        } catch (GenericExceptionHandler e) {
+            System.out.println("Произошла ошибка");
         }
         waitForInput();
         showMenu();
@@ -87,12 +96,8 @@ public class LabelView implements GenericView {
     private void deleteTag() {
         System.out.print("Введите номер тэга: ");
         String id = scanner.nextLine();
-        try {
-            labelController.delete(id);
-            System.out.println("Тэг был удалён");
-        } catch (ObjectNotFoundException e){
-            System.out.println("Произошла ошибка при удалении");
-        }
+        labelController.delete(id);
+        System.out.println("Тэг был удалён");
     }
 
     private void updateTag() {
@@ -100,12 +105,8 @@ public class LabelView implements GenericView {
         String id = scanner.nextLine();
         System.out.print("Введите новое название тэга: ");
         String name = scanner.nextLine();
-        try {
-            labelController.update(name, id);
-            System.out.println("Тэг был удалён");
-        } catch (ObjectNotFoundException e){
-            System.out.println("Произошла ошибка при удалении");
-        }
+        labelController.update(name, id);
+        System.out.println("Тэг был обновлён");
     }
 
     private void createTag() {
@@ -117,23 +118,15 @@ public class LabelView implements GenericView {
     private void findById() {
         System.out.print("Введите ID тэга: ");
         String id = scanner.nextLine();
-        try {
-            Label label = labelController.getById(id);
-            System.out.printf("%d. %s\n", label.getId(), label.getName());
-        } catch (GenericExceptionHandler e){
-            System.out.println(e.getMessage());
-        }
+        Label label = labelController.getById(id);
+        System.out.printf("%d. %s\n", label.getId(), label.getName());
     }
 
     private void findByName() {
         System.out.print("Введите название тэга: ");
         String name = scanner.nextLine();
-        try {
-            Label label = labelController.getByName(name);
-            System.out.printf("%d. %s\n", label.getId(), label.getName());
-        } catch (GenericExceptionHandler e){
-            System.out.println(e.getMessage());
-        }
+        Label label = labelController.getByName(name);
+        System.out.printf("%d. %s\n", label.getId(), label.getName());
     }
 
     private void findAll() {
