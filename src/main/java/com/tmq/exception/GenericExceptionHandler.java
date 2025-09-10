@@ -24,9 +24,13 @@ public class GenericExceptionHandler extends RuntimeException {
     }
   }
 
-  public GenericExceptionHandler() throws IOException {
+  public GenericExceptionHandler() {
     super();
-    logStackTrace(FILE);
+    try {
+      logStackTrace(FILE);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   void logStackTrace(File file) throws IOException {

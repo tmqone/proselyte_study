@@ -2,6 +2,7 @@ package com.tmq.controller;
 
 import com.tmq.model.Post;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface PostController extends GenericController<Post> {

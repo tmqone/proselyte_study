@@ -92,8 +92,6 @@ public class PostView implements GenericView {
             }
         } catch (PostNotFoundException e) {
             System.out.println("Пост не найден");
-        } catch (PostExistsException e) {
-            System.out.println("Пост уже существует");
         } catch (NotCorrectInputException e) {
             System.out.println("Некорректный ввод");
         } catch (GenericExceptionHandler e) {

@@ -2,7 +2,6 @@ package com.tmq.controller;
 
 import com.tmq.exception.GenericExceptionHandler;
 import com.tmq.exception.NotCorrectInputException;
-import com.tmq.exception.PostExistsException;
 import com.tmq.exception.PostNotFoundException;
 import com.tmq.model.Label;
 import com.tmq.model.Post;
@@ -11,6 +10,7 @@ import com.tmq.repository.GsonPostRepositoryImpl;
 import com.tmq.repository.PostRepository;
 import com.tmq.validator.InputValidator;
 
+import java.io.IOException;
 import java.util.*;
 
 public class PostControllerImpl implements PostController {
