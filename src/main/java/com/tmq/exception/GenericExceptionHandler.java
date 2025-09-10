@@ -14,7 +14,7 @@ public class GenericExceptionHandler extends RuntimeException {
   public GenericExceptionHandler(String message) {
     super(message);
     try {
-      logStackTrace(FILE);
+      logStackTrace(FILE, this);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -23,27 +23,47 @@ public class GenericExceptionHandler extends RuntimeException {
   public GenericExceptionHandler() {
     super();
     try {
-      logStackTrace(FILE);
+      logStackTrace(FILE, this);
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  void logStackTrace(File file) throws IOException {
-    try (FileWriter fileWriter = new FileWriter(file, true)) {
-      fileWriter.append(getMessage()).append("\n");
-      for (StackTraceElement stackTraceElement : getStackTrace()) {
-        fileWriter
-                .append(LocalDateTime.now().toString())
-                .append(" ")
-                .append(stackTraceElement.toString())
-                .append("\n");
-      }
-      fileWriter.append((char) Character.LINE_SEPARATOR);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    void logStackTrace(File file, Throwable t) throws IOException {
+        try (FileWriter fileWriter = new FileWriter(file, true)) {
+            String newline = System.lineSeparator();
+            fileWriter.append("[")
+                    .append(LocalDateTime.now().toString())
+                    .append("] ")
+                    .append(t.getClass().getName())
+                    .append(": ")
+                    .append(t.getMessage() == null ? "" : t.getMessage())
+                    .append(newline);
+
+            for (StackTraceElement element : t.getStackTrace()) {
+                fileWriter.append("\tat ")
+                        .append(element.toString())
+                        .append(newline);
+            }
+            Throwable cause = t.getCause();
+            while (cause != null) {
+                fileWriter.append("Caused by: ")
+                        .append(cause.getClass().getName())
+                        .append(": ")
+                        .append(cause.getMessage() == null ? "" : cause.getMessage())
+                        .append(newline);
+                for (StackTraceElement element : cause.getStackTrace()) {
+                    fileWriter.append("\tat ")
+                            .append(element.toString())
+                            .append(newline);
+                }
+                cause = cause.getCause();
+            }
+            fileWriter.append("--------------------------------------------------")
+                    .append(newline);
+        }
     }
-  }
+
 
 
 }
