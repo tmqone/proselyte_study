@@ -94,6 +94,8 @@ public class PostView implements GenericView {
             System.out.println("Пост не найден");
         } catch (NotCorrectInputException e) {
             System.out.println("Некорректный ввод");
+        } catch (WriterNotFoundException e) {
+            System.out.println("Автор не найден");
         } catch (GenericExceptionHandler e) {
             System.out.println("Произошла ошибка");
         }
@@ -115,7 +117,8 @@ public class PostView implements GenericView {
     private void deletePost() {
         System.out.print("Введите номер поста: ");
         String id = scanner.nextLine();
-        System.out.println(postController.delete(id) ? "Пост был удалён\n" : "Произошла ошибка при удалении\n");
+        postController.delete(id);
+        System.out.println("Пост был удалён");
     }
 
     private void updatePost() {
@@ -127,17 +130,21 @@ public class PostView implements GenericView {
         String content = scanner.nextLine();
         System.out.print("Введите тэги через запятую: ");
         String labels = scanner.nextLine();
-        System.out.println(postController.update(name, id, labels, content) ? "Пост изменен\n" : "Произошла ошибка при изменении\n");
+        postController.update(name, id, labels, content);
+        System.out.println("Пост изменен");
     }
 
     private void createPost() {
+        System.out.print("Введите id автора: ");
+        String writerId = scanner.nextLine();
         System.out.print("Введите название поста: ");
         String name = scanner.nextLine();
         System.out.print("Введите контент поста: ");
         String content = scanner.nextLine();
         System.out.print("Введите тэги через запятую: ");
         String labels = scanner.nextLine();
-        System.out.println(postController.save(name, labels, content) ? "Пост сохранен\n" : "Произошла ошибка при сохранении\n");
+        postController.save(writerId,name, labels, content);
+        System.out.println("Пост сохранен");
     }
 
     private void findById() {

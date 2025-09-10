@@ -3,7 +3,6 @@ package com.tmq.view;
 import com.tmq.controller.WriterController;
 import com.tmq.controller.WriterControllerImpl;
 import com.tmq.exception.*;
-import com.tmq.model.Label;
 import com.tmq.model.Post;
 import com.tmq.model.Writer;
 
@@ -98,7 +97,7 @@ public class WriterView implements GenericView {
     private void findAllPostsFromAuthor() {
         System.out.print("Введите номер автора: ");
         String id = scanner.nextLine();
-        Optional.of(writerController.getAllPostsFromAuthor(id))
+        Optional.of(writerController.getAllPostsFromWriter(id))
                 .ifPresentOrElse(
                         list -> list.forEach(this::printPost),
                         () -> System.out.println("Пусто...")

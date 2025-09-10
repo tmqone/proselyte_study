@@ -35,7 +35,7 @@ public class MainView implements GenericView {
                 3. Теги
                 4. Выход
                 """);
-        System.out.print("Выберите опцию:");
+        System.out.print("Выберите опцию: ");
 
         chooseOption();
     }

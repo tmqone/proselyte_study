@@ -70,18 +70,18 @@ public class GsonPostRepositoryImpl implements PostRepository{
     }
 
     @Override
-    public boolean save(Post post) {
+    public Long save(Post post) {
         List<Post> posts = findAllWithDeleted();
         if (posts == null || posts.isEmpty()) {
             post.setId(1L);
             writeToFile(List.of(post), FILE, gson);
-            return true;
+            return 1L;
         } else {
             Long newId = posts.stream().mapToLong(Post::getId).max().getAsLong() + 1;
             post.setId(newId);
             posts.add(post);
             writeToFile(posts, FILE, gson);
-            return true;
+            return newId;
         }
     }
 

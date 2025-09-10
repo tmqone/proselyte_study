@@ -112,7 +112,8 @@ public class LabelView implements GenericView {
     private void createTag() {
         System.out.print("Введите название тэга: ");
         String name = scanner.nextLine();
-        System.out.println(labelController.save(name) ? "Тэг сохранен\n" : "Произошла ошибка при сохранении\n");
+        labelController.save(name);
+        System.out.println("Тэг сохранен");
     }
 
     private void findById() {

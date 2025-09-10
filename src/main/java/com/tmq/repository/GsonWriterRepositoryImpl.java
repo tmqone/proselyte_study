@@ -75,18 +75,18 @@ public class GsonWriterRepositoryImpl implements WriterRepository{
     }
 
     @Override
-    public boolean save(Writer writer) {
+    public Long save(Writer writer) {
         List<Writer> writers = findAllWithDeleted();
         if (writers == null || writers.isEmpty()) {
             writer.setId(1L);
             writeToFile(List.of(writer), FILE, gson);
-            return true;
+            return 1L;
         } else {
             Long newId = writers.stream().mapToLong(Writer::getId).max().getAsLong() + 1;
             writer.setId(newId);
             writers.add(writer);
             writeToFile(writers, FILE, gson);
-            return true;
+            return newId;
         }
     }
 
@@ -112,7 +112,6 @@ public class GsonWriterRepositoryImpl implements WriterRepository{
         }
     }
 
-    @SneakyThrows
     @Override
     public boolean delete(Writer writer) {
         List<Writer> writers = findAllWithDeleted();

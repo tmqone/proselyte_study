@@ -16,6 +16,7 @@ import java.util.stream.IntStream;
 public class LabelControllerImpl implements LabelController {
     private static final LabelControllerImpl INSTANCE = new LabelControllerImpl();
     private static final LabelRepository REPOSITORY = GsonLabelRepositoryImpl.getInstance();
+    private static final PostController POST_CONTROLLER = PostControllerImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
 
     public static LabelControllerImpl getInstance() {
@@ -44,10 +45,10 @@ public class LabelControllerImpl implements LabelController {
                 .orElseThrow(LabelNotFoundException::new);
     }
 
-    public boolean save(String name) {
+    public void save(String name) {
         name = name.trim();
         if (!inputValidator.validate(name)) throw new NotCorrectInputException();
-        return REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
+        REPOSITORY.save(Label.builder().name(name).status(Status.ACTIVE).build());
     }
 
     @Override
@@ -57,7 +58,10 @@ public class LabelControllerImpl implements LabelController {
         if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        return REPOSITORY.update(Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build());
+        Label label = Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build();
+
+        if (REPOSITORY.update(label)) POST_CONTROLLER.updateLabelInPosts(label);
+        return true;
     }
 
     @Override
@@ -66,7 +70,10 @@ public class LabelControllerImpl implements LabelController {
         if (!inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        return REPOSITORY.delete(Label.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
+        Label label = getById(id);
+        label.setStatus(Status.DELETED);
+        if (REPOSITORY.delete(label)) POST_CONTROLLER.updateLabelInPosts(label);
+        return true;
     }
 
     public List<Label> getAndSaveLabels(String labels) {
@@ -92,20 +99,5 @@ public class LabelControllerImpl implements LabelController {
                         .id(getByName(labelsTrimmed[x]).getId())
                         .name(labelsTrimmed[x]).build())
                 .toList();
-    }
-
-    public List<Label> getActiveLabels(List<Label> labelList) {
-        try {
-            Iterator<Label> iterator = labelList.iterator();
-            while (iterator.hasNext()) {
-                Label next = iterator.next();
-                REPOSITORY
-                        .findById(next.getId()).ifPresentOrElse(label -> {
-                        }, iterator::remove);
-            }
-            return labelList;
-        } catch (LabelNotFoundException e) {
-            return Collections.emptyList();
-        }
     }
 }

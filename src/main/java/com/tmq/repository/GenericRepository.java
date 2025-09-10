@@ -13,7 +13,7 @@ public interface GenericRepository<T, ID>{
     List<T> findAll();
     List<T> findAllWithDeleted();
     Optional<T> findById(ID id);
-    boolean save(T t);
+    ID save(T t);
     boolean update(T t);
     boolean delete(T t);
 

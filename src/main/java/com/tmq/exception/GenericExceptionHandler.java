@@ -1,13 +1,9 @@
 package com.tmq.exception;
 
 import com.tmq.util.FilesPath;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Time;
 import java.time.LocalDateTime;
 
 public class GenericExceptionHandler extends RuntimeException {

@@ -72,11 +72,12 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    public boolean save(Label label) {
+    public Long save(Label label) {
         List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             label.setId(1L);
             writeToFile(List.of(label), FILE, gson);
+            return 1L;
         } else {
             allLabels.stream()
                     .filter(value -> value.getName().equals(label.getName()))
@@ -90,8 +91,8 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
             label.setId(newId);
             allLabels.add(label);
             writeToFile(allLabels, FILE, gson);
+            return newId;
         }
-        return true;
     }
 
     @Override

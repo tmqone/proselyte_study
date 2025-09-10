@@ -9,12 +9,15 @@ import com.tmq.model.Status;
 import com.tmq.repository.GsonPostRepositoryImpl;
 import com.tmq.repository.PostRepository;
 import com.tmq.validator.InputValidator;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-import java.io.IOException;
 import java.util.*;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class PostControllerImpl implements PostController {
     private static final PostControllerImpl INSTANCE = new PostControllerImpl();
+    private static final WriterController WRITER_CONTROLLER = WriterControllerImpl.getInstance();
     private static final PostRepository REPOSITORY = GsonPostRepositoryImpl.getInstance();
     private static final LabelControllerImpl LABEL_CONTROLLER = LabelControllerImpl.getInstance();
     private final InputValidator inputValidator = new InputValidator();
@@ -24,10 +27,7 @@ public class PostControllerImpl implements PostController {
     }
 
     public List<Post> getAll() {
-        List<Post> posts = REPOSITORY.findAll();
-        posts.forEach(post -> post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels())));
-        posts.forEach(REPOSITORY::update);
-        return posts;
+        return REPOSITORY.findAll();
     }
 
     public List<Post> getByName(String name) {
@@ -36,10 +36,7 @@ public class PostControllerImpl implements PostController {
             if (!validateInput(name)) {
                 return Collections.emptyList();
             }
-            List<Post> posts = REPOSITORY.findByName(name).stream().toList();
-            posts.forEach(post -> post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels())));
-            posts.forEach(REPOSITORY::update);
-            return posts;
+            return REPOSITORY.findByName(name);
         } catch (PostNotFoundException e) {
             return Collections.emptyList();
         }
@@ -50,23 +47,22 @@ public class PostControllerImpl implements PostController {
         if (!inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        Post post = REPOSITORY.findById(Long.parseLong(id))
-                .orElseThrow(PostNotFoundException::new);
-        post.setLabels(LABEL_CONTROLLER.getActiveLabels(post.getLabels()));
-        REPOSITORY.update(post);
-        return post;
+        return REPOSITORY.findById(Long.parseLong(id)).orElseThrow(PostNotFoundException::new);
     }
 
-    public boolean save(String title, String labels, String content) {
-        if (!validateInput(title, content)) throw new NotCorrectInputException();
+    public void save(String writerId, String title, String labels, String content) {
+        if (!validateInput(title, content) || !inputValidator.validateLongString(writerId)) throw new NotCorrectInputException();
         labels = labels.trim();
         List<Label> labelList = Collections.emptyList();
         if (!labels.isEmpty()) labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
-        return REPOSITORY.save(Post.builder()
+        Post post = Post.builder()
                 .title(title)
                 .labels(labelList)
                 .content(content)
-                .status(Status.ACTIVE).build());
+                .status(Status.ACTIVE).build();
+        Long id = REPOSITORY.save(post);
+        post.setId(id);
+        WRITER_CONTROLLER.savePostToWriter(writerId, post);
     }
 
     @Override
@@ -78,14 +74,17 @@ public class PostControllerImpl implements PostController {
         if (!validateInput(title, content) || !inputValidator.validateLongString(id)) {
             return false;
         }
-        return REPOSITORY.update(Post
-                .builder()
+        Post post = Post.builder()
                 .title(title)
                 .labels(LABEL_CONTROLLER.getAndSaveLabels(labels))
                 .content(content)
                 .id(Long.parseLong(id))
-                .status(Status.ACTIVE).build());
-
+                .status(Status.ACTIVE).build();
+        if (REPOSITORY.update(post)) {
+            WRITER_CONTROLLER.updatePostInWriter(post);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -94,7 +93,13 @@ public class PostControllerImpl implements PostController {
         if (!inputValidator.validateLongString(id)) {
             return false;
         }
-        return REPOSITORY.delete(Post.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
+        Post post = getById(id);
+        post.setStatus(Status.DELETED);
+        if (REPOSITORY.delete(post)) {
+            WRITER_CONTROLLER.updatePostInWriter(post);
+            return true;
+        }
+        return false;
     }
 
     public List<Post> getByLabels(String tags) {
@@ -123,6 +128,17 @@ public class PostControllerImpl implements PostController {
             }
         }
         return allPosts;
+    }
+
+    @Override
+    public boolean updateLabelInPosts(Label label){
+        getAll().forEach(post -> {
+            post.getLabels()
+                    .replaceAll(labelInStream -> labelInStream.getId().equals(label.getId()) ? label : labelInStream);
+            REPOSITORY.update(post);
+            WRITER_CONTROLLER.updatePostInWriter(post);
+        });
+        return true;
     }
 
     private boolean validateInput(String... input) {
