@@ -1,9 +1,7 @@
 package com.tmq.view;
 
-import com.tmq.Main;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import java.util.Scanner;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

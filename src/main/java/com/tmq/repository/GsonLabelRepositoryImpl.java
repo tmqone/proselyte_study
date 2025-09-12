@@ -5,9 +5,11 @@ import com.google.gson.reflect.TypeToken;
 import com.tmq.exception.*;
 import com.tmq.model.Label;
 import com.tmq.model.Status;
+import com.tmq.util.FileWriterUtil;
 import com.tmq.util.FilesPath;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -20,10 +22,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class GsonLabelRepositoryImpl implements LabelRepository  {
+public class GsonLabelRepositoryImpl implements LabelRepository {
     private static final File FILE = new File(FilesPath.LABEL.getFilePath());
     private static final GsonLabelRepositoryImpl INSTANCE = new GsonLabelRepositoryImpl();
     private static final Gson gson = new Gson();
+    private static final FileWriterUtil<Label> FILE_WRITER_UTIL = new FileWriterUtil();
 
     public static GsonLabelRepositoryImpl getInstance() {
         return INSTANCE;
@@ -31,7 +34,8 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
 
     @Override
     public List<Label> findAll() {
-        Type listType = new TypeToken<ArrayList<Label>>() {}.getType();
+        Type listType = new TypeToken<ArrayList<Label>>() {
+        }.getType();
 
         try (FileReader reader = new FileReader(FILE)) {
             List<Label> labels = gson.fromJson(reader, listType);
@@ -44,9 +48,9 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
         }
     }
 
-    @Override
-    public List<Label> findAllWithDeleted() {
-        Type listType = new TypeToken<ArrayList<Label>>() {}.getType();
+    private List<Label> findAllWithDeleted() {
+        Type listType = new TypeToken<ArrayList<Label>>() {
+        }.getType();
         try (FileReader reader = new FileReader(FILE)) {
             List<Label> labels = gson.fromJson(reader, listType);
             if (labels == null) return Collections.emptyList();
@@ -72,13 +76,9 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
     }
 
     @Override
-    public Long save(Label label) {
+    public Label save(Label label) {
         List<Label> allLabels = findAllWithDeleted();
-        if (allLabels == null || allLabels.isEmpty()) {
-            label.setId(1L);
-            writeToFile(List.of(label), FILE, gson);
-            return 1L;
-        } else {
+        if (!allLabels.isEmpty()) {
             allLabels.stream()
                     .filter(value -> value.getName().equals(label.getName()))
                     .filter(value -> value.getStatus() == Status.ACTIVE)
@@ -86,50 +86,58 @@ public class GsonLabelRepositoryImpl implements LabelRepository  {
                     .ifPresent(value -> {
                         throw new LabelExistsException(value.getName() + " already exists");
                     });
-
-            Long newId = allLabels.stream().mapToLong(Label::getId).max().getAsLong() + 1;
-            label.setId(newId);
-            allLabels.add(label);
-            writeToFile(allLabels, FILE, gson);
-            return newId;
         }
+
+        label.setId(generateLabelID());
+        allLabels.add(label);
+        FILE_WRITER_UTIL.writeToFile(allLabels, FILE, gson);
+        return label;
     }
 
     @Override
-    public boolean update(Label label) {
-        List<Label> allLabels = findAll();
-        if (allLabels == null || allLabels.isEmpty()) {
-            throw new LabelNotFoundException();
-        } else {
-            List<Integer> indexes = IntStream.range(0, allLabels.size())
-                    .filter(index -> allLabels.get(index).getId().equals(label.getId()))
-                    .boxed().toList();
-
-            if (indexes.isEmpty()) {
-                throw new LabelNotFoundException();
-            }
-            if (indexes.size() > 1) {
-                throw new LabelNotFoundException("More than one active label with same id");
-            }
-            allLabels.set(indexes.getFirst(), label);
-            writeToFile(allLabels, FILE, gson);
-            return true;
-        }
-    }
-
-    @Override
-    public boolean delete(Label label) {
+    public Label update(Label label) {
         List<Label> allLabels = findAllWithDeleted();
         if (allLabels == null || allLabels.isEmpty()) {
             throw new LabelNotFoundException();
-        } else {
-            int i = IntStream.range(0, allLabels.size())
-                    .filter(index -> allLabels.get(index).getId().equals(label.getId()))
-                    .findFirst()
-                    .orElseThrow(LabelNotFoundException::new);
-            allLabels.get(i).setStatus(Status.DELETED);
-            writeToFile(allLabels, FILE, gson);
-            return true;
         }
+        List<Integer> indexes = IntStream.range(0, allLabels.size())
+                .filter(index -> allLabels.get(index).getStatus() == Status.ACTIVE)
+                .filter(index -> allLabels.get(index).getId().equals(label.getId()))
+                .boxed().toList();
+
+        if (indexes.isEmpty()) {
+            throw new LabelNotFoundException();
+        }
+
+        if (indexes.size() > 1) {
+            throw new LabelExistsException();
+        }
+
+        allLabels.set(indexes.getFirst(), label);
+        FILE_WRITER_UTIL.writeToFile(allLabels, FILE, gson);
+        return label;
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        List<Label> allLabels = findAllWithDeleted();
+        if (allLabels == null || allLabels.isEmpty()) {
+            throw new LabelNotFoundException();
+        }
+
+        int i = IntStream.range(0, allLabels.size())
+                .filter(index -> allLabels.get(index).getId().equals(id))
+                .findFirst()
+                .orElseThrow(LabelNotFoundException::new);
+        allLabels.get(i).setStatus(Status.DELETED);
+        FILE_WRITER_UTIL.writeToFile(allLabels, FILE, gson);
+        return true;
+    }
+
+    private Long generateLabelID() {
+        return findAllWithDeleted().stream()
+                .mapToLong(Label::getId)
+                .max()
+                .orElse(1L);
     }
 }

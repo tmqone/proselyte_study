@@ -3,10 +3,7 @@ package com.tmq.view;
 import com.tmq.controller.PostController;
 import com.tmq.controller.PostControllerImpl;
 import com.tmq.exception.*;
-import com.tmq.model.Label;
 import com.tmq.model.Post;
-
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
@@ -36,12 +33,11 @@ public class PostView implements GenericView {
         System.out.println("""
                 1. Найти все посты
                 2. Найти посты по автору
-                3. Найти посты по тегам
-                4. Найти пост по названию
-                5. Найти пост по ID
-                6. Добавить пост
-                7. Изменить пост
-                8. Удалить пост
+                3. Найти пост по названию
+                4. Найти пост по ID
+                5. Добавить пост
+                6. Изменить пост
+                7. Удалить пост
                 0. Вернуться в главное меню
                 """);
         chooseOption();
@@ -61,26 +57,22 @@ public class PostView implements GenericView {
                     break;
 
                 case "3":
-                    findByTags();
-                    break;
-
-                case "4":
                     findByName();
                     break;
 
-                case "5":
+                case "4":
                     findById();
                     break;
 
-                case "6":
+                case "5":
                     createPost();
                     break;
 
-                case "7":
+                case "6":
                     updatePost();
                     break;
 
-                case "8":
+                case "7":
                     deletePost();
                     break;
 
@@ -101,17 +93,6 @@ public class PostView implements GenericView {
         }
         waitForInput();
         showMenu();
-    }
-
-    private void findByTags() {
-        System.out.print("Введите тэги через запятую: ");
-        String labels = scanner.nextLine();
-        List<Post> postsList = postController.getByLabels(labels);
-        if (postsList.isEmpty()) {
-            System.out.println("Пусто...");
-        } else {
-            postsList.forEach(this::printPost);
-        }
     }
 
     private void deletePost() {
@@ -177,7 +158,7 @@ public class PostView implements GenericView {
         if (posts.isEmpty()) {
             System.out.println("Пусто...");
         } else {
-            posts.forEach(post -> printPost(post));
+            posts.forEach(this::printPost);
         }
     }
 
@@ -185,7 +166,7 @@ public class PostView implements GenericView {
         Optional.of(postController.getAll())
                 .filter(list -> !list.isEmpty())
                 .ifPresentOrElse(
-                        list -> list.forEach(x -> printPost(x)), () -> System.out.println("Пусто...")
+                        list -> list.forEach(this::printPost), () -> System.out.println("Пусто...")
                 );
     }
 }

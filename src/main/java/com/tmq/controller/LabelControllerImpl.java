@@ -8,7 +8,6 @@ import com.tmq.repository.LabelRepository;
 import com.tmq.validator.InputValidator;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -23,10 +22,12 @@ public class LabelControllerImpl implements LabelController {
         return INSTANCE;
     }
 
+    @Override
     public List<Label> getAll() {
         return REPOSITORY.findAll();
     }
 
+    @Override
     public Label getByName(String name) {
         name = name.trim();
         if (!inputValidator.validate(name)) {
@@ -37,6 +38,7 @@ public class LabelControllerImpl implements LabelController {
 
     }
 
+    @Override
     public Label getById(String id) {
         id = id.trim();
         if (!inputValidator.validateLongString(id)) throw new NotCorrectInputException();
@@ -45,6 +47,7 @@ public class LabelControllerImpl implements LabelController {
                 .orElseThrow(LabelNotFoundException::new);
     }
 
+    @Override
     public void save(String name) {
         name = name.trim();
         if (!inputValidator.validate(name)) throw new NotCorrectInputException();
@@ -58,9 +61,12 @@ public class LabelControllerImpl implements LabelController {
         if (!inputValidator.validate(name) || !inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        Label label = Label.builder().name(name).id(Long.parseLong(id)).status(Status.ACTIVE).build();
-
-        if (REPOSITORY.update(label)) POST_CONTROLLER.updateLabelInPosts(label);
+        Label label = Label.builder()
+                .name(name)
+                .id(Long.parseLong(id))
+                .status(Status.ACTIVE).build();
+        REPOSITORY.update(label);
+        POST_CONTROLLER.updateLabelInPosts(label);
         return true;
     }
 
@@ -72,7 +78,8 @@ public class LabelControllerImpl implements LabelController {
         }
         Label label = getById(id);
         label.setStatus(Status.DELETED);
-        if (REPOSITORY.delete(label)) POST_CONTROLLER.updateLabelInPosts(label);
+        REPOSITORY.delete(Long.parseLong(id));
+        POST_CONTROLLER.updateLabelInPosts(label);
         return true;
     }
 
@@ -86,12 +93,12 @@ public class LabelControllerImpl implements LabelController {
             }
         }
 
-        labelsToSave.forEach(label -> {
+        labelsToSave.forEach(label ->
             REPOSITORY.save(Label.builder()
                     .name(label)
                     .status(Status.ACTIVE)
-                    .build());
-        });
+                    .build())
+        );
 
         return IntStream.range(0, labelsTrimmed.length)
                 .mapToObj(x -> Label.builder()

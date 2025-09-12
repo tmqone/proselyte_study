@@ -1,6 +1,5 @@
 package com.tmq.controller;
 import com.tmq.exception.NotCorrectInputException;
-import com.tmq.exception.PostNotFoundException;
 import com.tmq.exception.WriterNotFoundException;
 import com.tmq.model.Post;
 import com.tmq.model.Status;
@@ -8,10 +7,13 @@ import com.tmq.model.Writer;
 import com.tmq.repository.GsonWriterRepositoryImpl;
 import com.tmq.repository.WriterRepository;
 import com.tmq.validator.InputValidator;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.Collections;
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class WriterControllerImpl implements WriterController {
     private static final WriterController INSTANCE = new WriterControllerImpl();
     private static final WriterRepository REPOSITORY = GsonWriterRepositoryImpl.getInstance();
@@ -80,12 +82,13 @@ public class WriterControllerImpl implements WriterController {
         if (!validateInput(lastName, firstName) || !inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        return REPOSITORY.update(Writer.builder()
+        REPOSITORY.update(Writer.builder()
                                         .lastName(lastName)
                                         .id(Long.parseLong(id))
                                         .firstName(firstName)
                                         .posts(getAllPostsFromWriter(id))
                                         .status(Status.ACTIVE).build());
+        return true;
     }
 
     @Override
@@ -96,12 +99,13 @@ public class WriterControllerImpl implements WriterController {
         if (!validateInput(lastName, firstName) || !inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        return REPOSITORY.update(Writer.builder()
+        REPOSITORY.update(Writer.builder()
                 .lastName(lastName)
                 .id(Long.parseLong(id))
                 .firstName(firstName)
                 .posts(posts)
                 .status(Status.ACTIVE).build());
+        return true;
     }
 
     @Override
@@ -113,7 +117,7 @@ public class WriterControllerImpl implements WriterController {
         getAllPostsFromWriter(id).stream()
                 .filter(post -> post.getStatus() == Status.ACTIVE)
                 .forEach(post -> POST_CONTROLLER.delete(post.getId().toString()));
-        return REPOSITORY.delete(Writer.builder().id(Long.parseLong(id)).status(Status.DELETED).build());
+        return REPOSITORY.delete(Long.parseLong(id));
     }
 
     @Override

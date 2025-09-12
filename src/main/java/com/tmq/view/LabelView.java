@@ -40,7 +40,7 @@ public class LabelView implements GenericView {
                 4. Добавить тэг
                 5. Изменить тэг
                 6. Удалить тэг
-                7. Вернуться в главное меню
+                0. Вернуться в главное меню
                 """);
         chooseOption();
         clearConsole();
@@ -75,7 +75,7 @@ public class LabelView implements GenericView {
                     deleteTag();
                     break;
 
-                case "7":
+                case "0":
                     exit();
                     break;
                 default:

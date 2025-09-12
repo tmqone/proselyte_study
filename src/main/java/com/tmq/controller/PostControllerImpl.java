@@ -1,6 +1,5 @@
 package com.tmq.controller;
 
-import com.tmq.exception.GenericExceptionHandler;
 import com.tmq.exception.NotCorrectInputException;
 import com.tmq.exception.PostNotFoundException;
 import com.tmq.model.Label;
@@ -26,10 +25,12 @@ public class PostControllerImpl implements PostController {
         return INSTANCE;
     }
 
+    @Override
     public List<Post> getAll() {
         return REPOSITORY.findAll();
     }
 
+    @Override
     public List<Post> getByName(String name) {
         name = name.trim();
         try {
@@ -42,6 +43,7 @@ public class PostControllerImpl implements PostController {
         }
     }
 
+    @Override
     public Post getById(String id) {
         id = id.trim();
         if (!inputValidator.validateLongString(id)) {
@@ -50,9 +52,11 @@ public class PostControllerImpl implements PostController {
         return REPOSITORY.findById(Long.parseLong(id)).orElseThrow(PostNotFoundException::new);
     }
 
+    @Override
     public void save(String writerId, String title, String labels, String content) {
-        if (!validateInput(title, content) || !inputValidator.validateLongString(writerId)) throw new NotCorrectInputException();
         labels = labels.trim();
+        if (!validateInput(title, content) || !inputValidator.validateLongString(writerId))
+            throw new NotCorrectInputException();
         List<Label> labelList = Collections.emptyList();
         if (!labels.isEmpty()) labelList = LABEL_CONTROLLER.getAndSaveLabels(labels);
         Post post = Post.builder()
@@ -60,9 +64,8 @@ public class PostControllerImpl implements PostController {
                 .labels(labelList)
                 .content(content)
                 .status(Status.ACTIVE).build();
-        Long id = REPOSITORY.save(post);
-        post.setId(id);
-        WRITER_CONTROLLER.savePostToWriter(writerId, post);
+        Post savedPost = REPOSITORY.save(post);
+        WRITER_CONTROLLER.savePostToWriter(writerId, savedPost);
     }
 
     @Override
@@ -80,11 +83,9 @@ public class PostControllerImpl implements PostController {
                 .content(content)
                 .id(Long.parseLong(id))
                 .status(Status.ACTIVE).build();
-        if (REPOSITORY.update(post)) {
-            WRITER_CONTROLLER.updatePostInWriter(post);
-            return true;
-        }
-        return false;
+        REPOSITORY.update(post);
+        WRITER_CONTROLLER.updatePostInWriter(post);
+        return true;
     }
 
     @Override
@@ -95,43 +96,13 @@ public class PostControllerImpl implements PostController {
         }
         Post post = getById(id);
         post.setStatus(Status.DELETED);
-        if (REPOSITORY.delete(post)) {
-            WRITER_CONTROLLER.updatePostInWriter(post);
-            return true;
-        }
-        return false;
-    }
-
-    public List<Post> getByLabels(String tags) {
-        tags = tags.trim();
-        List<String> tagsList = Arrays.stream(tags.split("\\s*,\\s*")).toList();
-        if (!validateInput(tags)) throw new GenericExceptionHandler();
-
-        List<Post> allPosts = getAll();
-        Iterator<String> allTagsIterator = tagsList.iterator();
-
-        while (allTagsIterator.hasNext()) {
-            String tag = allTagsIterator.next();
-            Iterator<Post> allPostsIterator = allPosts.iterator();
-            while (allPostsIterator.hasNext()) {
-                Post post = allPostsIterator.next();
-                List<Label> currentPostLabels = post.getLabels();
-                if (currentPostLabels.isEmpty()) {
-                    allPostsIterator.remove();
-                    continue;
-                }
-                for (int i = 0; i < currentPostLabels.size(); i++) {
-                    if (currentPostLabels.get(i).getName().equals(tag)) break;
-                    if (!currentPostLabels.get(i).getName().equals(tag) && i == currentPostLabels.size() - 1)
-                        allPostsIterator.remove();
-                }
-            }
-        }
-        return allPosts;
+        REPOSITORY.delete(Long.parseLong(id));
+        WRITER_CONTROLLER.updatePostInWriter(post);
+        return true;
     }
 
     @Override
-    public boolean updateLabelInPosts(Label label){
+    public boolean updateLabelInPosts(Label label) {
         getAll().forEach(post -> {
             post.getLabels()
                     .replaceAll(labelInStream -> labelInStream.getId().equals(label.getId()) ? label : labelInStream);
