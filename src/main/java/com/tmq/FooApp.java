@@ -1,8 +1,6 @@
 package com.tmq;
 
-import java.util.*;
-
-public class App {
+public class FooApp {
 
 
     public static void main(String[] args) throws InterruptedException {

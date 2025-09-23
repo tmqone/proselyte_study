@@ -1,5 +1,10 @@
 package com.tmq;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class Foo {
     private boolean isFirstPrinted = false;
     private boolean isSecondPrinted = false;
@@ -10,27 +15,25 @@ public class Foo {
     }
 
     public synchronized void first() {
-        System.out.printf("first");
+        System.out.print("first");
         isFirstPrinted = true;
         notifyAll();
     }
 
     public synchronized void second() throws InterruptedException {
         while (!isFirstPrinted) {
-            // System.out.print(Thread.currentThread().getName() + " не печатаю два, т.к. единица еще не распечатана");
             wait();
         }
         isSecondPrinted = true;
-        System.out.printf("second");
+        System.out.print("second");
         notifyAll();
     }
 
     public synchronized void third() throws InterruptedException {
         while (!isSecondPrinted) {
-            //System.out.println(Thread.currentThread().getName() + " не печатаю три, т.к. двойка еще не распечатана");
             wait();
         }
-        System.out.printf("third");
+        System.out.print("third");
         reset();
     }
 }
