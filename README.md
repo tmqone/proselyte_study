@@ -1,6 +1,7 @@
 Module 1.5
 В данном репо реализованы следующие паттерны проектирования:
 Порождающие (creational):
+
     •Фабричный метод (factory)
     •Абстрактная фабрика (abstractfactory)
     •Строитель (builder)
@@ -8,6 +9,7 @@ Module 1.5
     •Одиночка (singleton)
 
 Струтурные (structural):
+
     •Адаптер (adapter)
     •Мост (bridge)
     •Компоновщик (composite)
@@ -17,6 +19,7 @@ Module 1.5
     •Заместитель (proxy)
 
 Поведенческие (behavioral):
+
     •Цепочка обязанностей (chain)
     •Команда (command)
     •Интерпретатор (interpreter)
