@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: migrations/001-migrate-default-tables.sql
+      relativeToChangelogFile: true
+  - include:
+      file: migrations/002-test-data.sql
+      relativeToChangelogFile: true
