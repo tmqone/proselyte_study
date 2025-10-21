@@ -19,7 +19,7 @@ Java (25)
 Docker Compose
 ```
 
-## Деплой
+## Запуск проекта
 
 ```bash
 docker compose up -d  # Поднять postgres в контейнере
