@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface LabelRepository extends GenericRepository<Long, Label>{
-    Optional<Label> findByName(String name, Connection connection) throws SQLException;
-    List<Label> findByPostId(Long postId, Connection connection) throws SQLException;
-    boolean saveLabelToPost(Long labelId, Long postId, Connection connection);
+    Optional<Label> findByName(String name);
+    List<Label> findByPostId(Long postId);
+    boolean saveLabelToPost(Long labelId, Long postId);
 }

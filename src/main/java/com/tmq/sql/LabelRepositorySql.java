@@ -17,7 +17,7 @@ public class LabelRepositorySql {
             INSERT INTO posts_labels (post_id, label_id) VALUES (?, ?)
             """;
 
-    public final static String SAVE_SQL = """
+    public final static String SAVE_LABEL_SQL = """
             INSERT INTO labels (name)
             VALUES (?)
             ON CONFLICT (name) DO UPDATE SET name = excluded.name RETURNING id
@@ -27,6 +27,11 @@ public class LabelRepositorySql {
             DELETE FROM labels WHERE id = ?
             """;
 
+    public static final String DELETE_LABEL_FROM_POST = """
+            delete from posts_labels
+            where post_id = ?
+            """;
+
     public final static String UPDATE_SQL = """
             UPDATE labels SET name = ? WHERE id = ?
             """;
@@ -34,4 +39,5 @@ public class LabelRepositorySql {
     public final static String FIND_BY_NAME = """
             SELECT * FROM labels WHERE name = ?
             """;
+
 }

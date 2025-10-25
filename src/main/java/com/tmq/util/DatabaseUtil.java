@@ -4,18 +4,19 @@ import com.tmq.exception.GeneralException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.concurrent.ArrayBlockingQueue;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DatabaseUtil {
 
     private static final int POOL_SIZE = 1;
 
-    private static final ArrayBlockingQueue<Connection> CONNECTIONS = new ArrayBlockingQueue<>(5);
+    private static final List<String> methodsToCloseConnection = List.of("close");
+    private static final List<Connection> CONNECTIONS = new ArrayList<>();
     private static boolean isInitialized = false;
 
     static {
@@ -38,11 +39,13 @@ public class DatabaseUtil {
                         PropertiesUtil.get("DB.USERNAME"),
                         PropertiesUtil.get("DB.PASSWORD")
                 );
+                connection.setAutoCommit(false);
                 var proxyConnection = (Connection) Proxy.newProxyInstance(
                         DatabaseUtil.class.getClassLoader(),
                         new Class[]{Connection.class},
-                        ((proxy, method, args) -> method.getName().equals("close") ?
-                                CONNECTIONS.add((Connection) proxy) : method.invoke(connection, args)));
+                        ((proxy, method, args) ->
+                                methodsToCloseConnection.contains(method.getName()) ?
+                                        CONNECTIONS.add((Connection) proxy) : method.invoke(connection, args)));
                 CONNECTIONS.add(proxyConnection);
 
             }
@@ -56,11 +59,38 @@ public class DatabaseUtil {
             initConnection();
             isInitialized = true;
         }
+        return CONNECTIONS.getFirst();
+    }
 
-        try {
-            return CONNECTIONS.take();
-        } catch (InterruptedException e) {
-            throw new GeneralException(e);
-        }
+    public static PreparedStatement getStatement(String sql) throws SQLException {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql);
+        return proxyPreparedStatement(connection, preparedStatement);
+    }
+
+    public static PreparedStatement getStatementWithGeneratedKeys(String sql) throws SQLException {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        return proxyPreparedStatement(connection, preparedStatement);
+    }
+
+    private static PreparedStatement proxyPreparedStatement(Connection connection, Statement preparedStatement) {
+        InvocationHandler handler = (proxy, method, args) -> {
+            try {
+                if (methodsToCloseConnection.contains(method.getName())) {
+                    if (preparedStatement.getResultSet() != null) {
+                        preparedStatement.getResultSet().close();
+                    }
+                    preparedStatement.close();
+                    CONNECTIONS.add(connection);
+                }
+                return method.invoke(preparedStatement, args);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+        return (PreparedStatement) Proxy.newProxyInstance(DatabaseUtil.class.getClassLoader(),
+                new Class[]{PreparedStatement.class},
+                handler);
     }
 }

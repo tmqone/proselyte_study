@@ -1,8 +1,10 @@
-package com.tmq.repository;
+package com.tmq.repository.jdbc;
 
 import com.tmq.exception.GeneralException;
 import com.tmq.exception.WriterNotFoundException;
 import com.tmq.model.Writer;
+import com.tmq.repository.WriterRepository;
+import com.tmq.util.DatabaseUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -14,17 +16,16 @@ import java.util.Optional;
 import static com.tmq.sql.WriterRepositorySql.*;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class WriterRepositoryImpl implements WriterRepository {
-    private final static WriterRepository INSTANCE = new WriterRepositoryImpl();
-
+public class JdbcWriterRepositoryImpl implements WriterRepository {
+    private final static WriterRepository INSTANCE = new JdbcWriterRepositoryImpl();
     public static WriterRepository getInstance() {
         return INSTANCE;
     }
 
     @Override
-    public List<Writer> findAll(Connection connection) {
-        try {
-            ResultSet resultSet = connection.prepareStatement(FIND_ALL_SQL).executeQuery();
+    public List<Writer> findAll() {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatement(FIND_ALL_SQL)){
+            ResultSet resultSet = preparedStatement.executeQuery();
             List<Writer> writers = new ArrayList<>();
             while (resultSet.next()) {
                 writers.add(Writer.builder()
@@ -40,9 +41,8 @@ public class WriterRepositoryImpl implements WriterRepository {
     }
 
     @Override
-    public Optional<Writer> findById(Long id, Connection connection) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_ID_SQL);
+    public Optional<Writer> findById(Long id) {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatement(FIND_BY_ID_SQL)){
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             if (resultSet.next()) {
@@ -52,16 +52,15 @@ public class WriterRepositoryImpl implements WriterRepository {
                         .firstName(resultSet.getString("first_name"))
                         .build());
             }
-            return Optional.empty();
+            throw new WriterNotFoundException();
         } catch (SQLException e){
             throw new GeneralException(e);
         }
     }
 
     @Override
-    public List<Writer> findByName(String firstName, String lastName, Connection connection) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_NAME_SQL);
+    public List<Writer> findByName(String firstName, String lastName) {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatement(FIND_BY_NAME_SQL)){
             preparedStatement.setString(1, "%".concat(firstName).concat("%"));
             preparedStatement.setString(2, "%".concat(lastName).concat("%"));
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -76,7 +75,6 @@ public class WriterRepositoryImpl implements WriterRepository {
                         )
                 );
             }
-            if (writers.isEmpty()) throw new WriterNotFoundException();
             return writers;
         } catch (SQLException e) {
             throw new GeneralException(e);
@@ -84,9 +82,8 @@ public class WriterRepositoryImpl implements WriterRepository {
     }
 
     @Override
-    public Writer save(Writer writer, Connection connection) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(SAVE_SQL, Statement.RETURN_GENERATED_KEYS);
+    public Writer save(Writer writer) {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatementWithGeneratedKeys(SAVE_SQL)){
             preparedStatement.setString(1, writer.getFirstName());
             preparedStatement.setString(2, writer.getLastName());
             preparedStatement.executeUpdate();
@@ -94,6 +91,7 @@ public class WriterRepositoryImpl implements WriterRepository {
             if (resultSet.next()) {
                 writer.setId(resultSet.getLong(1));
             }
+            preparedStatement.getConnection().commit();
             return writer;
         } catch (SQLException e) {
             throw new GeneralException(e);
@@ -101,25 +99,28 @@ public class WriterRepositoryImpl implements WriterRepository {
     }
 
     @Override
-    public Writer update(Writer writer, Connection connection) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL);
+    public Writer update(Writer writer) {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatement(UPDATE_SQL)){
             preparedStatement.setString(1, writer.getFirstName());
             preparedStatement.setString(2, writer.getLastName());
             preparedStatement.setLong(3, writer.getId());
-            preparedStatement.executeUpdate();
-            return writer;
+            int i = preparedStatement.executeUpdate();
+            preparedStatement.getConnection().commit();
+            if (i > 0) {
+                return writer;
+            }
+            throw new WriterNotFoundException();
         } catch (SQLException e){
             throw new GeneralException(e);
         }
     }
 
     @Override
-    public boolean delete(Long id, Connection connection) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_ID_SQL);
+    public boolean delete(Long id) {
+        try (PreparedStatement preparedStatement = DatabaseUtil.getStatement(DELETE_BY_ID_SQL)){
             preparedStatement.setLong(1, id);
             int i = preparedStatement.executeUpdate();
+            preparedStatement.getConnection().commit();
             return i > 0;
         } catch (SQLException e) {
             throw new GeneralException(e);

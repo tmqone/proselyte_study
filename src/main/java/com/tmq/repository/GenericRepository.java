@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface GenericRepository<ID, T>{
-    List<T> findAll(Connection connection) throws SQLException;
-    Optional<T> findById(ID id, Connection connection) throws SQLException;
-    T save(T t, Connection connection) throws SQLException;
-    T update(T t, Connection connection) throws SQLException;
-    boolean delete(ID id, Connection connection) throws SQLException;
+    List<T> findAll();
+    Optional<T> findById(ID id);
+    T save(T t);
+    T update(T t);
+    boolean delete(ID id);
 }
