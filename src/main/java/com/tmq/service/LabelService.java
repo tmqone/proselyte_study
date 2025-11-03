@@ -9,15 +9,17 @@ public interface LabelService extends GenericService<Label> {
 
     Label getByName(String name);
 
+    List<Label> getByName(List<Label> labels);
+
     Label getById(Long id);
 
     Label save(Label label);
 
     List<Label> save(List<Label> labels);
 
-    boolean saveLabelToPost(Long labelId, Long postId);
-
     Label update(Label label);
 
     boolean delete(Long id);
+
+    List<Label> findOrCreateLabels(List<Label> labels);
 }

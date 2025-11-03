@@ -31,6 +31,9 @@ public class PostServiceImplTest {
     @Mock
     PostRepository postRepository;
 
+    @Mock
+    LabelServiceImpl labelService;
+
     @InjectMocks
     PostServiceImpl postService;
 
@@ -156,7 +159,7 @@ public class PostServiceImplTest {
 
 
         Mockito.when(postRepository.save(postGiven)).thenReturn(returned);
-
+        Mockito.when(labelService.findOrCreateLabels(postGiven.getLabels())).thenReturn(labelRepositoryGiven);
         postService.save(postGiven);
 
         Mockito.verify(postRepository, Mockito.times(1)).save(postGiven);
@@ -185,6 +188,7 @@ public class PostServiceImplTest {
                 .build();
 
 
+        Mockito.when(labelService.findOrCreateLabels(postGiven.getLabels())).thenReturn(labelRepositoryGiven);
         Mockito.when(postRepository.update(postGiven)).thenReturn(postGiven);
         Mockito.when(postRepository.findById(1L)).thenReturn(Optional.of(postGiven));
 
@@ -212,7 +216,7 @@ public class PostServiceImplTest {
                 .labels(labelRepositoryGiven)
                 .build();
 
-
+        Mockito.when(labelService.findOrCreateLabels(postGiven.getLabels())).thenReturn(labelRepositoryGiven);
         Mockito.when(postRepository.update(postGiven)).thenReturn(postGiven);
         Mockito.when(postRepository.findById(1L)).thenReturn(Optional.of(postGiven));
 
@@ -241,24 +245,7 @@ public class PostServiceImplTest {
                 .labels(labelRepositoryGiven)
                 .build();
 
-        Mockito.when(postRepository.save(postGiven)).thenThrow(GeneralException.class);
-        Assertions.assertThrows(GeneralException.class, () -> postService.save(postGiven));
-        Mockito.verify(postRepository, Mockito.times(1)).save(postGiven);
-    }
-
-    @Test
-    public void savePost_repositorySqlException() {
-        List<Label> labelRepositoryGiven = List.of(new Label(1L, "Test"));
-        Post postGiven = Post.builder()
-                .id(0L)
-                .content("TEST")
-                .writer(new Writer(1L, null, null, null))
-                .created(null)
-                .updated(null)
-                .postStatus(PostStatus.ACTIVE)
-                .labels(labelRepositoryGiven)
-                .build();
-
+        Mockito.when(labelService.findOrCreateLabels(postGiven.getLabels())).thenReturn(labelRepositoryGiven);
         Mockito.when(postRepository.save(postGiven)).thenThrow(GeneralException.class);
         Assertions.assertThrows(GeneralException.class, () -> postService.save(postGiven));
         Mockito.verify(postRepository, Mockito.times(1)).save(postGiven);

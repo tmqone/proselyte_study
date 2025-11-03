@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface LabelRepository extends GenericRepository<Long, Label>{
     Optional<Label> findByName(String name);
-    List<Label> findByPostId(Long postId);
-    boolean saveLabelToPost(Long labelId, Long postId);
+    List<Label> findByName(List<Label> labels);
+
+    List<Label> findOrCreateLabels(List<Label> labels);
 }

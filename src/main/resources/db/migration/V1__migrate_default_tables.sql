@@ -1,7 +1,3 @@
--- liquibase formatted sql
-
--- changeset tmq:001
--- comment: initialize tables
 CREATE TABLE writers (
     id BIGINT PRIMARY KEY UNIQUE GENERATED ALWAYS AS IDENTITY,
     first_name VARCHAR(100) NOT NULL,

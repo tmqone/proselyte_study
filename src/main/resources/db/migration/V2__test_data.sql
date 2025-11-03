@@ -1,7 +1,3 @@
--- liquibase formatted sql
-
--- changeset tmq:002
--- comment: migrate test data
 INSERT INTO writers (first_name, last_name) VALUES
                                                 ('Haruki', 'Murakami'),
                                                 ('Joan', 'Didion'),

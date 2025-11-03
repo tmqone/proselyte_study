@@ -23,6 +23,11 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
+    public List<Label> getByName(List<Label> labels) {
+        return labelRepository.findByName(labels);
+    }
+
+    @Override
     public Label getById(Long id) {
         return labelRepository.findById(id)
                 .orElseThrow(LabelNotFoundException::new);
@@ -38,10 +43,6 @@ public class LabelServiceImpl implements LabelService {
         return labels.stream().map(labelRepository::save).toList();
     }
 
-    @Override
-    public boolean saveLabelToPost(Long labelId, Long postId) {
-        return labelRepository.saveLabelToPost(labelId, postId);
-    }
 
     @Override
     public Label update(Label label) {
@@ -51,5 +52,10 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public boolean delete(Long id) {
         return labelRepository.delete(id);
+    }
+
+    @Override
+    public List<Label> findOrCreateLabels(List<Label> labels) {
+        return labelRepository.findOrCreateLabels(labels);
     }
 }

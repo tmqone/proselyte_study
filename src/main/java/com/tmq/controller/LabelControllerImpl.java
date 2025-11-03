@@ -47,18 +47,17 @@ public class LabelControllerImpl implements LabelController {
     public LabelDto save(String name) {
         name = name.trim();
         if (inputValidator.validate(name)) throw new NotCorrectInputException();
-        return labelMapper.fromEntity(labelService.save(new Label(0L, name)));
+        return labelMapper.fromEntity(labelService.save(Label.builder().name(name).build()));
     }
 
     @Override
     public LabelDto update(String name, String id) {
-
         name = name.trim();
         id = id.trim();
         if (inputValidator.validate(name) || inputValidator.validateLongString(id)) {
             throw new NotCorrectInputException();
         }
-        return labelMapper.fromEntity(labelService.update(new Label(Long.parseLong(id), name)));
+        return labelMapper.fromEntity(labelService.update(Label.builder().name(name).id(Long.valueOf(id)).build()));
     }
 
     @Override

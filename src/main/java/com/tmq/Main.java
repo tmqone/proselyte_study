@@ -1,12 +1,11 @@
 package com.tmq;
 
-import com.tmq.util.DatabaseUtil;
+import com.tmq.util.HibernateUtil;
 import com.tmq.view.MainView;
 
-import java.sql.SQLException;
-
 public class Main {
-    static void main() throws SQLException {
+    static void main(String[] args) {
+        HibernateUtil.getSessionFactory().isClosed();
         MainView.getInstance().start();
     }
 }

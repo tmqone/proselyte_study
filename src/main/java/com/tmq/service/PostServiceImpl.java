@@ -41,6 +41,7 @@ public class PostServiceImpl implements PostService {
         post.setCreated(Instant.now());
         post.setUpdated(Instant.now());
         post.setPostStatus(PostStatus.ACTIVE);
+        post.setLabels(labelService.findOrCreateLabels(post.getLabels()));
         return postRepository.save(post);
     }
 
@@ -49,6 +50,7 @@ public class PostServiceImpl implements PostService {
     public Post update(Post post) {
         post.setUpdated(Instant.now());
         post.setWriter(postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new).getWriter());
+        post.setLabels(labelService.findOrCreateLabels(post.getLabels()));
         return postRepository.update(post);
     }
 
