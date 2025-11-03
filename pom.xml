@@ -15,6 +15,18 @@
         <liquibase.version>5.0.1</liquibase.version>
         <postgresql.version>42.7.8</postgresql.version>
         <lombok.version>1.18.38</lombok.version>
+        <mockito-junit-jupiter.version>5.20.0</mockito-junit-jupiter.version>
+        <hibernate.version>6.5.2.Final</hibernate.version>
+        <flyway-database-postgresql.version>10.20.1</flyway-database-postgresql.version>
+        <flyway.version>9.22.3</flyway.version>
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
+        <flyway-maven-plugin.version>9.22.0</flyway-maven-plugin.version>
+        <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
+        <datasource.url>jdbc:postgresql://localhost:54210/cli</datasource.url>
+        <datasource.user>cli_user</datasource.user>
+        <datasource.password>cli_pass</datasource.password>
+        <datasource.schemas>public</datasource.schemas>
     </properties>
 
     <dependencies>
@@ -33,30 +45,30 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.20.0</version>
+            <version>${mockito-junit-jupiter.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
-            <version>6.5.2.Final</version>
+            <version>${hibernate.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>3.5.4</version>
+            <version>${maven-surefire-plugin.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
-            <version>10.20.1</version>
+            <version>${flyway-database-postgresql.version}</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>9.22.3</version>
+            <version>${flyway.version}</version>
         </dependency>
     </dependencies>
 
@@ -65,7 +77,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.13.0</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
@@ -81,7 +93,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.4</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>-Dnet.bytebuddy.experimental=true</argLine>
                 </configuration>
@@ -89,7 +101,7 @@
             <plugin>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-maven-plugin</artifactId>
-                <version>9.22.0</version>
+                <version>${flyway-maven-plugin.version}</version>
                 <dependencies>
                     <dependency>
                         <groupId>org.postgresql</groupId>
@@ -98,17 +110,17 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <url>jdbc:postgresql://localhost:54210/cli</url>
-                    <user>cli_user</user>
-                    <password>cli_pass</password>
-                    <schemas>public</schemas>
+                    <url>${datasource.url}</url>
+                    <user>${datasource.user}</user>
+                    <password>${datasource.password}</password>
+                    <schemas>${datasource.schemas}</schemas>
                     <validateMigrationNaming>true</validateMigrationNaming>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>${maven-assembly-plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>
