@@ -16,22 +16,27 @@ public class HibernateUtil {
 
     private static SessionFactory initSessionFactory() {
         return new Configuration()
-                .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")
-                .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:54210/cli")
-                .setProperty("hibernate.connection.username", "cli_user")
-                .setProperty("hibernate.connection.password", "cli_pass")
-                .setProperty("hibernate.show_sql", "false")
-                .setProperty("hibernate.format_sql", "true")
-                .setProperty("hibernate.connection.autocommit", "false")
+                .setProperty("hibernate.connection.driver_class", PropertiesUtil.get("hibernate.connection.driver_class"))
+                .setProperty("hibernate.connection.url", PropertiesUtil.get("hibernate.connection.url"))
+                .setProperty("hibernate.connection.username", PropertiesUtil.get("hibernate.connection.username"))
+                .setProperty("hibernate.connection.password", PropertiesUtil.get("hibernate.connection.password"))
+                .setProperty("hibernate.show_sql", PropertiesUtil.get("hibernate.show_sql"))
+                .setProperty("hibernate.format_sql", PropertiesUtil.get("hibernate.format_sql"))
+                .setProperty("hibernate.connection.autocommit", PropertiesUtil.get("hibernate.connection.autocommit"))
                 .addAnnotatedClass(Label.class)
                 .addAnnotatedClass(Post.class)
                 .addAnnotatedClass(Writer.class)
                 .buildSessionFactory();
     }
 
-    public static SessionFactory getSessionFactory() {
+    public static void initHibernate(){
+        getSessionFactory().isClosed();
+    }
+
+    private static SessionFactory getSessionFactory() {
         return sessionFactory;
     }
+
 
     public static Session getSession() {
         return sessionFactory.openSession();

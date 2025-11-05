@@ -5,7 +5,7 @@ import com.tmq.view.MainView;
 
 public class Main {
     static void main(String[] args) {
-        HibernateUtil.getSessionFactory().isClosed();
+        HibernateUtil.initHibernate();
         MainView.getInstance().start();
     }
 }

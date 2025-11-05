@@ -55,9 +55,7 @@ public class HibernateLabelRepositoryImpl implements LabelRepository {
     @Override
     public List<Label> findAll() {
         try (Session session = HibernateUtil.getSession()) {
-            session.beginTransaction();
             List<Label> labels = session.createQuery("from Label", Label.class).list();
-            session.getTransaction().commit();
             return labels;
         }
     }
@@ -65,9 +63,7 @@ public class HibernateLabelRepositoryImpl implements LabelRepository {
     @Override
     public Optional<Label> findById(Long aLong) {
         try (Session session = HibernateUtil.getSession()) {
-            session.beginTransaction();
             Label label = session.get(Label.class, aLong);
-            session.getTransaction().commit();
             return Optional.ofNullable(label);
         }
     }

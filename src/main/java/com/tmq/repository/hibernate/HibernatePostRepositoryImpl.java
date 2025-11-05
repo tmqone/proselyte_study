@@ -15,7 +15,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> findByWriter(Long writerId) {
         try (Session session = HibernateUtil.getSession()) {
-            session.beginTransaction();
             Query<Post> query = session.createQuery("""
                     from Post p
                     join fetch p.writer
@@ -24,7 +23,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
                     """, Post.class);
             query.setParameter("writer_id", writerId);
             List<Post> posts = query.list();
-            session.getTransaction().commit();
             return posts;
         }
     }
@@ -32,7 +30,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
     @Override
     public List<Post> findAll() {
         try (Session session = HibernateUtil.getSession()) {
-            session.beginTransaction();
             Query<Post> query = session.createQuery("""
                     from Post p
                     join fetch p.writer
@@ -40,7 +37,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
                     where p.postStatus != 'DELETED'
                     """, Post.class);
             List<Post> posts = query.list();
-            session.getTransaction().commit();
             return posts;
         }
     }
@@ -48,7 +44,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
     @Override
     public Optional<Post> findById(Long aLong) {
         try (Session session = HibernateUtil.getSession()) {
-            session.beginTransaction();
             Query<Post> query = session.createQuery("""
                     from Post p
                     join fetch p.writer
@@ -57,7 +52,6 @@ public class HibernatePostRepositoryImpl implements PostRepository {
                     """, Post.class);
             query.setParameter("id", aLong);
             Post post = query.uniqueResult();
-            session.getTransaction().commit();
             return Optional.ofNullable(post);
         }
     }
