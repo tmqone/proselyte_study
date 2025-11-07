@@ -2,9 +2,9 @@ services:
   db:
     image: postgres:15.14-alpine3.21
     environment:
-      POSTGRES_DB: cli
-      POSTGRES_USER: cli_user
-      POSTGRES_PASSWORD: cli_pass
+      POSTGRES_DB: fileApp
+      POSTGRES_USER: fileApp_user
+      POSTGRES_PASSWORD: fileApp_pass
     ports:
       - "54210:5432"
     healthcheck:

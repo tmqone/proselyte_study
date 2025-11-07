@@ -1,8 +1,8 @@
 package com.tmq.util;
 
-import com.tmq.model.Label;
-import com.tmq.model.Post;
-import com.tmq.model.Writer;
+import com.tmq.model.Event;
+import com.tmq.model.File;
+import com.tmq.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -23,9 +23,9 @@ public class HibernateUtil {
                 .setProperty("hibernate.show_sql", PropertiesUtil.get("hibernate.show_sql"))
                 .setProperty("hibernate.format_sql", PropertiesUtil.get("hibernate.format_sql"))
                 .setProperty("hibernate.connection.autocommit", PropertiesUtil.get("hibernate.connection.autocommit"))
-                .addAnnotatedClass(Label.class)
-                .addAnnotatedClass(Post.class)
-                .addAnnotatedClass(Writer.class)
+                .addAnnotatedClass(User.class)
+                .addAnnotatedClass(File.class)
+                .addAnnotatedClass(Event.class)
                 .buildSessionFactory();
     }
 
