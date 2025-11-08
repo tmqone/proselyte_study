@@ -22,4 +22,7 @@ public class File {
 
     @Column(name = "file_path")
     private String filePath;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
 }

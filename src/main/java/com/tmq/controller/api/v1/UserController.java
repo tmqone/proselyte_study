@@ -3,7 +3,7 @@ package com.tmq.controller.api.v1;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmq.dto.user.*;
 import com.tmq.service.UserService;
-import jakarta.servlet.ServletException;
+import com.tmq.util.JacksonMapper;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,18 +14,18 @@ import java.util.List;
 
 @WebServlet("/api/v1/user")
 public class UserController extends HttpServlet {
-    private final ObjectMapper mapper = new ObjectMapper();
-    private final UserService userService = new UserService();
+    private final ObjectMapper mapper = JacksonMapper.getObjectMapper();
+    private final UserService userService = UserService.getInstance();
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         CreateUserRequest createUserRequest = mapper.readValue(req.getReader(), CreateUserRequest.class);
         CreateUserResponse user = userService.save(createUserRequest);
         resp.getWriter().write(mapper.writeValueAsString(user));
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         UpdateUserRequest updateUserRequest = mapper.readValue(req.getReader(), UpdateUserRequest.class);
         UpdateUserResponse update = userService.update(updateUserRequest);
         resp.getWriter().write(mapper.writeValueAsString(update));
@@ -33,14 +33,14 @@ public class UserController extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         DeleteUserRequest deleteUserRequest = mapper.readValue(req.getReader(), DeleteUserRequest.class);
         userService.delete(deleteUserRequest);
         resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String id = req.getParameter("id");
         if (req.getParameter("id") != null) {
             FindUserByIdResponse user = userService.findById(Integer.parseInt(id));

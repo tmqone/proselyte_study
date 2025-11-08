@@ -1,4 +1,7 @@
 package com.tmq.dto.file;
 
-public record CreateFileResponse (Integer id, String name, String filePath){
+import com.tmq.dto.entity.FileDto;
+import java.util.List;
+
+public record CreateFileResponse (List<FileDto> files){
 }

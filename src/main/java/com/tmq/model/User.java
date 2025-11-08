@@ -1,11 +1,13 @@
 package com.tmq.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -23,6 +25,6 @@ public class User {
     private String username;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @Fetch(FetchMode.JOIN)
-    private List<Event> events;
+    @Builder.Default
+    private List<Event> events = new ArrayList<>();
 }

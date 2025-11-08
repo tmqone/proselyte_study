@@ -13,7 +13,7 @@ public class HibernateUtil {
     static {
         sessionFactory = initSessionFactory();
     }
-
+    //TODO приделать кэш 2-ого уровня
     private static SessionFactory initSessionFactory() {
         return new Configuration()
                 .setProperty("hibernate.connection.driver_class", PropertiesUtil.get("hibernate.connection.driver_class"))

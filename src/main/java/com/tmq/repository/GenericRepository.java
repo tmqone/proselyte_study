@@ -11,4 +11,5 @@ public interface GenericRepository<ID, T>{
     T save(T t);
     T update(T t);
     boolean delete(ID id);
+    boolean existsById(ID id);
 }

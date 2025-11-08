@@ -7,5 +7,5 @@ import lombok.Builder;
 
 import java.util.List;
 
-public record UpdateUserRequest(Integer id, String username, @JsonIgnoreProperties("userDto") List<EventDto> events){
+public record UpdateUserRequest(Integer id, String username){
 }

@@ -4,12 +4,22 @@ import com.tmq.exception.EventNotFoundException;
 import com.tmq.model.Event;
 import com.tmq.repository.EventRepository;
 import com.tmq.util.HibernateUtil;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import java.util.List;
 import java.util.Optional;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class HibernateEventRepositoryImpl implements EventRepository {
+    private static final HibernateEventRepositoryImpl INSTANCE = new HibernateEventRepositoryImpl();
+
+    public static HibernateEventRepositoryImpl getInstance() {
+        return INSTANCE;
+    }
+
     @Override
     public List<Event> findAll() {
         try (Session session = HibernateUtil.getSession()){
@@ -29,9 +39,8 @@ public class HibernateEventRepositoryImpl implements EventRepository {
         try (Session session = HibernateUtil.getSession()){
             session.beginTransaction();
             session.persist(event);
-            session.find(Event.class, event.getId());
             session.getTransaction().commit();
-            return event;
+            return findById(event.getId()).orElseThrow(EventNotFoundException::new);
         }
     }
 
@@ -39,12 +48,12 @@ public class HibernateEventRepositoryImpl implements EventRepository {
     public Event update(Event event) {
         try (Session session = HibernateUtil.getSession()){
             session.beginTransaction();
-            Event merge = findById(event.getId()).orElseThrow(EventNotFoundException::new);
-            merge.setFile(event.getFile());
-            merge.setUser(event.getUser());
-            merge.setAction(event.getAction());
+            Event result = session.find(Event.class, event.getId());
+            result.setUser(event.getUser());
+            result.setAction(event.getAction());
+            result.setFile(event.getFile());
             session.getTransaction().commit();
-            return merge;
+            return findById(result.getId()).orElseThrow(EventNotFoundException::new);
         }
     }
 
@@ -52,9 +61,16 @@ public class HibernateEventRepositoryImpl implements EventRepository {
     public boolean delete(Integer integer) {
         try (Session session = HibernateUtil.getSession()){
             session.beginTransaction();
-            session.remove(integer);
+            session.remove(Event.builder().id(integer).build());
             session.getTransaction().commit();
             return true;
+        }
+    }
+
+    public boolean existsById(Integer integer) {
+        try (Session session = HibernateUtil.getSession()){
+            return session.createQuery("select count(f) from Event f where f.id = :id", Long.class)
+                    .setParameter("id", integer).uniqueResult() > 0;
         }
     }
 }

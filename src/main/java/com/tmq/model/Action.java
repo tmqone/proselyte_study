@@ -2,7 +2,7 @@ package com.tmq.model;
 
 public enum Action {
     UPLOAD,
-    DOWNLOAD,
+    GET,
     DELETE,
     UPDATED
 }

@@ -6,12 +6,20 @@ import com.tmq.mapper.UserMapper;
 import com.tmq.model.User;
 import com.tmq.repository.UserRepository;
 import com.tmq.repository.hibernate.HibernateUserRepositoryImpl;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserService{
-    private final UserRepository userRepository = new HibernateUserRepositoryImpl();
-    private final UserMapper userMapper = new UserMapper();
+    private static final UserService INSTANCE = new UserService();
+    private static final UserRepository userRepository = HibernateUserRepositoryImpl.getInstance();
+    private static final UserMapper userMapper = new UserMapper();
+
+    public static UserService getInstance() {
+        return INSTANCE;
+    }
 
     //TODO сделать валидаторы
     public CreateUserResponse save(CreateUserRequest userDto) {
@@ -38,8 +46,12 @@ public class UserService{
     public List<FindAllUserResponse> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper::toUserDto)
-                .map(x -> new FindAllUserResponse(x.id(), x.username(), x.events()))
+                .map(UserMapper::toUserWithoutEventDto)
+                .map(value -> new FindAllUserResponse(value.id(), value.name()))
                 .toList();
+    }
+
+    public boolean existsById(Integer id) {
+        return userRepository.existsById(id);
     }
 }

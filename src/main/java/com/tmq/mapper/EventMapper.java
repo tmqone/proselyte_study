@@ -1,6 +1,8 @@
 package com.tmq.mapper;
 
 import com.tmq.dto.entity.EventDto;
+import com.tmq.dto.entity.EventWithoutUserDto;
+import com.tmq.dto.entity.UserWithoutEventDto;
 import com.tmq.dto.event.*;
 import com.tmq.model.Action;
 import com.tmq.model.Event;
@@ -18,23 +20,32 @@ public class EventMapper {
                 event.getAction());
     }
 
+    public static EventWithoutUserDto toEventWithoutUserEventsDto(Event event){
+        return new EventWithoutUserDto(
+                event.getId(),
+                FileMapper.toFileDto(event.getFile()),
+                event.getAction()
+        );
+    }
+
     public Event postToEntity(CreateEventRequest dto) {
         return Event.builder()
                 .file(File.builder().id(dto.fileId()).build())
                 .user(User.builder().id(dto.userId()).build())
-                .id(dto.userId())
+                .action(dto.action())
                 .build();
     }
 
     public CreateEventResponse postFromEntity(Event event) {
         return new CreateEventResponse(
-                event.getId(), UserMapper.toUserDto(event.getUser()),
+                event.getId(), UserMapper.toUserWithoutEventDto(event.getUser()),
                 FileMapper.toFileDto(event.getFile()), event.getAction()
         );
     }
 
     public FindEventByIdResponse getByIdFromEntity(Event event) {
-        return new FindEventByIdResponse(event.getId(), event.getUser(), event.getFile(), event.getAction());
+        return new FindEventByIdResponse(event.getId(), UserMapper.toUserWithoutEventDto(event.getUser()),
+                FileMapper.toFileDto(event.getFile()), event.getAction());
     }
 
     public Event updateToEntity(UpdateEventRequest dto) {
@@ -46,12 +57,13 @@ public class EventMapper {
 
     public List<FindAllEventResponse> findAllFromEntity(List<Event> event) {
         return event.stream()
-                .map(value -> new FindAllEventResponse(value.getId(), value.getUser(), value.getFile(), value.getAction()))
+                .map(value -> new FindAllEventResponse(value.getId(), UserMapper.toUserWithoutEventDto(value.getUser()),
+                        FileMapper.toFileDto(value.getFile()), value.getAction()))
                 .toList();
     }
 
     public UpdateEventResponse updateFromEntity(Event event) {
-        return new UpdateEventResponse(event.getId(), UserMapper.toUserDto(event.getUser()),
+        return new UpdateEventResponse(event.getId(), UserMapper.toUserWithoutEventDto(event.getUser()),
                 FileMapper.toFileDto(event.getFile()), event.getAction());
     }
 

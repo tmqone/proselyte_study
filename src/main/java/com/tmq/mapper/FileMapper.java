@@ -4,6 +4,8 @@ import com.tmq.dto.entity.FileDto;
 import com.tmq.dto.file.*;
 import com.tmq.model.File;
 
+import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 
 public class FileMapper {
@@ -12,12 +14,12 @@ public class FileMapper {
         return new FileDto(file.getId(), file.getName(), file.getFilePath());
     }
 
-    public File postToEntity(CreateFileRequest dto) {
-        return File.builder().name(dto.name()).filePath(dto.filePath()).build();
+    public File postToEntity(CreateFileRequest dto, String filePath, String name) {
+        return File.builder().filePath(filePath).name(name).isDeleted(false).build();
     }
 
-    public CreateFileResponse postFromEntity(File file) {
-        return new CreateFileResponse(file.getId(), file.getName(), file.getFilePath());
+    public CreateFileResponse postFromEntity(List<File> files) {
+        return new CreateFileResponse(files.stream().map(FileMapper::toFileDto).toList());
     }
 
     public FindFileResponse getByIdFromEntity(File dto) {
@@ -30,7 +32,7 @@ public class FileMapper {
     }
 
     public File updateToEntity(UpdateFileRequest dto) {
-        return File.builder().id(dto.id()).name(dto.name()).filePath(dto.filePath()).build();
+        return File.builder().id(dto.id()).name(dto.name()).build();
     }
 
     public UpdateFileResponse updateFromEntity(File file) {
