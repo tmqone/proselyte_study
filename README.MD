@@ -18,12 +18,3 @@ Docker Compose
 ```bash
 docker compose up -d
 ```
-
-## API документация
-
-<!-- ReDoc -->
-<script src="https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js"></script>
-<div id="redoc-container"></div>
-<script>
-  Redoc.init('https://raw.githubusercontent.com/tmqone/proselyte_study/refs/heads/module-2.4/src/main/resources/swagger.yml', {}, document.getElementById('redoc-container'))
-</script>
