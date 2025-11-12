@@ -22,7 +22,7 @@ services:
 
   app:
     container_name: app
-    image: test_app
+    image: tmqone/proselyte_study:latest
     ports:
       - "8000:8080"
     depends_on:
