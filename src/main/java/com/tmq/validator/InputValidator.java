@@ -1,35 +1,27 @@
 package com.tmq.validator;
 
+import com.tmq.exception.NotCorrectInputException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+import java.util.Arrays;
+
 public class InputValidator {
-    private static final InputValidator INSTANCE = new InputValidator();
-
-    public static InputValidator getInstance() {
-        return INSTANCE;
+    public void validate(String name){
+        if (name == null || name.trim().isEmpty()) throw new NotCorrectInputException("Ошибка валидации полей");
     }
 
-    public boolean validate(String name){
-        return name == null || name.trim().isEmpty();
-    }
-
-    public boolean validateLongString(String number){
+    public void validateLongString(String number){
         try {
-            if (number == null || number.isEmpty()) return true;
+            if (number == null || number.isEmpty()) throw new NotCorrectInputException("Ошибка валидации полей");
             number = number.trim();
             Long.parseLong(number);
         } catch (NumberFormatException e) {
-            return true;
+            throw new NotCorrectInputException("Ошибка валидации полей");
         }
-        return false;
     }
 
-    public boolean validateInput(String... input) {
-        for (String s : input) {
-            if (validate(s)) return true;
-        }
-        return false;
+    public void validateInput(String... input) {
+        Arrays.stream(input).forEach(this::validate);
     }
 }

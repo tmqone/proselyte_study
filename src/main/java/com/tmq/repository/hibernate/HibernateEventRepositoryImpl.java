@@ -1,12 +1,12 @@
 package com.tmq.repository.hibernate;
 
 import com.tmq.exception.EventNotFoundException;
+import com.tmq.model.Action;
 import com.tmq.model.Event;
 import com.tmq.repository.EventRepository;
 import com.tmq.util.HibernateUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.hibernate.Hibernate;
 import org.hibernate.Session;
 
 import java.util.List;
@@ -22,55 +22,142 @@ public class HibernateEventRepositoryImpl implements EventRepository {
 
     @Override
     public List<Event> findAll() {
-        try (Session session = HibernateUtil.getSession()){
-            return session.createQuery("from Event", Event.class).list();
+        try (Session session = HibernateUtil.getSession()) {
+            return session.createQuery("""
+                    from Event e
+                    left join fetch e.file
+                    left join fetch e.user
+                    """, Event.class).list();
+        }
+    }
+
+    @Override
+    public List<Event> findAllByUser(Integer userId) {
+        try (Session session = HibernateUtil.getSession()) {
+            return session.createQuery("""
+                    from Event e
+                    left join fetch e.file
+                    left join fetch e.user
+                    where e.user.id = :userId
+                    """, Event.class).setParameter("userId", userId).list();
+        }
+    }
+
+    @Override
+    public List<Event> findAllByUserWithAction(Integer userId, Action action) {
+        try (Session session = HibernateUtil.getSession()) {
+            return session.createQuery("""
+                    from Event e
+                    left join fetch e.file
+                    left join fetch e.user
+                    where e.user.id = :userId and e.action = :action
+                    """, Event.class).setParameter("userId", userId)
+                    .setParameter("action", action).list();
+        }
+    }
+
+    @Override
+    public List<Event> findAllByUserWithFileId(Integer userId, Integer fileId) {
+        try (Session session = HibernateUtil.getSession()) {
+            return session.createQuery("""
+                    from Event e
+                    left join fetch e.file
+                    left join fetch e.user
+                    where e.user.id = :userId and e.file.id = :fileId
+                    """, Event.class).setParameter("userId", userId)
+                    .setParameter("fileId", fileId).list();
+        }
+    }
+
+    @Override
+    public List<Event> findByFileId(Integer fileId) {
+        try (Session session = HibernateUtil.getSession()) {
+            return session.createQuery("""
+                    from Event e
+                    left join fetch e.file
+                    left join fetch e.user
+                    where e.file.id = :fileId
+                    """, Event.class)
+                    .setParameter("fileId", fileId).list();
         }
     }
 
     @Override
     public Optional<Event> findById(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
-            return Optional.ofNullable(session.get(Event.class, integer));
+        try (Session session = HibernateUtil.getSession()) {
+            return Optional.ofNullable(session.createQuery("""
+                            from Event e
+                            left join fetch e.file
+                            left join fetch e.user
+                            where e.id = :id
+                            """, Event.class)
+                    .setParameter("id", integer)
+                    .uniqueResult());
         }
     }
 
     @Override
     public Event save(Event event) {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
             session.persist(event);
             session.getTransaction().commit();
-            return findById(event.getId()).orElseThrow(EventNotFoundException::new);
+            return event;
         }
     }
 
     @Override
     public Event update(Event event) {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
-            Event result = session.find(Event.class, event.getId());
-            result.setUser(event.getUser());
-            result.setAction(event.getAction());
-            result.setFile(event.getFile());
+            int i = session.createQuery("""
+                            update Event e 
+                            set e.file = :file, e.user = :user, e.action = :action
+                            where e.id = :id
+                            """)
+                    .setParameter("id", event.getId())
+                    .setParameter("file", event.getFile())
+                    .setParameter("user", event.getUser())
+                    .setParameter("action", event.getAction())
+                    .executeUpdate();
+
+            if (i < 1) throw new EventNotFoundException();
+
+            Event result = Optional.ofNullable(
+                    session.createQuery("""
+                                    from Event e
+                                    left join fetch e.file
+                                    left join fetch e.user
+                                    where e.id = :id
+                                    """, Event.class)
+                            .setParameter("id", event.getId())
+                            .uniqueResult()
+            ).orElseThrow(EventNotFoundException::new);
+
             session.getTransaction().commit();
-            return findById(result.getId()).orElseThrow(EventNotFoundException::new);
+            return result;
         }
     }
 
     @Override
     public boolean delete(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
-            session.remove(Event.builder().id(integer).build());
+            int i = session.createQuery("delete Event e where e.id = :id")
+                    .setParameter("id", integer)
+                    .executeUpdate();
             session.getTransaction().commit();
-            return true;
+            return i > 0;
         }
     }
 
-    public boolean existsById(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
-            return session.createQuery("select count(f) from Event f where f.id = :id", Long.class)
-                    .setParameter("id", integer).uniqueResult() > 0;
+    @Override
+    public List<Event> save(List<Event> events) {
+        try (Session session = HibernateUtil.getSession()) {
+            session.beginTransaction();
+            events.forEach(session::persist);
+            session.getTransaction().commit();
+            return events;
         }
     }
 }

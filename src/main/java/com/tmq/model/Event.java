@@ -1,13 +1,10 @@
 package com.tmq.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 @Data
 @Builder
@@ -22,12 +19,10 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    @Fetch(FetchMode.JOIN)
     private User user;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "file_id")
-    @Fetch(FetchMode.JOIN)
     private File file;
 
     @Enumerated(EnumType.STRING)

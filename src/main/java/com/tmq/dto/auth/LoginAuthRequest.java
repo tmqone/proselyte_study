@@ -1,4 +1,4 @@
 package com.tmq.dto.auth;
 
-public record LoginServiceRequest (String username, String password){
+public record LoginAuthRequest(String username, char[] password){
 }

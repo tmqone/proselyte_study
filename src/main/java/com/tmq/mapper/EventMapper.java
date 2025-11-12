@@ -2,7 +2,6 @@ package com.tmq.mapper;
 
 import com.tmq.dto.entity.EventDto;
 import com.tmq.dto.entity.EventWithoutUserDto;
-import com.tmq.dto.entity.UserWithoutEventDto;
 import com.tmq.dto.event.*;
 import com.tmq.model.Action;
 import com.tmq.model.Event;
@@ -52,7 +51,7 @@ public class EventMapper {
         return Event.builder().id(dto.id())
                 .user(User.builder().id(dto.userId()).build())
                 .file(File.builder().id(dto.fileId()).build())
-                .action(Action.valueOf(dto.action())).build();
+                .action(dto.action()).build();
     }
 
     public List<FindAllEventResponse> findAllFromEntity(List<Event> event) {

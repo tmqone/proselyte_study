@@ -1,31 +1,22 @@
 
 # Module 2.3
 
-Консольное CRUD приложение, которое взаимодействует с БД через Hibernate и позволяет выполнять все CRUD операции над сущностями:
+REST API приложение, которое взаимодействует с файловым хранилищем и предоставляет возможность получать доступ к файлам и истории загрузок.:
 ```
-Writer (id, firstName, lastName, List<Post> posts);
-Post (id, content, created, updated, List<Label> labels, status);
-Label (id, name);
-PostStatus (enum ACTIVE, UNDER_REVIEW, DELETED);
+User -> Integer id, String name, List<Event> events
+Event -> Integer id, User user, File file
+File -> Integer id, String name, String filePath
 ```
-
-
-
-
 
 ## Зависимости
 ```
-Java (25)
 Docker Compose
 ```
 
 ## Запуск проекта
 
 ```bash
-docker compose up -d  # Поднять postgres в контейнере
-./mvnw flyway:migrate # Выполнить миграцию БД
-./mvnw package # Сборка проекта
-java -jar target/proselyte_study-1.0-SNAPSHOT-jar-with-dependencies.jar # Запуск проекта
+docker compose up -d
 ```
 
 

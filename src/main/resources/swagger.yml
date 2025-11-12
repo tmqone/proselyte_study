@@ -1,0 +1,2009 @@
+openapi: 3.0.0
+info:
+  title: Приложение для работы с файлами
+  version: 1.0.0
+  description: _OpenAPI документация для API v1_
+servers:
+  - url: 'http://localhost:8080/api/v1'
+paths:
+  /auth/login:
+    post:
+      summary: Авторизация
+      tags:
+        - Авторизация и регистрация
+      parameters:
+        - name: user_id
+          in: header
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Авторизация успешна
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  access_token:
+                    type: string
+        '401':
+          description: Неправильный логин или пароль
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      description: Метод для авторизации пользователя
+  /auth/register:
+    post:
+      summary: Регистрация
+      tags:
+        - Авторизация и регистрация
+      responses:
+        '200':
+          description: Пользователь зарегистрирован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                  access_token:
+                    type: string
+        '409':
+          description: Пользователь с таким именем уже существует
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      description: Метод для регистрации пользователя
+  /user:
+    get:
+      summary: Получить информации о пользователе
+      tags:
+        - Пользовательское взаимодействие с учётной записью
+      responses:
+        '200':
+          description: Информация о пользователе получена
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      description: Получение информации об авторизованном пользователе
+  /file:
+    get:
+      summary: Получить информацию о файлах пользователя
+      tags:
+        - Пользовательское взаимодействие с файлами
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Информация о файле получена
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_path:
+                    type: string
+        '204':
+          description: Файлы не найдены
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      description: >-
+        Получение информации о файлах, которые доступны пользователю.
+        Пользователь также может получить информацию об определенном файле,
+        который ему доступен через параметр запроса "id".
+    post:
+      summary: Загрузить пользовательский файл
+      tags:
+        - Пользовательское взаимодействие с файлами
+      responses:
+        '200':
+          description: Файл загружен
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  files:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        file_path:
+                          type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '409':
+          description: Файл с таким именем уже существует
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      description: Загрузка файла
+    delete:
+      summary: Удалить пользовательский файл
+      tags:
+        - Пользовательское взаимодействие с файлами
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            deprecated: false
+      responses:
+        '204':
+          description: Файл удалён
+          headers:
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      security:
+        - BearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      description: Удаление файла, который доступен пользователю
+    put:
+      summary: Изменить имя файла
+      tags:
+        - Пользовательское взаимодействие с файлами
+      parameters:
+        - name: user_id
+          in: header
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Имя файла изменено
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_path:
+                    type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Methods:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Headers:
+              schema:
+                deprecated: false
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+      description: Изменение имя файла, который доступен пользователю
+  /file/download:
+    get:
+      summary: Скачать пользовательский файл
+      tags:
+        - Пользовательское взаимодействие с файлами
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Файл скачен
+          headers:
+            Transfer-Encoding:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      description: Скачивание файла, который доступен пользователю
+  /event:
+    get:
+      summary: Получить информацию о событии
+      tags:
+        - Пользовательское взаимодействие с событиями
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+        - name: file_id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Получена информация о событии по идентификатору ивента
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                  file:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      file_path:
+                        type: string
+                  action:
+                    type: string
+        '204':
+          description: Информация о событиях по идентификатору файла отсутствует
+          headers:
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Событие не найдено
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: >-
+        Получить информацию о событиях, которые доступны пользователю.
+        Пользователь может найти определенное событие через параметр запроса id.
+        Пользователь может найти события по файлу через параметр запроса
+        "file_id"
+  /admin/user:
+    get:
+      summary: Получение информации о системных пользователях
+      tags:
+        - Административное взаимодействие с пользователями
+      responses:
+        '200':
+          description: Информация о пользователях получена
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Methods:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Headers:
+              schema:
+                deprecated: false
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    username:
+                      type: string
+                    role:
+                      type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Пользователь не найден
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+      description: >-
+        Получение информации о всех пользователях системы. Метод может вернуть
+        информацию по определенному пользователю, если в запросе указан параметр
+        "id".
+    post:
+      summary: Создать пользователя
+      tags:
+        - Административное взаимодействие с пользователями
+      responses:
+        '200':
+          description: Пользователь создан
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '409':
+          description: Пользователь с таким именем уже существует
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Methods:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Headers:
+              schema:
+                deprecated: false
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: utc-millisec
+                role:
+                  type: string
+      description: Создание пользователя
+    put:
+      summary: Изменить информацию о пользователе
+      tags:
+        - Административное взаимодействие с пользователями
+      responses:
+        '200':
+          description: Информация о пользователя изменена
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+        '404':
+          description: Пользователь не найден
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Methods:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Headers:
+              schema:
+                deprecated: false
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: utc-millisec
+                username:
+                  type: string
+                role:
+                  type: string
+      description: Изменение информации о пользователе
+    delete:
+      summary: Удалить пользователя
+      tags:
+        - Административное взаимодействие с пользователями
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            deprecated: false
+      responses:
+        '204':
+          description: Пользователь удалён
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '409':
+          description: >-
+            Пользователь не может быть удалён, т.к. у него имеются связанные
+            сущности
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Methods:
+              schema:
+                deprecated: false
+            Access-Control-Allow-Headers:
+              schema:
+                deprecated: false
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      description: Удаление пользователя
+  /admin/file:
+    get:
+      summary: Получить информацию о файле в системе
+      tags:
+        - Административное взаимодействие с файлами
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Информация о файле получена
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '204':
+          description: В системе отсутствуют файлы
+          headers:
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+        '404':
+          description: Файл не найден
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: >-
+        Метод для получения информации о файлах в системе. Метод возвращает
+        определенный информацию об определенном файле, если указан параметр
+        запроса "id".
+    delete:
+      summary: Удаление файла
+      tags:
+        - Административное взаимодействие с файлами
+      responses:
+        '204':
+          description: Файл удалён
+          headers:
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Файл или пользователь не найден
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: utc-millisec
+                user_id:
+                  type: string
+                  format: utc-millisec
+      description: Удаление файла
+    put:
+      summary: Изменение информации о файле
+      tags:
+        - Административное взаимодействие с файлами
+      parameters:
+        - name: user_id
+          in: header
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Информация о файле изменена
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  name:
+                    type: string
+                  file_path:
+                    type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                user_id:
+                  type: integer
+                name:
+                  type: string
+      description: Метод изменяет информацию о файле
+  /admin/file/download:
+    get:
+      summary: Скачать файл
+      tags:
+        - Административное взаимодействие с файлами
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+        - name: user_id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Скачать файл
+          headers:
+            Transfer-Encoding:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Файл не найден
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: string
+            Access-Control-Allow-Methods:
+              schema:
+                type: string
+            Access-Control-Allow-Headers:
+              schema:
+                type: string
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: Получение байтового потока данных из файла.
+  /admin/event:
+    get:
+      summary: Получить информацию о событиях
+      tags:
+        - Административное взаимодействия с событиями
+      parameters:
+        - name: id
+          in: query
+          required: false
+          schema:
+            deprecated: false
+      responses:
+        '200':
+          description: Получена информация о событии/событиях
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '204':
+          description: События не найдены
+          headers:
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Событие не найдено
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      description: >-
+        Метод возвращает информацию по событиями в системе. Если указан параметр
+        запроса "id", то метод возвращает информацию по определенному событию.
+    put:
+      summary: Изменить информацию о событиях
+      tags:
+        - Административное взаимодействия с событиями
+      responses:
+        '200':
+          description: Событие изменено
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Событие не найдено
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '409':
+          description: Не найден файл/пользователь из тела запроса
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: utc-millisec
+                user_id:
+                  type: string
+                  format: utc-millisec
+                file_id:
+                  type: string
+                  format: utc-millisec
+                action:
+                  type: string
+      description: Метод изменяет информацию о событии
+    delete:
+      summary: Удалить событие
+      tags:
+        - Административное взаимодействия с событиями
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            deprecated: false
+      responses:
+        '204':
+          description: Событие удалено
+          headers:
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '404':
+          description: Событие не найдено
+          headers:
+            Content-Length:
+              schema:
+                deprecated: false
+            Date:
+              schema:
+                deprecated: false
+            Keep-Alive:
+              schema:
+                deprecated: false
+            Connection:
+              schema:
+                deprecated: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      description: Метод удаляет событие
+    post:
+      summary: Создать событие
+      tags:
+        - Административное взаимодействия с событиями
+      responses:
+        '200':
+          description: Событие добавлено
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '400':
+          description: Некорректное тело запроса
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '401':
+          description: Пользователь не авторизован
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '403':
+          description: У пользователя нет доступа
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+        '409':
+          description: Пользователь или файл не найдены
+          headers:
+            Content-Length:
+              schema:
+                type: integer
+            Date:
+              schema:
+                type: string
+            Keep-Alive:
+              schema:
+                type: string
+            Connection:
+              schema:
+                type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                  format: utc-millisec
+                file_id:
+                  type: string
+                  format: utc-millisec
+                action:
+                  type: string
+      description: Метод создаёт новое событие
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+security:
+  - BearerAuth: []

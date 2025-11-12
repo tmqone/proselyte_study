@@ -1,4 +1,6 @@
 package com.tmq.model;
 
-public class Role {
+public enum Role {
+    ADMIN,
+    USER
 }

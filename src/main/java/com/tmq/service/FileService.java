@@ -5,11 +5,9 @@ import com.tmq.dto.file.FindFileRequest;
 import com.tmq.dto.file.*;
 import com.tmq.dto.user.FindUserByIdResponse;
 import com.tmq.exception.FileNotFoundException;
-import com.tmq.exception.UserNotFoundException;
 import com.tmq.mapper.FileMapper;
 import com.tmq.model.Action;
 import com.tmq.model.File;
-import com.tmq.model.User;
 import com.tmq.repository.FileRepository;
 import com.tmq.repository.hibernate.HibernateFileRepositoryImpl;
 import com.tmq.util.FileUtil;
@@ -43,45 +41,100 @@ public class FileService{
         });
 
         List<File> result = filesToSaveInDatabase.stream().map(fileRepository::save).toList();
-        result.forEach(file -> eventService.save(new CreateEventRequest(user.id(), file.getId(), Action.UPLOAD)));
+        result.forEach(file -> eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.UPLOAD)));
         return fileMapper.postFromEntity(result);
     }
 
     public UpdateFileResponse update(UpdateFileRequest request) {
-        userService.existsById(request.userId());
-        File file = fileRepository.findById(request.id()).orElseThrow(FileNotFoundException::new);
+        File file = fileRepository.findByUserId(request.userId())
+                .stream()
+                .filter(result -> result.getId().equals(request.id()))
+                .findFirst()
+                .orElseThrow(FileNotFoundException::new);
         Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
         file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
         file.setName(request.name());
         File userResponse = fileRepository.update(file);
-        eventService.save(new CreateEventRequest(request.userId(), userResponse.getId(), Action.UPDATED));
+        eventService.insert(new CreateEventRequest(request.userId(), userResponse.getId(), Action.UPDATED));
         return fileMapper.updateFromEntity(userResponse);
     }
 
     public boolean delete(DeleteFileRequest deleteFileRequest) {
         FindUserByIdResponse user = userService.findById(deleteFileRequest.userId());
-        File file = fileRepository.findById(deleteFileRequest.id(), deleteFileRequest.userId())
+        File file = fileRepository.findByUserId(deleteFileRequest.userId())
+                .stream()
+                .filter(result -> result.getId().equals(deleteFileRequest.id()))
+                .findFirst()
                 .orElseThrow(FileNotFoundException::new);
         FileUtil.deleteFile(Path.of(file.getFilePath()));
-        boolean delete = fileRepository.delete(deleteFileRequest.id(), deleteFileRequest.userId());
-        eventService.save(new CreateEventRequest(user.id(), file.getId(), Action.DELETE));
+        boolean delete = fileRepository.delete(deleteFileRequest.id());
+        eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.DELETE));
+        return delete;
+    }
+
+    public UpdateFileResponse updateByAdmin(UpdateFileRequest request, Integer adminId) {
+        File file = fileRepository.findByUserId(request.userId())
+                .stream()
+                .filter(result -> result.getId().equals(request.id()))
+                .findFirst()
+                .orElseThrow(FileNotFoundException::new);
+        Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
+        file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
+        file.setName(request.name());
+        File userResponse = fileRepository.update(file);
+        eventService.insert(new CreateEventRequest(adminId, userResponse.getId(), Action.UPDATED));
+        return fileMapper.updateFromEntity(userResponse);
+    }
+
+    public boolean deleteByAdmin(Integer id, Integer userId, Integer adminId) {
+        FindUserByIdResponse user = userService.findById(userId);
+        File file = fileRepository.findById(id)
+                .orElseThrow(FileNotFoundException::new);
+        FileUtil.deleteFile(Path.of(file.getFilePath()));
+        boolean delete = fileRepository.delete(id);
+        eventService.insert(new CreateEventRequest(adminId, file.getId(), Action.DELETE));
         return delete;
     }
 
     public FindFileResponse findById(FindFileRequest request) {
-//        if (!userService.existsById(request.userId())) throw new UserNotFoundException();
-        File file = fileRepository.findById(request.id(), request.userId()).orElseThrow(FileNotFoundException::new);
-//        eventService.save(new CreateEventRequest(user.id(), file.getId(), Action.GET));
+        File file = fileRepository.findByUserId(request.userId())
+                .stream()
+                .filter(result -> result.getId().equals(request.id()))
+                .findFirst()
+                .orElseThrow(FileNotFoundException::new);
+        eventService.insert(new CreateEventRequest(request.userId(), file.getId(), Action.GET));
         return fileMapper.getByIdFromEntity(file);
     }
 
-    public List<FindAllFilesResponse> findAll(Integer userId) {
-        List<File> files = fileRepository.findAll(userId);
-//        files.forEach(file -> eventService.save(new CreateEventRequest(userId, file.getId(), Action.GET)));
+    public FindFileResponse findByIdNoEvent(Integer id) {
+        return fileMapper.getByIdFromEntity(fileRepository.findById(id).orElseThrow(FileNotFoundException::new));
+    }
+
+    public List<FindAllFilesResponse> findByUserIdNoEvent(Integer userId) {
+        return fileMapper.getAllFromEntity(fileRepository.findByUserId(userId));
+    }
+
+    public List<FindAllFilesResponse> findAllFilesByUserId(Integer userId) {
+        List<File> files = fileRepository.findAllByUserId(userId);
+        List<CreateEventRequest> list = files.stream()
+                .map(file -> new CreateEventRequest(userId, file.getId(), Action.GET))
+                .toList();
+        eventService.insert(list);
         return fileMapper.getAllFromEntity(files);
     }
 
-    public boolean existsById(Integer id){
-        return fileRepository.existsById(id);
+    public byte[] downloadFile(DownloadFileRequest request) {
+        File file = fileRepository.findByUserId(request.userId())
+                .stream()
+                .filter(result -> result.getId().equals(request.id()))
+                .findFirst()
+                .orElseThrow(FileNotFoundException::new);
+        byte[] result = FileUtil.getFile(Path.of(file.getFilePath()));
+        eventService.insert(new CreateEventRequest(request.userId(), request.id(), Action.DOWNLOAD));
+        return result;
+    }
+
+    public List<FindAllFilesResponse> findAll(){
+        return fileMapper.getAllFromEntity(fileRepository.findAll());
     }
 }

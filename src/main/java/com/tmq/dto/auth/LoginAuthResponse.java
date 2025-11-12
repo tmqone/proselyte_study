@@ -1,4 +1,4 @@
 package com.tmq.dto.auth;
 
-public class LoginAuthResponse {
+public record LoginAuthResponse (String username, String accessToken){
 }

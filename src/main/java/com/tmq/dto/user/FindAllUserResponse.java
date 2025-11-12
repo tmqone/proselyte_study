@@ -1,8 +1,7 @@
 package com.tmq.dto.user;
 
-import com.tmq.dto.entity.EventWithoutUserDto;
+import com.tmq.model.Role;
 
-import java.util.List;
 
-public record FindAllUserResponse(Integer id, String username) {
+public record FindAllUserResponse(Integer id, String username, Role role) {
 }

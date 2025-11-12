@@ -6,6 +6,8 @@ import com.tmq.mapper.UserMapper;
 import com.tmq.model.User;
 import com.tmq.repository.UserRepository;
 import com.tmq.repository.hibernate.HibernateUserRepositoryImpl;
+
+import com.tmq.util.BCryptUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -21,9 +23,9 @@ public class UserService{
         return INSTANCE;
     }
 
-    //TODO сделать валидаторы
     public CreateUserResponse save(CreateUserRequest userDto) {
         User user = userMapper.postToEntity(userDto);
+        user.setPassword(BCryptUtil.encryptPassword(user.getPassword()));
         User save = userRepository.save(user);
         return userMapper.postFromEntity(save);
     }
@@ -34,9 +36,9 @@ public class UserService{
         return userMapper.updateFromEntity(save);
     }
 
-    public boolean delete(DeleteUserRequest userDto) {
-        userMapper.deleteToEntity(userDto);
-        return userRepository.delete(userDto.id());
+    public boolean delete(Integer userId) {
+        if (userRepository.delete(userId)) return true;
+        throw new UserNotFoundException();
     }
 
     public FindUserByIdResponse findById(Integer id) {
@@ -46,12 +48,23 @@ public class UserService{
     public List<FindAllUserResponse> findAll() {
         return userRepository.findAll()
                 .stream()
-                .map(UserMapper::toUserWithoutEventDto)
-                .map(value -> new FindAllUserResponse(value.id(), value.name()))
+                .map(userMapper::toFindAllUserResponse)
                 .toList();
     }
 
-    public boolean existsById(Integer id) {
-        return userRepository.existsById(id);
+    public FindUserWithAllFields findByNameWithPassword(String name) {
+        return userRepository.findByUsername(name)
+                .map(userMapper::entityToUserDtoWithPassword)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public FindUserWithAllFields findByIdWithPassword(Integer id) {
+        return userRepository.findById(id)
+                .map(userMapper::entityToUserDtoWithPassword)
+                .orElseThrow(UserNotFoundException::new);
+    }
+
+    public boolean isUserExistByUsername(String username) {
+        return userRepository.findByUsername(username).isPresent();
     }
 }

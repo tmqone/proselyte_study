@@ -1,14 +1,51 @@
 services:
   db:
+    container_name: db
     image: postgres:15.14-alpine3.21
     environment:
       POSTGRES_DB: fileApp
       POSTGRES_USER: fileApp_user
       POSTGRES_PASSWORD: fileApp_pass
+    volumes:
+      - postgres-data:/var/lib/postgresql
     ports:
       - "54210:5432"
+    networks:
+      - "app"
+    hostname: db
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U cli_user -d cli_pass]
+      test: ["CMD-SHELL", "pg_isready -U fileApp_user -d fileApp"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 20
+      start_period: 10s
+
+  app:
+    container_name: app
+    image: test_app
+    ports:
+      - "8000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+        - "app"
+    hostname: app
+
+  swagger:
+    image: swaggerapi/swagger-ui:v5.30.1
+    container_name: swagger
+    ports:
+      - "80:8080"
+    environment:
+      SWAGGER_JSON_URL: http://app:8080/api/v1/api-docs
+    networks:
+      - "app"
+    hostname: swagger
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  postgres-data: {}

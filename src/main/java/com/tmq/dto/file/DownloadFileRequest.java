@@ -1,4 +1,4 @@
 package com.tmq.dto.file;
 
-public class DownloadFileRequest {
+public record DownloadFileRequest (Integer id, Integer userId){
 }

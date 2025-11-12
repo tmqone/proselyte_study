@@ -9,27 +9,68 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
+    <profiles>
+        <profile>
+            <id>local</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+
+        <profile>
+            <id>docker</id>
+            <properties>
+                <datasource.url>jdbc:postgresql://db:5432/fileApp</datasource.url>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <properties>
+        <!--maven-->
         <maven.compiler.source>25</maven.compiler.source>
         <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--        plugins-versions-->
         <liquibase.version>5.0.1</liquibase.version>
         <postgresql.version>42.7.8</postgresql.version>
         <lombok.version>1.18.38</lombok.version>
         <mockito-junit-jupiter.version>5.20.0</mockito-junit-jupiter.version>
         <hibernate.version>6.5.2.Final</hibernate.version>
         <flyway-database-postgresql.version>10.20.1</flyway-database-postgresql.version>
-        <flyway.version>9.22.3</flyway.version>
+        <flyway.version>11.16.0</flyway.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
         <maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
         <flyway-maven-plugin.version>9.22.0</flyway-maven-plugin.version>
         <maven-assembly-plugin.version>3.6.0</maven-assembly-plugin.version>
-        <datasource.url>jdbc:postgresql://localhost:54210/fileApp</datasource.url>
+        <jackson.databind.version>2.15.2</jackson.databind.version>
+        <jwt.version>0.13.0</jwt.version>
+
+        <!--        resource-filtering-->
+        <hibernate.connection.driver_class>org.postgresql.Driver</hibernate.connection.driver_class>
+        <hibernate.connection.username>fileApp_user</hibernate.connection.username>
+        <hibernate.connection.password>fileApp_pass</hibernate.connection.password>
+        <hibernate.show_sql>true</hibernate.show_sql>
+        <hibernate.format_sql>true</hibernate.format_sql>
+        <hibernate.connection.autocommit>false</hibernate.connection.autocommit>
+        <file.path>${user.dir}/uploads/</file.path>
+        <jwt.token>f27ed5020534419f0beb94fd14547ef9c447d8a98bb8e0038be6f3bcc49a3f75</jwt.token>
         <datasource.user>fileApp_user</datasource.user>
         <datasource.password>fileApp_pass</datasource.password>
         <datasource.schemas>public</datasource.schemas>
-        <jackson.databind.version>2.15.2</jackson.databind.version>
+        <flyway.migrations.path>classpath:db/migration</flyway.migrations.path>
+        <datasource.url>jdbc:postgresql://localhost:54210/fileApp</datasource.url>
+
+        <!--        test resource-filtering-->
+        <test.hibernate.connection.driver_class>org.h2.Driver</test.hibernate.connection.driver_class>
+        <test.file.path>${user.dir}/test_uploads</test.file.path>
+        <test.datasource.url>jdbc:h2:mem:testdb</test.datasource.url>
+        <test.datasource.user>sa</test.datasource.user>
+        <test.flyway.migrations.path>classpath:db/test-migration</test.flyway.migrations.path>
+
     </properties>
+
 
     <dependencies>
         <dependency>
@@ -42,11 +83,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>swagger-ui</artifactId>
-            <version>5.30.1</version>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -86,9 +122,52 @@
             <version>6.1.0</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>${jwt.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>${jwt.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>at.favre.lib</groupId>
+            <artifactId>bcrypt</artifactId>
+            <version>0.10.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.4.240</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
+
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -112,26 +191,6 @@
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <argLine>-Dnet.bytebuddy.experimental=true</argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.flywaydb</groupId>
-                <artifactId>flyway-maven-plugin</artifactId>
-                <version>${flyway-maven-plugin.version}</version>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>${postgresql.version}</version>
-                    </dependency>
-                </dependencies>
-                <configuration>
-                    <url>${datasource.url}</url>
-                    <user>${datasource.user}</user>
-                    <password>${datasource.password}</password>
-                    <schemas>${datasource.schemas}</schemas>
-                    <validateMigrationNaming>true</validateMigrationNaming>
-                    <cleanDisabled>false</cleanDisabled>
                 </configuration>
             </plugin>
         </plugins>

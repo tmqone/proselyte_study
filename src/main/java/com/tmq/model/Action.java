@@ -4,5 +4,6 @@ public enum Action {
     UPLOAD,
     GET,
     DELETE,
+    DOWNLOAD,
     UPDATED
 }

@@ -25,7 +25,7 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     public List<User> findAll() {
         try (Session session = HibernateUtil.getSession()) {
             return session.createQuery("""
-            from User u
+            from User 
             """, User.class).list();
         }
     }
@@ -39,6 +39,8 @@ public class HibernateUserRepositoryImpl implements UserRepository {
             """, User.class).setParameter("id", integer).uniqueResult());
         }
     }
+
+
 
     @Override
     public User save(User user) {
@@ -68,22 +70,22 @@ public class HibernateUserRepositoryImpl implements UserRepository {
     public boolean delete(Integer integer) {
         try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
-            User user = Optional.ofNullable(session
-                    .createQuery("from User u where u.id = :id", User.class)
-                    .setParameter("id", integer)
-                    .uniqueResult()
-            ).orElseThrow(UserNotFoundException::new);
-            session.remove(user);
+            int i = session.createQuery("""
+                    delete from User u
+                    where u.id = :id
+                    """).setParameter("id", integer).executeUpdate();
             session.getTransaction().commit();
+            return i > 0;
         }
-        return true;
     }
 
     @Override
-    public boolean existsById(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
-            return session.createQuery("select count(f) from User f where f.id = :id", Long.class)
-                    .setParameter("id", integer).uniqueResult() > 0;
+    public Optional<User> findByUsername(String username) {
+        try (Session session = HibernateUtil.getSession()) {
+            return Optional.ofNullable(session.createQuery("""
+            from User u
+            where u.username = :username
+            """, User.class).setParameter("username", username).uniqueResult());
         }
     }
 }

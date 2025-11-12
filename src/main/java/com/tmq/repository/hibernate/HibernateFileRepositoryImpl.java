@@ -22,13 +22,13 @@ public class HibernateFileRepositoryImpl implements FileRepository {
 
     @Override
     public List<File> findAll() {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             return session.createQuery("from File where isDeleted = false", File.class).list();
         }
     }
 
-    public List<File> findAll(Integer userId) {
-        try (Session session = HibernateUtil.getSession()){
+    public List<File> findAllByUserId(Integer userId) {
+        try (Session session = HibernateUtil.getSession()) {
             return session
                     .createQuery("""
                             from File f 
@@ -41,28 +41,29 @@ public class HibernateFileRepositoryImpl implements FileRepository {
 
     @Override
     public Optional<File> findById(Integer id) {
-        try (Session session = HibernateUtil.getSession()){
-            return Optional.ofNullable(session.get(File.class, id));
+        try (Session session = HibernateUtil.getSession()) {
+            return Optional.ofNullable(session
+                    .createQuery("from File where id = :id and isDeleted = false", File.class)
+                    .setParameter("id", id).uniqueResult());
         }
     }
 
-    public Optional<File> findById(Integer id, Integer userId) {
-        try (Session session = HibernateUtil.getSession()){
-            return Optional.ofNullable(session
+    public List<File> findByUserId(Integer userId) {
+        try (Session session = HibernateUtil.getSession()) {
+            return session
                     .createQuery("""
                             from File f 
                             join Event e on e.file = f 
-                            where e.user.id = :userId and f.id = :id and f.isDeleted = false
+                            where e.user.id = :userId and f.isDeleted = false
                             """, File.class)
-                    .setParameter("id", id)
                     .setParameter("userId", userId)
-                    .uniqueResult());
+                    .list();
         }
     }
 
     @Override
     public File save(File file) {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
             session.persist(file);
             session.getTransaction().commit();
@@ -72,49 +73,27 @@ public class HibernateFileRepositoryImpl implements FileRepository {
 
     @Override
     public File update(File file) {
-        try (Session session = HibernateUtil.getSession()){
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
-            File merge = session.find(File.class, file.getId());
-            merge.setFilePath(file.getFilePath());
-            merge.setName(file.getName());
+            int update = session.createQuery("update File f set f.name = :name, f.filePath = :filepath where f.id = :id")
+                    .setParameter("name", file.getName())
+                    .setParameter("filepath", file.getFilePath())
+                    .setParameter("id", file.getId())
+                    .executeUpdate();
+            if (update == 0) throw new FileNotFoundException();
             session.getTransaction().commit();
-            return merge;
+            return file;
         }
     }
 
-    @Override
-    public boolean delete(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
+    public boolean delete(Integer id) {
+        try (Session session = HibernateUtil.getSession()) {
             session.beginTransaction();
-            File file = session.get(File.class, integer);
-            file.setIsDeleted(true);
-            session.getTransaction().commit();
-            return true;
-        }
-    }
-
-    @Override
-    public boolean existsById(Integer integer) {
-        try (Session session = HibernateUtil.getSession()){
-            return session.createQuery("select count(f) from File f where f.id = :id", Long.class)
-                    .setParameter("id", integer).uniqueResult() > 0;
-        }
-    }
-
-    public boolean delete(Integer id, Integer userId) {
-        try (Session session = HibernateUtil.getSession()){
-            session.beginTransaction();
-            Optional.ofNullable(session
-                    .createQuery("""
-                            from File f 
-                            join Event e on e.file = f 
-                            where e.user.id = :userId and f.id = :id and f.isDeleted = false
-                            """, File.class)
+            int i = session.createQuery("update File set isDeleted = true where id = :id")
                     .setParameter("id", id)
-                    .setParameter("userId", userId)
-                    .uniqueResult()).ifPresentOrElse(file -> file.setIsDeleted(true), () -> {throw new FileNotFoundException();});
+                    .executeUpdate();
             session.getTransaction().commit();
-            return true;
+            return i > 0;
         }
     }
 }

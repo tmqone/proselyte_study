@@ -1,4 +1,6 @@
 package com.tmq.dto.auth;
 
-public class RegisterAuthRequest {
+import com.tmq.model.Role;
+
+public record RegisterAuthRequest (String username, char[] password) {
 }

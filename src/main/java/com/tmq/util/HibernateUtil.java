@@ -3,17 +3,21 @@ package com.tmq.util;
 import com.tmq.model.Event;
 import com.tmq.model.File;
 import com.tmq.model.User;
+import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+@UtilityClass
 public class HibernateUtil {
+    @Getter
     private static final SessionFactory sessionFactory;
 
     static {
         sessionFactory = initSessionFactory();
     }
-    //TODO приделать кэш 2-ого уровня
+
     private static SessionFactory initSessionFactory() {
         return new Configuration()
                 .setProperty("hibernate.connection.driver_class", PropertiesUtil.get("hibernate.connection.driver_class"))
@@ -23,6 +27,7 @@ public class HibernateUtil {
                 .setProperty("hibernate.show_sql", PropertiesUtil.get("hibernate.show_sql"))
                 .setProperty("hibernate.format_sql", PropertiesUtil.get("hibernate.format_sql"))
                 .setProperty("hibernate.connection.autocommit", PropertiesUtil.get("hibernate.connection.autocommit"))
+                .setProperty("hibernate.generate_statistics", "true")
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(File.class)
                 .addAnnotatedClass(Event.class)
@@ -32,11 +37,6 @@ public class HibernateUtil {
     public static void initHibernate(){
         getSessionFactory().isClosed();
     }
-
-    private static SessionFactory getSessionFactory() {
-        return sessionFactory;
-    }
-
 
     public static Session getSession() {
         return sessionFactory.openSession();

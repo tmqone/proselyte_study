@@ -1,11 +1,9 @@
 package com.tmq.util;
 
-import com.tmq.dto.file.CreateFileRequest;
-import com.tmq.dto.file.UpdateFileRequest;
 import com.tmq.exception.FileExistsException;
 import com.tmq.exception.GeneralException;
-import com.tmq.exception.NotCorrectInputException;
 import jakarta.servlet.http.Part;
+import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +11,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 
+@UtilityClass
 public class FileUtil {
     public static void initUploadFolder(){
         File file = new File(PropertiesUtil.get("file.path"));
@@ -34,7 +32,7 @@ public class FileUtil {
                 .concat("/")
                 .concat(userId.toString())
                 .concat("/")
-                .concat(part.getSubmittedFileName()));
+                .concat(part.getSubmittedFileName().replace(' ', '_')));
     }
 
     public static Map<String, Path> saveFiles(Collection<Part> parts, Integer userId){
