@@ -46,7 +46,6 @@ public class UserAdminController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String id = req.getParameter("id");
         if (req.getParameter("id") != null) {
             Map<String, Integer> params = RequestValidator
                     .validateRequestQueryNumberParams(req.getParameterMap(), "id");

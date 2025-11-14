@@ -33,7 +33,7 @@ public class HibernateFileRepositoryImplTest {
 
     @Test
     public void findAll() {
-        List<File> all = fileRepository.findAll();
+        List<File> all = HibernateUtil.handleRequest(fileRepository::findAll);
         Assertions.assertNotNull(all);
         Assertions.assertFalse(all.isEmpty());
         all.forEach((file -> {
@@ -44,7 +44,7 @@ public class HibernateFileRepositoryImplTest {
 
     @Test
     public void findAllByUserId_files_found() {
-        List<File> allByUserId = fileRepository.findAllByUserId(1);
+        List<File> allByUserId = HibernateUtil.handleRequest(() -> fileRepository.findAllByUserId(1));
         Assertions.assertNotNull(allByUserId);
         allByUserId.forEach((file -> {
             Assertions.assertFalse(file.getIsDeleted());
@@ -54,7 +54,7 @@ public class HibernateFileRepositoryImplTest {
 
     @Test
     public void findAllByUserId_files_not_found() {
-        List<File> allByUserId = fileRepository.findAllByUserId(0);
+        List<File> allByUserId = HibernateUtil.handleRequest(() -> fileRepository.findAllByUserId(0));
         Assertions.assertNotNull(allByUserId);
         Assertions.assertTrue(allByUserId.isEmpty());
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getQueryExecutionCount());
@@ -63,7 +63,7 @@ public class HibernateFileRepositoryImplTest {
     @Test
     public void findById_file_found() {
         int fileId = 1;
-        Optional<File> byId = fileRepository.findById(fileId);
+        Optional<File> byId = HibernateUtil.handleRequest(() -> fileRepository.findById(fileId));
         Assertions.assertTrue(byId.isPresent());
         Assertions.assertFalse(byId.get().getIsDeleted());
         Assertions.assertEquals(fileId, byId.get().getId());
@@ -76,13 +76,13 @@ public class HibernateFileRepositoryImplTest {
     @Test
     public void findById_file_not_found() {
         int fileId = 0;
-        Optional<File> byId = fileRepository.findById(fileId);
+        Optional<File> byId = HibernateUtil.handleRequest(() -> fileRepository.findById(fileId));
         Assertions.assertFalse(byId.isPresent());
     }
 
     @Test
     public void findByUserId_files_found() {
-        List<File> byUserId = fileRepository.findByUserId(1);
+        List<File> byUserId = HibernateUtil.handleRequest(() -> fileRepository.findByUserId(1));
         byUserId.forEach((file -> {
             Assertions.assertFalse(file.getIsDeleted());
         }));
@@ -94,7 +94,7 @@ public class HibernateFileRepositoryImplTest {
 
     @Test
     public void findByUserId_files_not_found() {
-        List<File> byUserId = fileRepository.findByUserId(0);
+        List<File> byUserId = HibernateUtil.handleRequest(() -> fileRepository.findByUserId(0));
         Assertions.assertNotNull(byUserId);
         Assertions.assertTrue(byUserId.isEmpty());
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getQueryExecutionCount());
@@ -107,7 +107,7 @@ public class HibernateFileRepositoryImplTest {
                 .isDeleted(false)
                 .build();
         Assertions.assertDoesNotThrow(() -> {
-            File save = fileRepository.save(saveSuccess);
+            File save = HibernateUtil.handleRequest(() -> fileRepository.save(saveSuccess));
             Assertions.assertNotNull(save);
             Assertions.assertNotNull(save.getId());
         });
@@ -121,9 +121,9 @@ public class HibernateFileRepositoryImplTest {
                 .isDeleted(false)
                 .build();
         Assertions.assertDoesNotThrow(() -> {
-            fileRepository.update(updateSuccess);
+            HibernateUtil.handleRequest(() -> fileRepository.update(updateSuccess));
         });
-        Optional<File> byId = fileRepository.findById(updateSuccess.getId());
+        Optional<File> byId = HibernateUtil.handleRequest(() -> fileRepository.findById(updateSuccess.getId()));
         Assertions.assertTrue(byId.isPresent());
         Assertions.assertFalse(byId.get().getIsDeleted());
         Assertions.assertEquals(1, byId.get().getId());
@@ -138,7 +138,7 @@ public class HibernateFileRepositoryImplTest {
                 .isDeleted(false)
                 .build();
         Assertions.assertThrows(FileNotFoundException.class, () -> {
-            fileRepository.update(updateSuccess);
+            HibernateUtil.handleRequest(() -> fileRepository.update(updateSuccess));
         });
     }
 
@@ -150,19 +150,19 @@ public class HibernateFileRepositoryImplTest {
                 .build();
 
         Assertions.assertDoesNotThrow(() -> {
-            File save = fileRepository.save(saveSuccess);
+            File save = HibernateUtil.handleRequest(() -> fileRepository.save(saveSuccess));
             Assertions.assertNotNull(save);
             Assertions.assertNotNull(save.getId());
             saveSuccess.setId(save.getId());
         });
 
-        boolean delete = fileRepository.delete(saveSuccess.getId());
+        boolean delete = HibernateUtil.handleRequest(() -> fileRepository.delete(saveSuccess.getId()));
         Assertions.assertTrue(delete);
     }
 
     @Test
     public void delete_file_not_found() {
-        boolean delete = fileRepository.delete(0);
+        boolean delete = HibernateUtil.handleRequest(() -> fileRepository.delete(0));
         Assertions.assertFalse(delete);
     }
 }

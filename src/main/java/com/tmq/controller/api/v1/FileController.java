@@ -27,22 +27,29 @@ public class FileController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if (req.getRequestURI().equals("/api/v1/file/download")) {
-            Map<String, Integer> paramsMap = RequestValidator
-                    .validateRequestQueryNumberParams(req.getParameterMap(), "id");
-            byte[] bytes = fileService.downloadFile(new DownloadFileRequest(paramsMap.get("id"),
-                    JwtUtil.getUserId(req.getHeader("Authorization"))));
-            resp.getOutputStream().write(bytes);
-        } else if (req.getParameter("id") != null) {
-            Map<String, Integer> queryMap = RequestValidator
-                    .validateRequestQueryNumberParams(req.getParameterMap(), "id");
-            FindFileResponse userResponse = fileService.findById(new FindFileRequest(queryMap.get("id"),
-                    JwtUtil.getUserId(req.getHeader("Authorization"))));
-            resp.getWriter().write(mapper.writeValueAsString(userResponse));
-        } else {
-            List<FindAllFilesResponse> all = fileService.findAllFilesByUserId(JwtUtil.getUserId(req.getHeader("Authorization")));
-            if (all.isEmpty()) resp.sendError(HttpServletResponse.SC_NO_CONTENT);
-            resp.getWriter().write(mapper.writeValueAsString(all));
+        String uri = req.getRequestURI();
+        int userId = JwtUtil.getUserId(req.getHeader("Authorization"));
+
+        switch (uri) {
+            case "/api/v1/file/download" -> {
+                Map<String, Integer> paramsMap = RequestValidator
+                        .validateRequestQueryNumberParams(req.getParameterMap(), "id");
+                byte[] bytes = fileService.downloadFile(new DownloadFileRequest(paramsMap.get("id"), userId));
+                resp.getOutputStream().write(bytes);
+            }
+            default -> {
+                List<FindAllFilesResponse> all = fileService.findAllFilesByUserId(userId);
+
+                if (req.getParameter("id") != null) {
+                    Map<String, Integer> queryMap = RequestValidator
+                            .validateRequestQueryNumberParams(req.getParameterMap(), "id");
+                    FindFileResponse userResponse = fileService.findById(new FindFileRequest(queryMap.get("id"), userId));
+                    resp.getWriter().write(mapper.writeValueAsString(userResponse));
+                } else {
+                    if (all.isEmpty()) resp.sendError(HttpServletResponse.SC_NO_CONTENT);
+                    resp.getWriter().write(mapper.writeValueAsString(all));
+                }
+            }
         }
     }
 

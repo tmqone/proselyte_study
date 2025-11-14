@@ -39,7 +39,7 @@ public class HibernateUserRepositoryImplTest {
 
     @Test
     public void findAll() {
-        List<User> list = userRepository.findAll();
+        List<User> list = HibernateUtil.handleRequest(userRepository::findAll);
         Assertions.assertFalse(list.isEmpty());
         Assertions.assertEquals("user", list.get(0).getUsername());
         Assertions.assertEquals(1, HibernateUtil.getSession().getSessionFactory().getStatistics().getQueryExecutionCount());
@@ -47,7 +47,7 @@ public class HibernateUserRepositoryImplTest {
 
     @Test
     public void findById_success() {
-        User user = userRepository.findById(1).orElseThrow(AssertionError::new);
+        User user = HibernateUtil.handleRequest(() -> userRepository.findById(1).orElseThrow(AssertionError::new));
         Assertions.assertNotNull(user);
         Assertions.assertNotNull(user.getId());
         Assertions.assertNotNull(user.getUsername());
@@ -61,7 +61,7 @@ public class HibernateUserRepositoryImplTest {
     @Test
     public void findById_notFound() {
         Assertions.assertThrows(UserNotFoundException.class, () -> {
-            userRepository.findById(0).orElseThrow(UserNotFoundException::new);
+            HibernateUtil.handleRequest(() -> userRepository.findById(0).orElseThrow(UserNotFoundException::new));
         });
     }
 
@@ -69,7 +69,7 @@ public class HibernateUserRepositoryImplTest {
     public void save_success() {
         User user = User.builder().username("tmq").role(Role.USER).password("123".toCharArray()).build();
         Assertions.assertDoesNotThrow(() -> {
-            userRepository.save(user);
+            HibernateUtil.handleRequest(() -> userRepository.save(user));
         });
         Assertions.assertNotNull(user.getId());
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getFlushCount());
@@ -80,16 +80,16 @@ public class HibernateUserRepositoryImplTest {
     public void save_username_exists() {
         User user = User.builder().username("user").role(Role.USER).password("123".toCharArray()).build();
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            userRepository.save(user);
+            HibernateUtil.handleRequest(() -> userRepository.save(user));
         });
     }
 
     @Test
     public void update_success() {
         User user = User.builder().username("update_success").role(Role.USER).password("123".toCharArray()).build();
-        User save = userRepository.save(user);
+        User save = HibernateUtil.handleRequest(() -> userRepository.save(user));
         save.setUsername("update_success");
-        userRepository.update(user);
+        HibernateUtil.handleRequest(() -> userRepository.update(user));
         Assertions.assertNotNull(user.getId());
         Assertions.assertEquals("update_success", user.getUsername());
         Assertions.assertEquals(2, HibernateUtil.getSessionFactory().getStatistics().getFlushCount());
@@ -100,10 +100,10 @@ public class HibernateUserRepositoryImplTest {
     @Test
     public void update_username_exists() {
         User user = User.builder().username("update_username_exists").role(Role.USER).password("123".toCharArray()).build();
-        User save = userRepository.save(user);
+        User save = HibernateUtil.handleRequest(() -> userRepository.save(user));
         save.setUsername("user");
         Assertions.assertThrows(ConstraintViolationException.class, () -> {
-            userRepository.update(user);
+            HibernateUtil.handleRequest(() -> userRepository.update(user));
         });
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getFlushCount());
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getEntityLoadCount());
@@ -114,7 +114,7 @@ public class HibernateUserRepositoryImplTest {
     public void update_user_not_found() {
         User user = User.builder().id(0).build();
         Assertions.assertThrows(UserNotFoundException.class, () -> {
-            userRepository.update(user);
+            HibernateUtil.handleRequest(() -> userRepository.update(user));
         });
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getQueryExecutionCount());
     }
@@ -122,21 +122,21 @@ public class HibernateUserRepositoryImplTest {
     @Test
     public void delete_success() {
         User user = User.builder().username("delete_success").role(Role.USER).password("123".toCharArray()).build();
-        User save = userRepository.save(user);
-        boolean delete = userRepository.delete(save.getId());
+        User save = HibernateUtil.handleRequest(() -> userRepository.save(user));
+        boolean delete = HibernateUtil.handleRequest(() -> userRepository.delete(save.getId()));
         Assertions.assertTrue(delete);
         Assertions.assertEquals(1, HibernateUtil.getSessionFactory().getStatistics().getFlushCount());
     }
 
     @Test
     public void delete_user_not_found() {
-        boolean delete = userRepository.delete(0);
+        boolean delete = HibernateUtil.handleRequest(() -> userRepository.delete(0));
         Assertions.assertFalse(delete);
     }
 
     @Test
     public void findByUsername_success() {
-        Optional<User> user = userRepository.findByUsername("user");
+        Optional<User> user = HibernateUtil.handleRequest(() -> userRepository.findByUsername("user"));
         Assertions.assertDoesNotThrow(() -> {
             user.get();
         });
@@ -146,7 +146,7 @@ public class HibernateUserRepositoryImplTest {
 
     @Test
     public void findByUsername_user_not_found() {
-        Optional<User> user = userRepository.findByUsername("null");
+        Optional<User> user = HibernateUtil.handleRequest(() -> userRepository.findByUsername("null"));
         Assertions.assertThrows(UserNotFoundException.class, () -> {
             user.orElseThrow(UserNotFoundException::new);
         });

@@ -1,7 +1,7 @@
 FROM maven AS build
 WORKDIR /app
 COPY . /app
-RUN mvn clean package -Pdocker
+RUN mvn clean package -Pdocker -DskipTests
 
 FROM tomcat:jre25-temurin
 WORKDIR /usr/local/tomcat

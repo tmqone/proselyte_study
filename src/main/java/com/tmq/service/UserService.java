@@ -8,13 +8,14 @@ import com.tmq.repository.UserRepository;
 import com.tmq.repository.hibernate.HibernateUserRepositoryImpl;
 
 import com.tmq.util.BCryptUtil;
+import com.tmq.util.HibernateUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserService{
+public class UserService {
     private static final UserService INSTANCE = new UserService();
     private static final UserRepository userRepository = HibernateUserRepositoryImpl.getInstance();
     private static final UserMapper userMapper = new UserMapper();
@@ -24,47 +25,54 @@ public class UserService{
     }
 
     public CreateUserResponse save(CreateUserRequest userDto) {
-        User user = userMapper.postToEntity(userDto);
-        user.setPassword(BCryptUtil.encryptPassword(user.getPassword()));
-        User save = userRepository.save(user);
-        return userMapper.postFromEntity(save);
+        return HibernateUtil.handleRequest(() -> {
+            User user = userMapper.postToEntity(userDto);
+            user.setPassword(BCryptUtil.encryptPassword(user.getPassword()));
+            User save = userRepository.save(user);
+            return userMapper.postFromEntity(save);
+        });
     }
 
     public UpdateUserResponse update(UpdateUserRequest userDto) {
-        User user = userMapper.updateToEntity(userDto);
-        User save = userRepository.update(user);
-        return userMapper.updateFromEntity(save);
+        return HibernateUtil.handleRequest(() -> {
+            User user = userMapper.updateToEntity(userDto);
+            User save = userRepository.update(user);
+            return userMapper.updateFromEntity(save);
+        });
     }
 
     public boolean delete(Integer userId) {
-        if (userRepository.delete(userId)) return true;
-        throw new UserNotFoundException();
+        return HibernateUtil.handleRequest(() -> {
+            if (userRepository.delete(userId)) return true;
+            throw new UserNotFoundException();
+        });
     }
 
     public FindUserByIdResponse findById(Integer id) {
-        return userMapper.getByIdFromEntity(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
+        return HibernateUtil.handleRequest(() ->
+                userMapper.getByIdFromEntity(userRepository.findById(id).orElseThrow(UserNotFoundException::new)));
     }
 
     public List<FindAllUserResponse> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(userMapper::toFindAllUserResponse)
-                .toList();
+        return HibernateUtil.handleRequest(
+                userRepository.findAll()
+                        .stream()
+                        .map(userMapper::toFindAllUserResponse)::toList);
     }
 
     public FindUserWithAllFields findByNameWithPassword(String name) {
-        return userRepository.findByUsername(name)
+        return HibernateUtil.handleRequest(() -> userRepository.findByUsername(name)
                 .map(userMapper::entityToUserDtoWithPassword)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new));
     }
 
     public FindUserWithAllFields findByIdWithPassword(Integer id) {
-        return userRepository.findById(id)
+        return HibernateUtil.handleRequest(() -> userRepository.findById(id)
                 .map(userMapper::entityToUserDtoWithPassword)
-                .orElseThrow(UserNotFoundException::new);
+                .orElseThrow(UserNotFoundException::new));
     }
 
     public boolean isUserExistByUsername(String username) {
-        return userRepository.findByUsername(username).isPresent();
+        return HibernateUtil.handleRequest(() -> userRepository.findByUsername(username).isPresent());
     }
 }

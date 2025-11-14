@@ -2,20 +2,15 @@ package com.tmq.controller.api.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmq.dto.user.*;
-import com.tmq.model.Role;
 import com.tmq.service.UserService;
 import com.tmq.util.JacksonMapperUtil;
 import com.tmq.util.JwtUtil;
-import com.tmq.validator.RequestValidator;
-import io.jsonwebtoken.Jwt;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 
 @WebServlet("/api/v1/user")
 public class UserController extends HttpServlet {

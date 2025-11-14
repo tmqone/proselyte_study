@@ -2,6 +2,7 @@ package com.tmq.controller.api.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmq.dto.file.*;
+import com.tmq.exception.NotCorrectInputException;
 import com.tmq.service.FileService;
 import com.tmq.util.JacksonMapperUtil;
 import com.tmq.util.JwtUtil;
@@ -24,34 +25,48 @@ public class FileAdminController extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        if (req.getRequestURI().equals("/api/v1/admin/file/download")) {
+        Map<String, String[]> parameterMap = req.getParameterMap();
+        String uri = req.getRequestURI();
+
+        if (uri.equals("/api/v1/admin/file/download")) {
             Map<String, Integer> paramsMap = RequestValidator
-                    .validateRequestQueryNumberParams(req.getParameterMap(), "id", "user_id");
+                    .validateRequestQueryNumberParams(parameterMap, "id", "user_id");
             byte[] bytes = fileService.downloadFile(new DownloadFileRequest(paramsMap.get("id"),
                     paramsMap.get("user_id")));
             resp.getOutputStream().write(bytes);
-        } else if (req.getParameter("id") == null && req.getParameter("user_id") == null) {
-            List<FindAllFilesResponse> all = fileService.findAll();
-            if (all.isEmpty()) resp.sendError(HttpServletResponse.SC_NO_CONTENT);
-            resp.getWriter().write(mapper.writeValueAsString(all));
-        } else if (req.getParameter("id") != null && req.getParameter("user_id") != null) {
-            Map<String, Integer> queryMap = RequestValidator
-                    .validateRequestQueryNumberParams(req.getParameterMap(), "id", "user_id");
-            FindFileResponse userResponse = fileService.findById(new FindFileRequest(queryMap.get("id"),
-                    queryMap.get("user_id")));
-            resp.getWriter().write(mapper.writeValueAsString(userResponse));
-        } else if (req.getParameter("id") != null) {
-            Map<String, Integer> queryMap = RequestValidator
-                    .validateRequestQueryNumberParams(req.getParameterMap(), "id");
-            FindFileResponse file = fileService.findByIdNoEvent(queryMap.get("id"));
-            resp.getWriter().write(mapper.writeValueAsString(file));
-        } else if (req.getParameter("user_id") != null) {
-            Map<String, Integer> params = RequestValidator.
-                    validateRequestQueryNumberParams(req.getParameterMap(), "user_id");
-            List<FindAllFilesResponse> userId = fileService.findByUserIdNoEvent(params.get("user_id"));
-            if (userId.isEmpty()) resp.sendError(HttpServletResponse.SC_NO_CONTENT);
-            resp.getWriter().write(mapper.writeValueAsString(userId));
+            return;
         }
+
+        String requestType = checkRequestType(req);
+
+        Object result = switch (requestType) {
+            case "all" -> fileService.findAll();
+            case "id_and_user" -> {
+                Map<String, Integer> queryMap = RequestValidator
+                        .validateRequestQueryNumberParams(parameterMap, "id", "user_id");
+                yield fileService.findById(new FindFileRequest(queryMap.get("id"), queryMap.get("user_id")));
+            }
+            case "id_only" -> {
+                Map<String, Integer> queryMap = RequestValidator
+                        .validateRequestQueryNumberParams(parameterMap, "id");
+                yield fileService.findByIdNoEvent(queryMap.get("id"));
+            }
+            case "user_only" -> {
+                Map<String, Integer> params = RequestValidator
+                        .validateRequestQueryNumberParams(parameterMap, "user_id");
+                yield fileService.findByUserIdNoEvent(params.get("user_id"));
+            }
+            default -> throw new NotCorrectInputException();
+        };
+
+        if (result instanceof List<?> list) {
+            if (list.isEmpty()) {
+                resp.sendError(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
+        }
+        
+        resp.getWriter().write(mapper.writeValueAsString(result));
     }
 
     @Override
@@ -68,5 +83,20 @@ public class FileAdminController extends HttpServlet {
                 .validateRequestQueryNumberParams(request.getParameterMap(), "id", "user_id");
         fileService.deleteByAdmin(params.get("id"), params.get("user_id"), JwtUtil.getUserId(request.getHeader("Authorization")));
         response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    private String checkRequestType(HttpServletRequest req) {
+        boolean hasId = req.getParameter("id") != null;
+        boolean hasUserId = req.getParameter("user_id") != null;
+
+        if (!hasId && !hasUserId) {
+            return "all";
+        } else if (hasId && hasUserId) {
+            return "id_and_user";
+        } else if (hasId) {
+            return "id_only";
+        } else {
+            return "user_only";
+        }
     }
 }

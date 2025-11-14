@@ -11,6 +11,7 @@ import com.tmq.model.File;
 import com.tmq.repository.FileRepository;
 import com.tmq.repository.hibernate.HibernateFileRepositoryImpl;
 import com.tmq.util.FileUtil;
+import com.tmq.util.HibernateUtil;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FileService{
+public class FileService {
     private static final FileService INSTANCE = new FileService();
     private static final FileMapper fileMapper = new FileMapper();
     private static final FileRepository fileRepository = HibernateFileRepositoryImpl.getInstance();
@@ -32,109 +33,127 @@ public class FileService{
     }
 
     public CreateFileResponse save(CreateFileRequest request) {
-        FindUserByIdResponse user = userService.findById(request.userId());
-        Map<String, Path> savedFileOnDisk = FileUtil.saveFiles(request.parts(), request.userId());
-        List<File> filesToSaveInDatabase = new ArrayList<>();
+        return HibernateUtil.handleRequest(() -> {
+            FindUserByIdResponse user = userService.findById(request.userId());
+            Map<String, Path> savedFileOnDisk = FileUtil.saveFiles(request.parts(), request.userId());
+            List<File> filesToSaveInDatabase = new ArrayList<>();
 
-        savedFileOnDisk.forEach((key, value) -> {
-            filesToSaveInDatabase.add(fileMapper.postToEntity(request, value.toString(), key));
+            savedFileOnDisk.forEach((key, value) -> {
+                filesToSaveInDatabase.add(fileMapper.postToEntity(request, value.toString(), key));
+            });
+
+            List<File> result = filesToSaveInDatabase.stream().map(fileRepository::save).toList();
+            result.forEach(file -> eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.UPLOAD)));
+            return fileMapper.postFromEntity(result);
         });
-
-        List<File> result = filesToSaveInDatabase.stream().map(fileRepository::save).toList();
-        result.forEach(file -> eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.UPLOAD)));
-        return fileMapper.postFromEntity(result);
     }
 
     public UpdateFileResponse update(UpdateFileRequest request) {
-        File file = fileRepository.findByUserId(request.userId())
-                .stream()
-                .filter(result -> result.getId().equals(request.id()))
-                .findFirst()
-                .orElseThrow(FileNotFoundException::new);
-        Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
-        file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
-        file.setName(request.name());
-        File userResponse = fileRepository.update(file);
-        eventService.insert(new CreateEventRequest(request.userId(), userResponse.getId(), Action.UPDATED));
-        return fileMapper.updateFromEntity(userResponse);
+        return HibernateUtil.handleRequest(() -> {
+            File file = fileRepository.findByUserId(request.userId())
+                    .stream()
+                    .filter(result -> result.getId().equals(request.id()))
+                    .findFirst()
+                    .orElseThrow(FileNotFoundException::new);
+            Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
+            file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
+            file.setName(request.name());
+            File userResponse = fileRepository.update(file);
+            eventService.insert(new CreateEventRequest(request.userId(), userResponse.getId(), Action.UPDATED));
+            return fileMapper.updateFromEntity(userResponse);
+        });
     }
 
     public boolean delete(DeleteFileRequest deleteFileRequest) {
-        FindUserByIdResponse user = userService.findById(deleteFileRequest.userId());
-        File file = fileRepository.findByUserId(deleteFileRequest.userId())
-                .stream()
-                .filter(result -> result.getId().equals(deleteFileRequest.id()))
-                .findFirst()
-                .orElseThrow(FileNotFoundException::new);
-        FileUtil.deleteFile(Path.of(file.getFilePath()));
-        boolean delete = fileRepository.delete(deleteFileRequest.id());
-        eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.DELETE));
-        return delete;
+        return HibernateUtil.handleRequest(() -> {
+            FindUserByIdResponse user = userService.findById(deleteFileRequest.userId());
+            File file = fileRepository.findByUserId(deleteFileRequest.userId())
+                    .stream()
+                    .filter(result -> result.getId().equals(deleteFileRequest.id()))
+                    .findFirst()
+                    .orElseThrow(FileNotFoundException::new);
+            FileUtil.deleteFile(Path.of(file.getFilePath()));
+            boolean delete = fileRepository.delete(deleteFileRequest.id());
+            eventService.insert(new CreateEventRequest(user.id(), file.getId(), Action.DELETE));
+            return delete;
+        });
     }
 
     public UpdateFileResponse updateByAdmin(UpdateFileRequest request, Integer adminId) {
-        File file = fileRepository.findByUserId(request.userId())
-                .stream()
-                .filter(result -> result.getId().equals(request.id()))
-                .findFirst()
-                .orElseThrow(FileNotFoundException::new);
-        Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
-        file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
-        file.setName(request.name());
-        File userResponse = fileRepository.update(file);
-        eventService.insert(new CreateEventRequest(adminId, userResponse.getId(), Action.UPDATED));
-        return fileMapper.updateFromEntity(userResponse);
+        return HibernateUtil.handleRequest(() -> {
+            File file = fileRepository.findByUserId(request.userId())
+                    .stream()
+                    .filter(result -> result.getId().equals(request.id()))
+                    .findFirst()
+                    .orElseThrow(FileNotFoundException::new);
+            Map<String, Path> stringPathMap = FileUtil.updateFile(Path.of(file.getFilePath()), request.name());
+            file.setFilePath(String.valueOf(stringPathMap.get(request.name())));
+            file.setName(request.name());
+            File userResponse = fileRepository.update(file);
+            eventService.insert(new CreateEventRequest(adminId, userResponse.getId(), Action.UPDATED));
+            return fileMapper.updateFromEntity(userResponse);
+        });
     }
 
     public boolean deleteByAdmin(Integer id, Integer userId, Integer adminId) {
-        FindUserByIdResponse user = userService.findById(userId);
-        File file = fileRepository.findById(id)
-                .orElseThrow(FileNotFoundException::new);
-        FileUtil.deleteFile(Path.of(file.getFilePath()));
-        boolean delete = fileRepository.delete(id);
-        eventService.insert(new CreateEventRequest(adminId, file.getId(), Action.DELETE));
-        return delete;
+        return HibernateUtil.handleRequest(() -> {
+            FindUserByIdResponse user = userService.findById(userId);
+            File file = fileRepository.findById(id)
+                    .orElseThrow(FileNotFoundException::new);
+            FileUtil.deleteFile(Path.of(file.getFilePath()));
+            boolean delete = fileRepository.delete(id);
+            eventService.insert(new CreateEventRequest(adminId, file.getId(), Action.DELETE));
+            return delete;
+        });
     }
 
     public FindFileResponse findById(FindFileRequest request) {
-        File file = fileRepository.findByUserId(request.userId())
-                .stream()
-                .filter(result -> result.getId().equals(request.id()))
-                .findFirst()
-                .orElseThrow(FileNotFoundException::new);
-        eventService.insert(new CreateEventRequest(request.userId(), file.getId(), Action.GET));
-        return fileMapper.getByIdFromEntity(file);
+        return HibernateUtil.handleRequest(() -> {
+            File file = fileRepository.findByUserId(request.userId())
+                    .stream()
+                    .filter(result -> result.getId().equals(request.id()))
+                    .findFirst()
+                    .orElseThrow(FileNotFoundException::new);
+            eventService.insert(new CreateEventRequest(request.userId(), file.getId(), Action.GET));
+            return fileMapper.getByIdFromEntity(file);
+        });
     }
 
     public FindFileResponse findByIdNoEvent(Integer id) {
-        return fileMapper.getByIdFromEntity(fileRepository.findById(id).orElseThrow(FileNotFoundException::new));
+        return HibernateUtil.handleRequest(() ->
+                fileMapper.getByIdFromEntity(fileRepository.findById(id).orElseThrow(FileNotFoundException::new)));
     }
 
     public List<FindAllFilesResponse> findByUserIdNoEvent(Integer userId) {
-        return fileMapper.getAllFromEntity(fileRepository.findByUserId(userId));
+        return HibernateUtil.handleRequest(() ->
+                fileMapper.getAllFromEntity(fileRepository.findByUserId(userId)));
     }
 
     public List<FindAllFilesResponse> findAllFilesByUserId(Integer userId) {
-        List<File> files = fileRepository.findAllByUserId(userId);
-        List<CreateEventRequest> list = files.stream()
-                .map(file -> new CreateEventRequest(userId, file.getId(), Action.GET))
-                .toList();
-        eventService.insert(list);
-        return fileMapper.getAllFromEntity(files);
+        return HibernateUtil.handleRequest(() -> {
+            List<File> files = fileRepository.findAllByUserId(userId);
+            List<CreateEventRequest> list = files.stream()
+                    .map(file -> new CreateEventRequest(userId, file.getId(), Action.GET))
+                    .toList();
+            eventService.insert(list);
+            return fileMapper.getAllFromEntity(files);
+        });
     }
 
     public byte[] downloadFile(DownloadFileRequest request) {
-        File file = fileRepository.findByUserId(request.userId())
-                .stream()
-                .filter(result -> result.getId().equals(request.id()))
-                .findFirst()
-                .orElseThrow(FileNotFoundException::new);
-        byte[] result = FileUtil.getFile(Path.of(file.getFilePath()));
-        eventService.insert(new CreateEventRequest(request.userId(), request.id(), Action.DOWNLOAD));
-        return result;
+        return HibernateUtil.handleRequest(() -> {
+            File file = fileRepository.findByUserId(request.userId())
+                    .stream()
+                    .filter(result -> result.getId().equals(request.id()))
+                    .findFirst()
+                    .orElseThrow(FileNotFoundException::new);
+            byte[] result = FileUtil.getFile(Path.of(file.getFilePath()));
+            eventService.insert(new CreateEventRequest(request.userId(), request.id(), Action.DOWNLOAD));
+            return result;
+        });
     }
 
-    public List<FindAllFilesResponse> findAll(){
-        return fileMapper.getAllFromEntity(fileRepository.findAll());
+    public List<FindAllFilesResponse> findAll() {
+        return HibernateUtil.handleRequest(() -> fileMapper.getAllFromEntity(fileRepository.findAll()));
     }
 }

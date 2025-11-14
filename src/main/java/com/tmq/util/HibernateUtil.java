@@ -1,13 +1,18 @@
 package com.tmq.util;
 
+import com.tmq.exception.GeneralException;
 import com.tmq.model.Event;
 import com.tmq.model.File;
 import com.tmq.model.User;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 @UtilityClass
 public class HibernateUtil {
@@ -28,6 +33,7 @@ public class HibernateUtil {
                 .setProperty("hibernate.format_sql", PropertiesUtil.get("hibernate.format_sql"))
                 .setProperty("hibernate.connection.autocommit", PropertiesUtil.get("hibernate.connection.autocommit"))
                 .setProperty("hibernate.generate_statistics", "true")
+                .setProperty("hibernate.current_session_context_class", "thread")
                 .addAnnotatedClass(User.class)
                 .addAnnotatedClass(File.class)
                 .addAnnotatedClass(Event.class)
@@ -39,6 +45,22 @@ public class HibernateUtil {
     }
 
     public static Session getSession() {
-        return sessionFactory.openSession();
+        return sessionFactory.getCurrentSession();
+    }
+
+
+    public static <T> T handleRequest(Supplier<T> supplier) {
+        Session session = getSession();
+        try {
+            session.beginTransaction();
+            T o = supplier.get();
+            session.getTransaction().commit();
+            return o;
+        } catch (Exception e) {
+            session.getTransaction().rollback();
+            throw e;
+        } finally {
+            session.close();
+        }
     }
 }

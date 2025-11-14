@@ -2,6 +2,7 @@ package com.tmq.controller.api.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmq.dto.event.*;
+import com.tmq.exception.NotCorrectInputException;
 import com.tmq.service.EventService;
 import com.tmq.util.JacksonMapperUtil;
 import com.tmq.validator.RequestValidator;
@@ -22,21 +23,30 @@ public class EventAdminController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Map<String, String[]> parameterMap = req.getParameterMap();
-        if (parameterMap.containsKey("id")) {
-            Map<String, Integer> params = RequestValidator.validateRequestQueryNumberParams(parameterMap, "id");
-            FindEventByIdResponse response = eventService.findById(params.get("id"));
-            resp.getWriter().write(objectMapper.writeValueAsString(response));
-        } else if (parameterMap.containsKey("file_id")) {
-            Map<String, Integer> params = RequestValidator.validateRequestQueryNumberParams(parameterMap, "file_id");
-            List<FindAllEventResponse> all = eventService.findByFileId(
-                    Integer.valueOf(req.getParameter("file_id"))
-            );
-            resp.getWriter().write(objectMapper.writeValueAsString(all));
-        } else {
-            List<FindAllEventResponse> all = eventService.findAll();
-            if (all.isEmpty()) resp.sendError(HttpServletResponse.SC_NO_CONTENT);
-            resp.getWriter().write(objectMapper.writeValueAsString(all));
+
+        String requestType = parameterMap.containsKey("id") ? "id" :
+                parameterMap.containsKey("file_id") ? "file_id" : "all";
+
+        Object result = switch (requestType) {
+            case "id" -> {
+                Map<String, Integer> params = RequestValidator.validateRequestQueryNumberParams(parameterMap, "id");
+                yield eventService.findById(params.get("id"));
+            }
+            case "file_id" -> {
+                Map<String, Integer> params = RequestValidator.validateRequestQueryNumberParams(parameterMap, "file_id");
+                yield eventService.findByFileId(params.get("file_id"));
+            }
+            case "all" -> eventService.findAll();
+            default -> throw new NotCorrectInputException();
+        };
+
+        if (result instanceof List<?> list) {
+            if (list.isEmpty()) {
+                resp.sendError(HttpServletResponse.SC_NO_CONTENT);
+                return;
+            }
         }
+        resp.getWriter().write(objectMapper.writeValueAsString(result));
     }
 
     @Override
