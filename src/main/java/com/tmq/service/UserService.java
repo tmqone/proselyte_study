@@ -54,10 +54,12 @@ public class UserService {
     }
 
     public List<FindAllUserResponse> findAll() {
-        return HibernateUtil.handleRequest(
-                userRepository.findAll()
-                        .stream()
-                        .map(userMapper::toFindAllUserResponse)::toList);
+        return HibernateUtil.handleRequest(() -> {
+            return userRepository.findAll()
+                    .stream()
+                    .map(userMapper::toFindAllUserResponse)
+                    .toList();
+        });
     }
 
     public FindUserWithAllFields findByNameWithPassword(String name) {

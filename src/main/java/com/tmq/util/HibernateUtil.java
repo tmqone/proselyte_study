@@ -51,16 +51,28 @@ public class HibernateUtil {
 
     public static <T> T handleRequest(Supplier<T> supplier) {
         Session session = getSession();
+        boolean isNewTransaction = !session.getTransaction().isActive();
+
         try {
-            session.beginTransaction();
-            T o = supplier.get();
-            session.getTransaction().commit();
-            return o;
+            if (isNewTransaction) {
+                session.beginTransaction();
+            }
+
+            T result = supplier.get();
+
+            if (isNewTransaction) {
+                session.getTransaction().commit();
+            }
+            return result;
         } catch (Exception e) {
-            session.getTransaction().rollback();
+            if (isNewTransaction && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
             throw e;
         } finally {
-            session.close();
+            if (isNewTransaction) {
+                session.close();
+            }
         }
     }
 }
