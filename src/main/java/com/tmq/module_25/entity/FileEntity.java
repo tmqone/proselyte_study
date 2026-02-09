@@ -20,5 +20,4 @@ public class FileEntity {
     private String location;
     @Column("status")
     private FileStatus status;
-    private EventEntity events;
 }

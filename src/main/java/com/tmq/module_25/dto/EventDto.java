@@ -6,8 +6,8 @@ import java.util.Date;
 
 public class EventDto {
     private Long id;
-    private UserDto user;
-    private FileDto file;
+    private Long userId;
+    private Long fileId;
     private EventStatus status;
     private Date timestamp;
 }

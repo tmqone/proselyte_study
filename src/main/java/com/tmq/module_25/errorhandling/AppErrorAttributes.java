@@ -2,6 +2,7 @@ package com.tmq.module_25.errorhandling;
 
 import com.tmq.module_25.exception.ApiException;
 import com.tmq.module_25.exception.AuthException;
+import com.tmq.module_25.exception.FileNotFoundException;
 import com.tmq.module_25.exception.UnauthorizedException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
@@ -38,6 +39,12 @@ public class AppErrorAttributes extends DefaultErrorAttributes {
             errorMap.put("code", ((ApiException) error).getErrorCode());
             errorMap.put("message", error.getMessage());
             errorList.add(errorMap);
+        } else if (error instanceof FileNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+            var errorMap = new LinkedHashMap<String, Object>();
+            errorMap.put("message", error.getMessage());
+            errorList.add(errorMap);
+
         } else if (error instanceof ApiException) {
             status = HttpStatus.BAD_REQUEST;
             var errorMap = new LinkedHashMap<String, Object>();

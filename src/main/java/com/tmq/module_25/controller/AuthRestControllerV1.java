@@ -31,14 +31,12 @@ public class AuthRestControllerV1 {
     @PostMapping("/login")
     public Mono<AuthResponseDto> login (@RequestBody AuthRequestDto dto) {
         return securityService.authenticate(dto.username(), dto.password())
-                .flatMap(tokenDetails -> {
-                    return Mono.just(new AuthResponseDto(
-                            tokenDetails.getUserId(),
-                            tokenDetails.getToken(),
-                            tokenDetails.getIssuedAt(),
-                            tokenDetails.getExpiresAt()
-                    ));
-                });
+                .flatMap(tokenDetails -> Mono.just(new AuthResponseDto(
+                        tokenDetails.getUserId(),
+                        tokenDetails.getToken(),
+                        tokenDetails.getIssuedAt(),
+                        tokenDetails.getExpiresAt()
+                )));
     }
 
     @GetMapping("/info")

@@ -16,7 +16,6 @@ public class UserEntity {
     private String password;
     private UserRole role;
     private UserStatus status;
-    private EventEntity events;
 
     @ToString.Include(name = "password")
     private String maskPassword(){
