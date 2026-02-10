@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-02-10T12:37:34+0300",
-    comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-9.3.0.jar, environment: Java 25.0.2 (Homebrew)"
+    date = "2026-02-10T13:39:18+0300",
+    comments = "version: 1.6.3, compiler: IncrementalProcessingEnvironment from gradle-language-java-9.3.0.jar, environment: Java 25.0.1 (Eclipse Adoptium)"
 )
 @Component
 public class EventMapperImpl implements EventMapper {

@@ -1,26 +1,26 @@
 INSERT INTO users (username, password, role, status) VALUES
-('ivan',  '{noop}ivan',  'USER',    'ACTIVE'),
-('maria', '{noop}maria', 'MANAGER', 'ACTIVE'),
-('admin', '{noop}admin', 'ADMIN',   'ACTIVE');
+('ivan',  'ivan',  'USER',    'ACTIVE'),
+('maria', 'maria', 'MANAGER', 'ACTIVE'),
+('admin', 'admin', 'ADMIN',   'ACTIVE');
 
 INSERT INTO files (name, location, status) VALUES
-('report.pdf',   's3://bucket/report.pdf',   'ACTIVE'),
-('avatar.png',   's3://bucket/avatar.png',   'ACTIVE'),
-('archive.zip',  's3://bucket/archive.zip',  'ARCHIVED'),
-('notes.txt',    's3://bucket/notes.txt',    'ACTIVE');
+('1.pdf',   '1',   'ACTIVE'),
+('2.png',   '2',   'ACTIVE'),
+('3.zip',  '3',  'ARCHIVED'),
+('4.txt',    '4',    'ACTIVE');
 
 INSERT INTO events (user_id, file_id, status) VALUES
                                                   ((SELECT id FROM users WHERE username = 'ivan'),
-                                                   (SELECT id FROM files WHERE name = 'report.pdf'),
+                                                   (SELECT id FROM files WHERE name = '1.pdf'),
                                                    'CREATED'),
 
                                                   ((SELECT id FROM users WHERE username = 'ivan'),
-                                                   (SELECT id FROM files WHERE name = 'avatar.png'),
+                                                   (SELECT id FROM files WHERE name = '2.png'),
                                                    'CREATED'),
 
                                                   ((SELECT id FROM users WHERE username = 'ivan'),
-                                                   (SELECT id FROM files WHERE name = 'report.pdf'),
-                                                   'DOWNLOADED');
+                                                   (SELECT id FROM files WHERE name = '3.zip'),
+                                                   'CREATED');
 
 INSERT INTO events (user_id, file_id, status) VALUES
     ((SELECT id FROM users WHERE username = 'maria'),

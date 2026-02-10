@@ -5,11 +5,13 @@ spring:
     url: r2dbc:pool:postgres://localhost:5432/app
     username: app
     password: app
+    name: apps
   flyway:
     url: jdbc:postgresql://localhost:5432/app
     user: app
     password: app
     locations: classpath:db/migration
+    clean-disabled: false
 
   jwt:
     secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim

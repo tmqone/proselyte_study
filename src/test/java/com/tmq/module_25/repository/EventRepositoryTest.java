@@ -2,6 +2,11 @@ package com.tmq.module_25.repository;
 
 import com.tmq.module_25.entity.FileEntity;
 import com.tmq.module_25.entity.FileStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.internal.configuration.models.EnvironmentModel;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -13,37 +18,45 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import java.util.Map;
+import java.util.logging.Logger;
+
 @SpringBootTest
 @Testcontainers
-public class EventRepositoryTest {
-
-    @Container
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18-alpine")
-            .withDatabaseName("app")
-      .withUsername("app")
-      .withPassword("app");
-
-    @DynamicPropertySource
-    static void props(DynamicPropertyRegistry r) {
-        r.add("spring.r2dbc.url", () ->
-                "r2dbc:postgresql://" + postgres.getHost() + ":" + postgres.getFirstMappedPort() + "/" + postgres.getDatabaseName());
-        r.add("spring.r2dbc.username", postgres::getUsername);
-        r.add("spring.r2dbc.password", postgres::getPassword);
-
-        r.add("spring.flyway.url", postgres::getJdbcUrl);
-        r.add("spring.flyway.user", postgres::getUsername);
-        r.add("spring.flyway.password", postgres::getPassword);
-        r.add("spring.flyway.locations", () -> "classpath:migration");
-        r.add("spring.flyway.enabled", () -> "true");
-    }
+public class EventRepositoryTest extends RepositoryConfigurationTest{
 
     @Autowired
     FileRepository fileRepository;
 
     @Test
-    void test(){
+    void getAllFilesTest(){
         StepVerifier.create(fileRepository.findAll())
-                .expectNext(new FileEntity(1L, "report.pdf",   "s3://bucket/report.pdf",   FileStatus.ACTIVE));
+                .expectNext(new FileEntity(1L, "1.pdf",   "1",   FileStatus.ACTIVE))
+                .expectNext(new FileEntity(2L, "2.png", "2", FileStatus.ACTIVE))
+                .expectNext(new FileEntity(3L, "3.zip", "3", FileStatus.ARCHIVED))
+                .expectNext(new FileEntity(4L, "4.txt", "4", FileStatus.ACTIVE))
+                .verifyComplete();
+    }
 
+    @Test
+    void findFileWithUserIdTest(){
+        StepVerifier.create(fileRepository.findFileWithUserId(1L, 1L))
+                .expectNext(new FileEntity(1L, "1.pdf", "1", FileStatus.ACTIVE))
+                .verifyComplete();
+    }
+
+    @Test
+    void deleteByIdTest(){
+        StepVerifier.create(fileRepository.deleteById(1L)).verifyComplete();
+        StepVerifier.create(fileRepository.findById(1L))
+                .expectNext(new FileEntity(1L, "1.pdf", "1", FileStatus.ARCHIVED))
+                .verifyComplete();
+    }
+
+    @Test
+    void findAllByUserId() {
+        StepVerifier.create(fileRepository.findAllByUserId(1L))
+                .expectNextCount(2L) // Два документа в статусе ACTIVE
+                .verifyComplete();
     }
 }

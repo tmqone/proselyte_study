@@ -24,12 +24,14 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class SecurityConfig {
 
-    @Value("${spring.jwt.secret}")
+    @Value("${jwt.secret}")
     private String secret;
 
     private final String[] publicRoutes = {
             "api/v1/auth/register",
-            "api/v1/auth/login"
+            "api/v1/auth/login",
+            "swagger-ui/**",
+            "/v3/api-docs/**"
     };
 
     @Bean
@@ -38,7 +40,11 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(authorizeExchangeSpec -> {
                     authorizeExchangeSpec.pathMatchers(HttpMethod.OPTIONS).permitAll();
+                    authorizeExchangeSpec.pathMatchers("/actuator/**").permitAll();
                     authorizeExchangeSpec.pathMatchers(publicRoutes).permitAll();
+                    authorizeExchangeSpec.pathMatchers(HttpMethod.GET,"/api/v1/users/admin")
+                            .hasAnyAuthority("ADMIN", "MODERATOR");
+                    authorizeExchangeSpec.pathMatchers("/api/v1/users/admin").hasAuthority("ADMIN");
                     authorizeExchangeSpec.anyExchange().authenticated();
                 })
                 .addFilterAt(bearerAuthenticationFilter(authenticationManager), SecurityWebFiltersOrder.AUTHENTICATION)

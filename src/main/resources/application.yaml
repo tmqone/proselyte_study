@@ -11,10 +11,15 @@ spring:
     password: app
     locations: classpath:db/migration
 
-  jwt:
-    secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim
-    expiration: 3600
-    issuer: tmq
+springdoc:
+  api-docs:
+    enabled: true
+
+
+jwt:
+  secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim
+  expiration: 3600
+  issuer: tmq
 
 aws:
   url: http://localhost
@@ -22,6 +27,8 @@ aws:
   accessKey: minioadmin
   secretKey: minioadmin12345
   bucket: back
+
 logging:
   level:
     com.tmq: debug
+

@@ -16,7 +16,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@PreAuthorize("hasAuthority('ADMIN')")
 @RequestMapping("/api/v1/users/admin")
 public class UserRestControllerV1 {
     private final UserService userService;
@@ -25,7 +24,7 @@ public class UserRestControllerV1 {
 
     @PostMapping
     public Mono<UserDto> createUser(@RequestBody UserRequestDto dto) {
-        return userService.register(UserEntity.builder()
+        return userService.createUser(UserEntity.builder()
                         .role(dto.getRole())
                         .username(dto.getUsername())
                         .password(dto.getPassword())

@@ -6,6 +6,7 @@ import com.tmq.module_25.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -35,10 +36,12 @@ public class EventService {
                 .switchIfEmpty(Mono.error(EventNotFoundException::new));
     }
 
+    @Transactional
     public Mono<EventEntity> createEvent(EventEntity event) {
         return eventRepository.save(event);
     }
 
+    @Transactional
     public Mono<Void> deleteEvent(Long id){
         return eventRepository.deleteEvent(id);
     }

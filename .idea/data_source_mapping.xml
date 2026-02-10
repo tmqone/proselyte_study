@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourcePerFileMappings">
-    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/9f613815-07a3-4219-8dda-2f889efe9775/console.sql" value="9f613815-07a3-4219-8dda-2f889efe9775" />
-    <file url="das://9f613815-07a3-4219-8dda-2f889efe9775/database/app/schema/public/table/events.sql" value="9f613815-07a3-4219-8dda-2f889efe9775" />
-  </component>
-</project>

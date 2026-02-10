@@ -20,11 +20,11 @@ public class SecurityService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${spring.jwt.secret}")
+    @Value("${jwt.secret}")
     private String secret;
-    @Value("${spring.jwt.expiration}")
+    @Value("${jwt.expiration}")
     private Long expirationInSeconds;
-    @Value("${spring.jwt.issuer}")
+    @Value("${jwt.issuer}")
     private String issuer;
 
     private TokenDetails generateToken(UserEntity user){
