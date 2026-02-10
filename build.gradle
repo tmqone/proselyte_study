@@ -1,7 +1,22 @@
+buildscript {
+	dependencies {
+		classpath "org.flywaydb:flyway-database-postgresql:$flywayDbVersion"
+		classpath "org.postgresql:postgresql:$postgreSqlVersion"
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version "$springBootVersion"
 	id 'io.spring.dependency-management' version "$springDependencyManagement"
+	id("org.flywaydb.flyway") version "12.0.0"
+}
+
+flyway {
+	url = "jdbc:postgresql://localhost:5432/app"
+	password = "app"
+	user = "app"
+	cleanDisabled = false;
 }
 
 group = 'com.tmq'

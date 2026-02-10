@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -36,4 +37,17 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
+    public Mono<Void> deleteUser(Long id ) {
+        return userRepository.deleteById(id);
+    }
+
+    public Mono<UserEntity> updateUser(UserEntity user) {
+        return userRepository.save(user.toBuilder()
+                .password(passwordEncoder.encode(user.getPassword()))
+                .build());
+    }
+
+    public Flux<UserEntity> getAll() {
+        return userRepository.findAll();
+    }
 }

@@ -11,7 +11,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import java.net.URI;
 
 @Configuration
-public class S3Configuration {
+public class S3Config {
     @Value("${aws.url}")
     private String url;
     @Value("${aws.port}")

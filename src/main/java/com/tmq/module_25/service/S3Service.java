@@ -1,5 +1,6 @@
 package com.tmq.module_25.service;
 
+import com.tmq.module_25.entity.FileDownloadEntity;
 import com.tmq.module_25.entity.FileMetaInfo;
 import com.tmq.module_25.exception.AWSException;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +73,7 @@ public class S3Service {
 
     }
 
-    public Mono<Map<Flux<DataBuffer>, FileMetaInfo>> downloadFile (String key) {
+    public Mono<FileDownloadEntity> downloadFile (String key) {
         GetObjectRequest req = GetObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
@@ -83,11 +84,13 @@ public class S3Service {
                     GetObjectResponse meta = pub.response();
                     Flux<DataBuffer> body = Flux.from(pub)
                             .map(bufferFactory::wrap);
-                    return Map.of(body, FileMetaInfo
-                                    .builder()
-                                    .contentType(Optional.ofNullable(meta.contentType()).orElse(MediaType.MULTIPART_FORM_DATA_VALUE))
-                                    .contentLength(Optional.of(meta.contentLength()).orElse(-1L))
-                                    .build());
+                    return FileDownloadEntity.builder()
+                            .data(body)
+                            .metaInfo(FileMetaInfo.builder()
+                                    .contentType(meta.contentType())
+                                    .contentLength(meta.contentLength())
+                                    .build())
+                            .build();
                 });
     }
 }

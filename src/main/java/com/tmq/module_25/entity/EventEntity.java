@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -23,5 +24,5 @@ public class EventEntity {
     @Column("file_id")
     private Long fileId;
     private EventStatus status;
-    private Date timestamp;
+    private LocalDateTime timestamp;
 }

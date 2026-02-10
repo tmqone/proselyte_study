@@ -11,5 +11,5 @@ import org.mapstruct.Mapper;
 public interface EventMapper {
     EventDto map (EventEntity eventEntity);
     @InheritInverseConfiguration
-    FileEntity map (FileDto fileDto);
+    EventEntity map (EventDto eventDto);
 }
