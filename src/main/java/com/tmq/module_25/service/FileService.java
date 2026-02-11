@@ -5,6 +5,7 @@ import com.tmq.module_25.exception.FileNotFoundException;
 import com.tmq.module_25.repository.FileRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,7 +13,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +22,13 @@ public class FileService {
     private final FileRepository fileRepository;
     private final EventService eventService;
 
+    @Value("${aws.external_url}")
+    private String minioURL;
+    @Value("${aws.port}")
+    private String minioPort;
+    @Value("${aws.bucket}")
+    private String minioBucket;
+
     @Transactional
     public Mono<FileEntity> createFile(FilePart filePart, Long userId) {
         log.info("User id = {} uploading file '{}'", userId, filePart.filename());
@@ -30,7 +37,7 @@ public class FileService {
                 .map(loc -> FileEntity.builder()
                         .name(filePart.filename())
                         .status(FileStatus.ACTIVE)
-                        .location(loc)
+                        .location("%s:%s/%s/%s".formatted(minioURL, minioPort, minioBucket, loc))
                         .build())
                 .flatMap(fileRepository::save)
                 .flatMap(file ->
@@ -43,24 +50,6 @@ public class FileService {
                                 .thenReturn(file)
                 )
                 .doOnSuccess(file -> log.info("User id = {} uploaded file {}", userId, file));
-    }
-
-    public Mono<FileDownloadEntity> downloadFile(Long fileId, Long userId) {
-        log.info("User id = {} tries to download file id = {}", userId, fileId);
-        return fileRepository.findFileWithUserId(userId, fileId)
-                .switchIfEmpty(Mono.error(new FileNotFoundException("File not found")))
-                .flatMap(entity -> s3Service.downloadFile(entity.getLocation()))
-                .doOnNext(file -> log.info("User id = {} successfully downloaded file id = {}"
-                        , userId, fileId));
-    }
-
-    public Mono<FileDownloadEntity> downloadFileByAdmin(Long fileId, Long userId) {
-        log.info("User id = {} tries to download file id = {}", userId, fileId);
-        return fileRepository.findFileEntityById(fileId)
-                .switchIfEmpty(Mono.error(new FileNotFoundException("File not found")))
-                .flatMap(entity -> s3Service.downloadFile(entity.getLocation()))
-                .doOnNext(file -> log.info("User id = {} successfully downloaded file id = {}"
-                        , userId, fileId));
     }
 
     public Mono<FileEntity> getFileInfo(Long fileId, Long userId) {
@@ -115,5 +104,6 @@ public class FileService {
                 .doOnNext(file -> log.info("User id={} archived file id={}", userId, id))
                 .then();
     }
+
 
 }

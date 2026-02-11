@@ -16,6 +16,7 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.core.async.ResponsePublisher;
@@ -24,6 +25,9 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
+import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +44,6 @@ public class S3Service {
     private String bucket;
 
     private final S3AsyncClient s3AsyncClient;
-    private final DataBufferFactory bufferFactory = new DefaultDataBufferFactory();
 
     public Mono<String> uploadFile (FilePart filePart) {
         try {
@@ -58,6 +61,7 @@ public class S3Service {
                                 .key(id)
                                 .contentType(contentType)
                                 .contentLength(size)
+                                .contentDisposition("attachment")
                                 .build();
 
                         return Mono.fromFuture(() ->
@@ -70,27 +74,5 @@ public class S3Service {
         } catch (IOException e) {
             throw new AWSException(e.getMessage(), "UPLOAD_FILE_ERROR");
         }
-
-    }
-
-    public Mono<FileDownloadEntity> downloadFile (String key) {
-        GetObjectRequest req = GetObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
-
-        return Mono.fromFuture(() -> s3AsyncClient.getObject(req, AsyncResponseTransformer.toPublisher()))
-                .map((ResponsePublisher<GetObjectResponse> pub) -> {
-                    GetObjectResponse meta = pub.response();
-                    Flux<DataBuffer> body = Flux.from(pub)
-                            .map(bufferFactory::wrap);
-                    return FileDownloadEntity.builder()
-                            .data(body)
-                            .metaInfo(FileMetaInfo.builder()
-                                    .contentType(meta.contentType())
-                                    .contentLength(meta.contentLength())
-                                    .build())
-                            .build();
-                });
     }
 }

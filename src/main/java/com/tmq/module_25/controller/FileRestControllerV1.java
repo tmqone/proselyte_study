@@ -26,7 +26,6 @@ public class FileRestControllerV1 {
     private final FileService fileService;
     private final FileMapper fileMapper;
 
-
     // USER CONTROLLERS
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -60,23 +59,6 @@ public class FileRestControllerV1 {
         return fileService.deleteFileByUser(fileId, principal.getId());
     }
 
-    @GetMapping("/download/{id}")
-    public Mono<ResponseEntity<Flux<DataBuffer>>> downloadFileByUser(@PathVariable("id") Long fileId, Authentication authentication) {
-        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
-        return fileService.downloadFile(fileId, principal.getId())
-                .flatMap(entity -> {
-                    HttpHeaders httpHeaders = new HttpHeaders();
-                    httpHeaders.setContentLength(entity.getMetaInfo().getContentLength());
-                    httpHeaders.setContentType(MediaType.valueOf(entity.getMetaInfo().getContentType()));
-                    return Mono.just(new ResponseEntity<>(
-                            entity.getData(),
-                            httpHeaders,
-                            HttpStatus.OK
-                    ));
-                });
-
-    }
-
     // MODERATOR / ADMIN CONTROLLERS
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
@@ -85,24 +67,6 @@ public class FileRestControllerV1 {
         CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
         return fileService.getAll()
                 .map(fileMapper::map);
-    }
-
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")
-    @GetMapping("/admin/download/{id}")
-    public Mono<ResponseEntity<Flux<DataBuffer>>> downloadFileByAdmin(@PathVariable("id") Long fileId, Authentication authentication) {
-        CustomPrincipal principal = (CustomPrincipal) authentication.getPrincipal();
-        return fileService.downloadFileByAdmin(fileId, principal.getId())
-                .flatMap(entity -> {
-                    HttpHeaders httpHeaders = new HttpHeaders();
-                    httpHeaders.setContentLength(entity.getMetaInfo().getContentLength());
-                    httpHeaders.setContentType(MediaType.valueOf(entity.getMetaInfo().getContentType()));
-                    return Mono.just(new ResponseEntity<>(
-                            entity.getData(),
-                            httpHeaders,
-                            HttpStatus.OK
-                    ));
-                });
-
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'MODERATOR')")

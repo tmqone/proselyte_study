@@ -20,9 +20,10 @@ jwt:
 
 aws:
   url: http://localhost
+  external_url: http://localhost
   port: 9000
-  accessKey: minioadmin
-  secretKey: minioadmin12345
+  accessKey: changeme
+  secretKey: changeme
   bucket: back
 
 logging:
