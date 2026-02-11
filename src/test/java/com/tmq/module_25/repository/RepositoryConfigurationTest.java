@@ -1,28 +1,21 @@
 package com.tmq.module_25.repository;
 
 import org.flywaydb.core.Flyway;
-import org.junit.jupiter.api.BeforeEach;
-import org.springframework.beans.factory.annotation.Value;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.shaded.com.google.errorprone.annotations.Var;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @Testcontainers
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class RepositoryConfigurationTest {
-
-    @Value("${spring.r2dbc.username}")
-    private String dbUser;
-    @Value("${spring.r2dbc.password}")
-    private String dbPassword;
-    @Value("${spring.r2dbc.name}")
-    private String dbName;
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18.1")
@@ -55,4 +48,6 @@ public abstract class RepositoryConfigurationTest {
         flyway.clean();
         flyway.migrate();
     }
+
+
 }

@@ -11,7 +11,6 @@ import reactor.test.StepVerifier;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Testcontainers
 public class UserRepositoryTest extends RepositoryConfigurationTest {
 
     @Autowired

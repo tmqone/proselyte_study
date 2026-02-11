@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: module-2.5
+  r2dbc:
+    url: r2dbc:pool:postgres://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+  flyway:
+    url: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
+    user: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    locations: classpath:db/migration
+
+springdoc:
+  api-docs:
+    enabled: true
+
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION_TIME_IN_SECONDS}
+  issuer: ${JWT_ISSUER}
+
+aws:
+  url: http://minio
+  port: ${MINIO_PORT}
+  accessKey: ${MINIO_ROOT_USER}
+  secretKey: ${MINIO_ROOT_PASSWORD}
+  bucket: back
+

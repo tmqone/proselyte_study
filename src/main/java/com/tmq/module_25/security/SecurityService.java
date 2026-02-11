@@ -7,6 +7,7 @@ import com.tmq.module_25.service.UserService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
@@ -71,7 +73,8 @@ public class SecurityService {
                         return Mono.error(new AuthException("Invalid username or password", "INVALID_USERNAME_OR_PASSWORD"));
                     }
 
-                    return Mono.just(generateToken(user).toBuilder().userId(user.getId()).build());
+                    return Mono.just(generateToken(user).toBuilder().userId(user.getId()).build())
+                            .doOnNext(tokenDetails -> log.info(tokenDetails.toString()));
                 })
                 .switchIfEmpty(Mono.error(new AuthException("Invalid username or password", "INVALID_USERNAME_OR_PASSWORD")));
     }

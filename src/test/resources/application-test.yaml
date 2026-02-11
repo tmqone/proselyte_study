@@ -13,10 +13,10 @@ spring:
     locations: classpath:db/migration
     clean-disabled: false
 
-  jwt:
-    secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim
-    expiration: 3600
-    issuer: tmq
+jwt:
+  secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim
+  expiration: 3600
+  issuer: tmq
 
 aws:
   url: http://localhost

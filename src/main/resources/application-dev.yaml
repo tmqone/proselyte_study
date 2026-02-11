@@ -2,19 +2,16 @@ spring:
   application:
     name: module-2.5
   r2dbc:
-    url: r2dbc:pool:postgres://localhost:5432/app
-    username: app
-    password: app
+    url: r2dbc:pool:postgres://localhost:5432/changeme
+    username: changeme
+    password: changeme
+    name: changeme
   flyway:
-    url: jdbc:postgresql://localhost:5432/app
-    user: app
-    password: app
+    url: jdbc:postgresql://localhost:5432/changeme
+    user: changeme
+    password: changeme
     locations: classpath:db/migration
-
-springdoc:
-  api-docs:
-    enabled: true
-
+    clean-disabled: false
 
 jwt:
   secret: h7tllLhLRIi3j2DSp7ogR47RacuJ5cMGawgnwfLpXim
@@ -31,4 +28,3 @@ aws:
 logging:
   level:
     com.tmq: debug
-

@@ -3,13 +3,13 @@ package com.tmq.module_25.repository;
 import com.tmq.module_25.entity.FileEntity;
 import com.tmq.module_25.entity.FileStatus;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import reactor.test.StepVerifier;
 
 @SpringBootTest
-@Testcontainers
 public class FileRepositoryTest extends RepositoryConfigurationTest {
 
     @Autowired
