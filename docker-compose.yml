@@ -1,6 +1,6 @@
 services:
   back:
-    image: tmq/module_2.5
+    image: tmqone/module_2.5
     container_name: back
     restart: unless-stopped
     env_file:
