@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "events")
-@Builder
+@Builder(toBuilder = true)
 public class EventEntity {
     @Id
     private Long id;

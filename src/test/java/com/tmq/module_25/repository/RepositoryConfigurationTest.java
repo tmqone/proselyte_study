@@ -9,10 +9,12 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.shaded.com.google.errorprone.annotations.Var;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Testcontainers
 public abstract class RepositoryConfigurationTest {
 
     @Value("${spring.r2dbc.username}")
@@ -21,12 +23,6 @@ public abstract class RepositoryConfigurationTest {
     private String dbPassword;
     @Value("${spring.r2dbc.name}")
     private String dbName;
-
-    protected Flyway flyway = Flyway.configure()
-                .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
-                .cleanDisabled(false)
-                .locations("classpath:migration")
-                .load();
 
     @Container
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:18.1")
@@ -50,6 +46,12 @@ public abstract class RepositoryConfigurationTest {
 
     @BeforeEach
     public void doMigration(){
+        Flyway flyway = Flyway.configure()
+                .dataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())
+                .cleanDisabled(false)
+                .locations("classpath:migration")
+                .load();
+
         flyway.clean();
         flyway.migrate();
     }
