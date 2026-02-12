@@ -73,8 +73,7 @@ public class SecurityService {
                         return Mono.error(new AuthException("Invalid username or password", "INVALID_USERNAME_OR_PASSWORD"));
                     }
 
-                    return Mono.just(generateToken(user).toBuilder().userId(user.getId()).build())
-                            .doOnNext(tokenDetails -> log.info(tokenDetails.toString()));
+                    return Mono.just(generateToken(user).toBuilder().userId(user.getId()).build());
                 })
                 .switchIfEmpty(Mono.error(new AuthException("Invalid username or password", "INVALID_USERNAME_OR_PASSWORD")));
     }

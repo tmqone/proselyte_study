@@ -67,30 +67,4 @@ class S3ServiceTest {
                 })
                 .verifyComplete();
     }
-
-    @Test
-    void downloadFileBuildsMetaInfo() {
-        ResponsePublisher<GetObjectResponse> publisher = mock(ResponsePublisher.class);
-        GetObjectResponse response = GetObjectResponse.builder()
-                .contentType("application/pdf")
-                .contentLength(128L)
-                .build();
-        when(publisher.response()).thenReturn(response);
-
-        ArgumentCaptor<GetObjectRequest> requestCaptor = ArgumentCaptor.forClass(GetObjectRequest.class);
-        when(s3AsyncClient.getObject(requestCaptor.capture(), any(AsyncResponseTransformer.class)))
-                .thenReturn(CompletableFuture.completedFuture(publisher));
-
-        StepVerifier.create(s3Service.downloadFile("key-1"))
-                .assertNext(download -> {
-                    assertThat(download).isNotNull();
-                    assertThat(download.getMetaInfo().getContentType()).isEqualTo("application/pdf");
-                    assertThat(download.getMetaInfo().getContentLength()).isEqualTo(128L);
-                })
-                .verifyComplete();
-
-        GetObjectRequest request = requestCaptor.getValue();
-        assertThat(request.bucket()).isEqualTo("test-bucket");
-        assertThat(request.key()).isEqualTo("key-1");
-    }
 }

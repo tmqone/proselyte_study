@@ -22,7 +22,7 @@ jwt:
   issuer: ${JWT_ISSUER}
 
 aws:
-  url: http://minio
+  url: ${MINIO_INTERNAL_URL}
   external_url: ${MINIO_URL}
   port: ${MINIO_PORT}
   accessKey: ${MINIO_ROOT_USER}

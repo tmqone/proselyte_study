@@ -19,7 +19,7 @@ jwt:
   issuer: tmq
 
 aws:
-  url: http://localhost
+  url: localhost
   external_url: http://localhost
   port: 9000
   accessKey: changeme

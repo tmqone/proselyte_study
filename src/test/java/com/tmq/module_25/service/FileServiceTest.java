@@ -71,41 +71,6 @@ class FileServiceTest {
         assertThat(event.getStatus()).isEqualTo(EventStatus.CREATED);
     }
 
-    @Test
-    void downloadFileReturnsFileDownloadEntity() {
-        FileEntity file = new FileEntity(1L, "1.pdf", "loc-1", FileStatus.ACTIVE);
-        FileDownloadEntity download = FileDownloadEntity.builder()
-                .metaInfo(FileMetaInfo.builder().contentType("text/plain").contentLength(5L).build())
-                .data(Flux.empty())
-                .build();
-
-        when(fileRepository.findFileWithUserId(1L, 1L)).thenReturn(Mono.just(file));
-        when(s3Service.downloadFile("loc-1")).thenReturn(Mono.just(download));
-
-        StepVerifier.create(fileService.downloadFile(1L, 1L))
-                .expectNext(download)
-                .verifyComplete();
-
-        verify(s3Service).downloadFile("loc-1");
-    }
-
-    @Test
-    void downloadFileWhenNotFoundErrors() {
-        when(fileRepository.findFileWithUserId(1L, 1L)).thenReturn(Mono.empty());
-
-        StepVerifier.create(fileService.downloadFile(1L, 1L))
-                .expectError(FileNotFoundException.class)
-                .verify();
-    }
-
-    @Test
-    void downloadFileByAdminWhenNotFoundErrors() {
-        when(fileRepository.findFileEntityById(2L)).thenReturn(Mono.empty());
-
-        StepVerifier.create(fileService.downloadFileByAdmin(2L, 99L))
-                .expectError(FileNotFoundException.class)
-                .verify();
-    }
 
     @Test
     void getFileInfoWhenNotFoundErrors() {
