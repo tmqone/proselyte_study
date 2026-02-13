@@ -45,6 +45,7 @@ public class FileService {
                                         .fileId(file.getId())
                                         .userId(userId)
                                         .status(EventStatus.CREATED)
+                                        .timestamp(LocalDateTime.now())
                                         .build()
                                 )
                                 .thenReturn(file)

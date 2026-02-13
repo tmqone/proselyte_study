@@ -28,9 +28,9 @@ public class SecurityConfig {
     private String secret;
 
     private final String[] publicRoutes = {
-            "api/v1/auth/register",
-            "api/v1/auth/login",
-            "swagger-ui/**",
+            "/api/v1/auth/register",
+            "/api/v1/auth/login",
+            "/swagger-ui/**",
             "/v3/api-docs/**"
     };
 

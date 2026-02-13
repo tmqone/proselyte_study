@@ -55,6 +55,7 @@ dependencies {
 	implementation "org.projectlombok:lombok:$lombokVersion"
 	implementation "software.amazon.awssdk:s3:$amazonSdkVersion"
 	implementation "software.amazon.awssdk:netty-nio-client:$amazonSdkVersion"
+	implementation 'org.springframework.boot:spring-boot-webtestclient'
 
 	compileOnly('org.projectlombok:lombok')
 	annotationProcessor "org.projectlombok:lombok"

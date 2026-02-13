@@ -1,13 +1,12 @@
 package com.tmq.module_25.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Import;
@@ -15,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -37,10 +37,11 @@ import java.util.concurrent.CompletionException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @Import(ControllerIntegrationTestBase.TestSecurityConfig.class)
 @Testcontainers
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class ControllerIntegrationTestBase {
     protected static final String MINIO_ACCESS_KEY = "minioadmin";
     protected static final String MINIO_SECRET_KEY = "minioadmin12345";
@@ -86,9 +87,6 @@ public abstract class ControllerIntegrationTestBase {
     protected WebTestClient webTestClient;
 
     @Autowired
-    protected ObjectMapper objectMapper;
-
-    @Autowired
     private S3AsyncClient s3AsyncClient;
 
     @BeforeEach
@@ -127,7 +125,7 @@ public abstract class ControllerIntegrationTestBase {
 
     protected JsonNode readJson(EntityExchangeResult<byte[]> result) {
         try {
-            return objectMapper.readTree(result.getResponseBody());
+            return new com.fasterxml.jackson.databind.ObjectMapper().readTree(result.getResponseBody());
         } catch (IOException e) {
             throw new IllegalStateException("Failed to parse JSON response", e);
         }
@@ -152,7 +150,7 @@ public abstract class ControllerIntegrationTestBase {
     static class TestSecurityConfig {
         @Bean
         @Primary
-        PasswordEncoder passwordEncoder() {
+        PasswordEncoder testPasswordEncoder() {
             return NoOpPasswordEncoder.getInstance();
         }
     }

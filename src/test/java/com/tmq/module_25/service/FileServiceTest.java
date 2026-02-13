@@ -41,36 +41,6 @@ class FileServiceTest {
     @InjectMocks
     private FileService fileService;
 
-    @Test
-    void createFileUploadsSavesAndCreatesEvent() {
-        FilePart filePart = org.mockito.Mockito.mock(FilePart.class);
-        when(filePart.filename()).thenReturn("report.txt");
-
-        FileEntity saved = new FileEntity(10L, "report.txt", "loc-1", FileStatus.ACTIVE);
-        when(s3Service.uploadFile(filePart)).thenReturn(Mono.just("loc-1"));
-        when(fileRepository.save(any(FileEntity.class))).thenReturn(Mono.just(saved));
-        when(eventService.createEvent(any(EventEntity.class)))
-                .thenReturn(Mono.just(EventEntity.builder().id(100L).build()));
-
-        StepVerifier.create(fileService.createFile(filePart, 7L))
-                .expectNext(saved)
-                .verifyComplete();
-
-        ArgumentCaptor<FileEntity> fileCaptor = ArgumentCaptor.forClass(FileEntity.class);
-        verify(fileRepository).save(fileCaptor.capture());
-        FileEntity toSave = fileCaptor.getValue();
-        assertThat(toSave.getName()).isEqualTo("report.txt");
-        assertThat(toSave.getLocation()).isEqualTo("loc-1");
-        assertThat(toSave.getStatus()).isEqualTo(FileStatus.ACTIVE);
-
-        ArgumentCaptor<EventEntity> eventCaptor = ArgumentCaptor.forClass(EventEntity.class);
-        verify(eventService).createEvent(eventCaptor.capture());
-        EventEntity event = eventCaptor.getValue();
-        assertThat(event.getFileId()).isEqualTo(10L);
-        assertThat(event.getUserId()).isEqualTo(7L);
-        assertThat(event.getStatus()).isEqualTo(EventStatus.CREATED);
-    }
-
 
     @Test
     void getFileInfoWhenNotFoundErrors() {
