@@ -2,14 +2,14 @@ spring:
   application:
     name: module-2.5
   r2dbc:
-    url: r2dbc:pool:postgres://localhost:5432/app
-    username: app
-    password: app
-    name: apps
+    url: r2dbc:pool:postgres://localhost:5432/changeme
+    username: changeme
+    password: changeme
+    name: changeme
   flyway:
-    url: jdbc:postgresql://localhost:5432/app
-    user: app
-    password: app
+    url: jdbc:postgresql://localhost:5432/changeme
+    user: changeme
+    password: changeme
     locations: classpath:db/migration
     clean-disabled: false
 
@@ -19,11 +19,13 @@ jwt:
   issuer: tmq
 
 aws:
-  url: http://localhost
+  url: localhost
+  external_url: http://localhost
   port: 9000
-  accessKey: minioadmin
-  secretKey: minioadmin12345
+  accessKey: changeme
+  secretKey: changeme
   bucket: back
+
 logging:
   level:
     com.tmq: debug
