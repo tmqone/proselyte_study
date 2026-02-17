@@ -1,0 +1,206 @@
+openapi: 3.0.0
+info:
+  description: "REST API для регистрации, логина, обновления токена и получения ин\
+    формации о пользователе через Keycloak."
+  title: Individuals API
+  version: 1.0.0
+servers:
+- url: http://localhost:8081/v1
+paths:
+  /auth/registration:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+          description: Успешная регистрация
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Ошибка валидации
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Пользователь уже существует
+      summary: Регистрация пользователя
+      x-content-type: application/json
+      x-accepts: application/json
+  /auth/login:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+          description: Успешная аутентификация
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Неверный логин или пароль
+      summary: Аутентификация пользователя
+      x-content-type: application/json
+      x-accepts: application/json
+  /auth/refresh-token:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+          description: Токен успешно обновлён
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Недействительный или просроченный refresh token
+      summary: Обновление токена доступа
+      x-content-type: application/json
+      x-accepts: application/json
+  /auth/me:
+    get:
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoResponse'
+          description: Данные пользователя
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Недействительный токен
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+          description: Пользователь не найден
+      security:
+      - bearerAuth: []
+      summary: Получение данных текущего пользователя
+      x-accepts: application/json
+components:
+  schemas:
+    UserRegistrationRequest:
+      example:
+        password: password
+        email: email
+        confirm_password: confirm_password
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          type: string
+        confirm_password:
+          type: string
+      required:
+      - confirm_password
+      - email
+      - password
+      type: object
+    UserLoginRequest:
+      example:
+        password: password
+        email: email
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          type: string
+      required:
+      - email
+      - password
+      type: object
+    TokenRefreshRequest:
+      example:
+        refresh_token: refresh_token
+      properties:
+        refresh_token:
+          type: string
+      required:
+      - refresh_token
+      type: object
+    TokenResponse:
+      example:
+        access_token: access_token
+        refresh_token: refresh_token
+        token_type: Bearer
+        expires_in: 0
+      properties:
+        access_token:
+          type: string
+        refresh_token:
+          type: string
+        expires_in:
+          type: integer
+        token_type:
+          example: Bearer
+          type: string
+      type: object
+    UserInfoResponse:
+      example:
+        roles:
+        - roles
+        - roles
+        created_at: 2000-01-23T04:56:07.000+00:00
+        id: id
+        email: email
+      properties:
+        id:
+          type: string
+        email:
+          type: string
+        roles:
+          items:
+            type: string
+          type: array
+        created_at:
+          format: date-time
+          type: string
+      type: object
+    ErrorResponse:
+      properties:
+        error:
+          type: string
+        status:
+          type: integer
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+
