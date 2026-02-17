@@ -1,3 +1,24 @@
 spring:
   application:
     name: individuals-api
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            provider: keycloak
+            client-id: individuals-api
+            client-secret: 6bgCSm9WwDpTwlUJaPItMRDeHppDu7J0
+            client-name: individuals-api
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/payment-system
+            token-uri: http://localhost:8080/realms/payment-system/openid-connect/token
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/payment-system
+server:
+  port: 8090
