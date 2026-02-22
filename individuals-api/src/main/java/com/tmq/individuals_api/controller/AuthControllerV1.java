@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
@@ -18,15 +19,16 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class AuthControllerV1 {
     private final UserService userService;
+    private final TokenService tokenService;
 
     @PostMapping("/registration")
-    public Mono<TokenResponse> registration (UserRegistrationRequest request) {
-        return Mono.empty();
+    public Mono<TokenResponse> registration (@RequestBody UserRegistrationRequest request) {
+        return userService.register(request.getEmail(), request.getPassword());
     }
 
     @PostMapping("/login")
     public Mono<TokenResponse> login (UserLoginRequest request) {
-        return Mono.empty();
+        return userService.login();
     }
 
     @PostMapping("/refresh-token")
@@ -36,7 +38,6 @@ public class AuthControllerV1 {
 
     @GetMapping("/me")
     public Mono<UserInfoResponse> getUserInfo(Authentication authentication){
-
         return Mono.empty();
     }
 }

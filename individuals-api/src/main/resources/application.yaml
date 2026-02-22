@@ -9,7 +9,7 @@ spring:
           keycloak:
             provider: keycloak
             client-id: individuals-api
-            client-secret: 6bgCSm9WwDpTwlUJaPItMRDeHppDu7J0
+            client-secret: 2ZEyyBtuY1X2Rry5K1GUWVWQGaAySw1D
             client-name: individuals-api
             authorization-grant-type: authorization_code
             scope: openid, profile, email

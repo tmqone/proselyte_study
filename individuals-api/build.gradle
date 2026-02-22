@@ -51,6 +51,9 @@ dependencies {
 	implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
 	implementation 'org.openapitools:jackson-databind-nullable:0.2.9'
 	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+
+	// Source: https://mvnrepository.com/artifact/org.keycloak/keycloak-admin-client
+	implementation 'org.keycloak:keycloak-admin-client:26.0.8'
 }
 
 tasks.named('test') {
