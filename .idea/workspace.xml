@@ -4,26 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakUserRepresentation.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/ApiException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/KeycloakException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/ValidationException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/validator/UserValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthControllerV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthRestControllerV1.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/TokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/TokenService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/realm-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/realm-config.json" afterDir="false" />
-    </list>
+    <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -337,6 +318,7 @@
       <workItem from="1771841484954" duration="12049000" />
       <workItem from="1771855519287" duration="132000" />
       <workItem from="1771855660653" duration="125000" />
+      <workItem from="1771948116832" duration="637000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />
