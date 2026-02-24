@@ -19,30 +19,31 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 @Slf4j
-public class AuthControllerV1 {
+public class AuthRestControllerV1 {
     private final UserService userService;
     private final TokenService tokenService;
 
     @PostMapping("/registration")
-    public ResponseEntity<Mono<TokenResponse>> registration (@RequestBody UserRegistrationRequest request) {
-        return userService.register(request)
-                .doOnSuccess(tokenResponse -> {
-                    return ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse);
-                });
+    public Mono<ResponseEntity<TokenResponse>> registration (@RequestBody Mono<UserRegistrationRequest> request) {
+        return request.flatMap(userService::register)
+                .map(tokenResponse -> ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Mono<TokenResponse>> login (UserLoginRequest request) {
-        return userService.login(request);
+    public Mono<ResponseEntity<TokenResponse>> login (@RequestBody Mono<UserLoginRequest> request) {
+        return request.flatMap(userService::login)
+                .map(ResponseEntity::ok);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<Mono<TokenResponse>> refreshToken(TokenRefreshRequest request) {
-        return Mono.empty();
+    public Mono<ResponseEntity<TokenResponse>> refreshToken(@RequestBody Mono<TokenRefreshRequest> request) {
+        return request
+                .flatMap(tokenRequest -> tokenService.refreshToken(tokenRequest.getRefreshToken()))
+                .map(ResponseEntity::ok);
     }
 
     @GetMapping("/me")
     public Mono<UserInfoResponse> getUserInfo(Authentication authentication){
-        return Mono.empty();
+        return userService.getUserInfo(authentication);
     }
 }

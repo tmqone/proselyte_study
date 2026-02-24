@@ -1,4 +1,11 @@
 package com.tmq.individuals_api.dto;
 
-public class KeycloakCredentialRepresentation {
+import lombok.Builder;
+
+@Builder
+public record KeycloakCredentialRepresentation (
+        String type,
+        boolean temporary,
+        String value
+){
 }

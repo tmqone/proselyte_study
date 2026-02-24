@@ -1,6 +1,5 @@
 package com.tmq.individuals_api.config;
 
-import org.keycloak.admin.client.Keycloak;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

@@ -5,25 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/KeycloakJwtAuthenticationConverter.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/SecurityConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/test-logback-spring.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakUserRepresentation.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/ApiException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/KeycloakException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/ValidationException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/validator/UserValidator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthControllerV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthControllerV1.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/ErrorResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/TokenRefreshRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/TokenResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/UserInfoResponseDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/UserLoginRequestDto.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/UserRegistrationRequestDto.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthControllerV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthRestControllerV1.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/TokenService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/TokenService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/realm-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/realm-config.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,7 +30,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="51" />
+    <option name="cachedIndexableFilesCount" value="53" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -105,6 +104,12 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$USER_HOME$/.gradle/wrapper/dists/gradle-9.3.0-bin/79n14ral3mx1ozqr3csh2u872/gradle-9.3.0/lib/gradle-core-api-9.3.0.jar!/org/gradle/api/Project.class" root0="SKIP_INSPECTION" />
   </component>
+  <component name="HttpClientEndpointsTabState">
+    <option name="cachedRequestData" value="&lt;CachedHttpClientTabRequests&gt;&#10;  &lt;entry key=&quot;b4e84b487e0def79fa52d49c3cfbca33b0a7a362&quot; value=&quot;###&amp;#10;POST http://localhost:8090/api/v1/auth/login&amp;#10;Content-Type: application/json&amp;#10;&amp;#10;{&amp;#10;  &amp;quot;email&amp;quot;: &amp;quot;&amp;quot;,&amp;#10;  &amp;quot;password&amp;quot;: &amp;quot;&amp;quot;&amp;#10;}&quot; /&gt;&#10;&lt;/CachedHttpClientTabRequests&gt;" />
+  </component>
+  <component name="HttpClientOnboardingState">{
+  &quot;isOnboardingCommentShown&quot;: true
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -124,56 +129,56 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
-    "Gradle.Build proselyte_study.executor": "Run",
-    "Gradle.Download Sources.executor": "Run",
-    "Gradle.EventRepositoryTest.deleteByIdTest.executor": "Run",
-    "Gradle.EventRepositoryTest.executor": "Run",
-    "Gradle.EventRepositoryTest.findFileWithUserIdTest.executor": "Run",
-    "Gradle.EventRepositoryTest.getAllFilesTest.executor": "Run",
-    "Gradle.FileRepositoryTest.executor": "Run",
-    "Gradle.UserRepositoryTest.executor": "Run",
-    "Gradle.proselyte_study [:individuals-api:build].executor": "Run",
-    "Gradle.proselyte_study [:individuals-api:clean].executor": "Run",
-    "Gradle.proselyte_study [:individuals-api:openApiGenerate].executor": "Run",
-    "Gradle.proselyte_study [bootJar].executor": "Run",
-    "Gradle.proselyte_study [build].executor": "Run",
-    "Gradle.proselyte_study [clean].executor": "Run",
-    "Gradle.proselyte_study [flywayClean].executor": "Run",
-    "Gradle.proselyte_study [flywayMigrate].executor": "Run",
-    "Gradle.proselyte_study [testClasses].executor": "Run",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "Spring Boot Application.Application.executor": "Run",
-    "Spring Boot.Application.executor": "Run",
-    "Spring Boot.IndividualsApiApplication.executor": "Debug",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "payment-system",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/tmq/OpenideProjects/proselyte_study/individuals-api",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.2",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
+    &quot;Gradle.Build proselyte_study.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EventRepositoryTest.deleteByIdTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EventRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EventRepositoryTest.findFileWithUserIdTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.EventRepositoryTest.getAllFilesTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.FileRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [:individuals-api:build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [:individuals-api:clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [:individuals-api:openApiGenerate].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [bootJar].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [build].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [flywayClean].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [flywayMigrate].executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.proselyte_study [testClasses].executor&quot;: &quot;Run&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;Spring Boot Application.Application.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.Application.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.IndividualsApiApplication.executor&quot;: &quot;Run&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;payment-system&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/tmq/OpenideProjects/proselyte_study/individuals-api&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -305,8 +310,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
       </set>
     </attachedChunks>
   </component>
@@ -327,6 +332,11 @@
       <workItem from="1771120222443" duration="35000" />
       <workItem from="1771147885912" duration="5963000" />
       <workItem from="1771303950694" duration="17006000" />
+      <workItem from="1771779147236" duration="5543000" />
+      <workItem from="1771788073510" duration="890000" />
+      <workItem from="1771841484954" duration="12049000" />
+      <workItem from="1771855519287" duration="132000" />
+      <workItem from="1771855660653" duration="125000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />
@@ -345,6 +355,21 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="event service logic added" />
     <option name="LAST_COMMIT_MESSAGE" value="event service logic added" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java</url>
+          <line>73</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
   <component name="com.vaadin.designer2.intellij.settings.SizePresetsSettingsComponent">
     <option name="sizePresets">
