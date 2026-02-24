@@ -5,6 +5,8 @@ import com.tmq.individuals_api.service.TokenService;
 import com.tmq.individuals_api.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,17 +24,20 @@ public class AuthControllerV1 {
     private final TokenService tokenService;
 
     @PostMapping("/registration")
-    public Mono<TokenResponse> registration (@RequestBody UserRegistrationRequest request) {
-        return userService.register(request.getEmail(), request.getPassword());
+    public ResponseEntity<Mono<TokenResponse>> registration (@RequestBody UserRegistrationRequest request) {
+        return userService.register(request)
+                .doOnSuccess(tokenResponse -> {
+                    return ResponseEntity.status(HttpStatus.CREATED).body(tokenResponse);
+                });
     }
 
     @PostMapping("/login")
-    public Mono<TokenResponse> login (UserLoginRequest request) {
-        return userService.login();
+    public ResponseEntity<Mono<TokenResponse>> login (UserLoginRequest request) {
+        return userService.login(request);
     }
 
     @PostMapping("/refresh-token")
-    public Mono<TokenResponse> refreshToken(TokenRefreshRequest request) {
+    public ResponseEntity<Mono<TokenResponse>> refreshToken(TokenRefreshRequest request) {
         return Mono.empty();
     }
 
