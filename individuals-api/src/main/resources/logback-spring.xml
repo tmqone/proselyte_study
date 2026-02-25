@@ -1,0 +1,72 @@
+<configuration debug="true">
+    <contextName>individuals-api</contextName>
+    <springProperty scope="context" name="appName" source="spring.application.name"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="docker">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>http://loki:3100/loki/api/v1/push</url>
+            </http>
+            <labels>
+                app = ${appName}
+                host = ${HOSTNAME}
+            </labels>
+            <structuredMetadata>
+                level = %level
+                thread = %thread
+                logger = %logger
+            </structuredMetadata>
+            <message>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </message>
+            <batch>
+                <maxItems>1000</maxItems>
+                <maxBytes>4194304</maxBytes>
+                <timeoutMs>10000</timeoutMs>
+                <drainOnStop>true</drainOnStop>
+            </batch>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!docker">
+        <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+            <http>
+                <url>http://localhost:3100/loki/api/v1/push</url>
+            </http>
+            <labels>
+                app = ${appName}
+                host = ${HOSTNAME}
+            </labels>
+            <structuredMetadata>
+                level = %level
+                thread = %thread
+                logger = %logger
+            </structuredMetadata>
+            <message>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </message>
+            <batch>
+                <maxItems>1000</maxItems>
+                <maxBytes>4194304</maxBytes>
+                <timeoutMs>10000</timeoutMs>
+                <drainOnStop>true</drainOnStop>
+            </batch>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="LOKI"/>
+        </root>
+    </springProfile>
+</configuration>

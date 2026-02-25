@@ -46,6 +46,9 @@ dependencies {
 	testImplementation "com.github.dasniko:testcontainers-keycloak:${testcontainersKeycloakVersion}"
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// LOKI
+	implementation 'com.github.loki4j:loki-logback-appender:2.0.3'
+
 	// OPEN API
 	implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
 	implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"

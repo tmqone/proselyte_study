@@ -3,23 +3,27 @@ package com.tmq.individuals_api.client;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.dto.TokenResponse;
 import com.tmq.individuals_api.exception.KeycloakException;
+import com.tmq.individuals_api.metrics.KeycloakMetrics;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import static com.tmq.individuals_api.metrics.KeycloakMetrics.*;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class KeycloakClient {
     private final WebClient keycloakWebClient;
+    private final KeycloakMetrics keycloakMetrics;
 
     @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
     private String clientId;
@@ -29,6 +33,8 @@ public class KeycloakClient {
     private final String BEARER_PREFIX = "Bearer ";
 
     public Mono<TokenResponse> getUserToken(String email, String password) {
+        Timer.Sample sample = keycloakMetrics.startSample();
+
         return keycloakWebClient.post()
                 .uri("/realms/payment-system/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -41,12 +47,16 @@ public class KeycloakClient {
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         response -> response.bodyToMono(String.class)
                                 .doOnNext(body -> log.error("Keycloak token error {}: {}", response.statusCode(), body))
-                                .flatMap(body -> Mono.error(new KeycloakException(
-                                        body, "KEYCLOAK_EXCEPTION"))))
-                .bodyToMono(TokenResponse.class);
+                                .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
+                .bodyToMono(TokenResponse.class)
+                .doFinally(signal -> keycloakMetrics.stopTimer(sample, OP_GET_USER_TOKEN))
+                .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_GET_USER_TOKEN))
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_USER_TOKEN));
     }
 
     public Mono<TokenResponse> getAdminToken() {
+        Timer.Sample sample = keycloakMetrics.startSample();
+
         return keycloakWebClient.post()
                 .uri("/realms/payment-system/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -54,10 +64,15 @@ public class KeycloakClient {
                         .with("client_id", clientId)
                         .with("client_secret", clientSecret))
                 .retrieve()
-                .bodyToMono(TokenResponse.class);
+                .bodyToMono(TokenResponse.class)
+                .doFinally(signal -> keycloakMetrics.stopTimer(sample, OP_GET_ADMIN_TOKEN))
+                .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_GET_ADMIN_TOKEN))
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_ADMIN_TOKEN));
     }
 
     public Mono<TokenResponse> refreshToken(String refreshToken) {
+        Timer.Sample sample = keycloakMetrics.startSample();
+
         return keycloakWebClient.post()
                 .uri("/realms/payment-system/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -69,12 +84,16 @@ public class KeycloakClient {
                 .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST),
                         response -> response.bodyToMono(String.class)
                                 .doOnNext(body -> log.error("Keycloak error {}: {}", response.statusCode(), body))
-                                .flatMap(body -> Mono.error(new KeycloakException(
-                                        body, "KEYCLOAK_EXCEPTION"))))
-                .bodyToMono(TokenResponse.class);
+                                .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
+                .bodyToMono(TokenResponse.class)
+                .doFinally(signal -> keycloakMetrics.stopTimer(sample, OP_REFRESH_TOKEN))
+                .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_REFRESH_TOKEN))
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_REFRESH_TOKEN));
     }
 
     public Mono<TokenResponse> createNewUser(KeycloakUserRepresentation user, String token) {
+        Timer.Sample sample = keycloakMetrics.startSample();
+
         return keycloakWebClient
                 .post()
                 .uri("/admin/realms/payment-system/users")
@@ -85,8 +104,10 @@ public class KeycloakClient {
                 .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
                         response -> response.bodyToMono(String.class)
                                 .doOnNext(body -> log.error("Keycloak error {}: {}", response.statusCode(), body))
-                                .flatMap(body -> Mono.error(new KeycloakException(
-                                        body, "KEYCLOAK_EXCEPTION"))))
-                .bodyToMono(TokenResponse.class);
+                                .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
+                .bodyToMono(TokenResponse.class)
+                .doFinally(signal -> keycloakMetrics.stopTimer(sample, OP_CREATE_USER))
+                .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_CREATE_USER))
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_CREATE_USER));
     }
 }

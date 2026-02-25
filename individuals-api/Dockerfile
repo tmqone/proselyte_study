@@ -14,5 +14,5 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /home/gradle/project/build/libs/*.jar app.jar
 
-EXPOSE 8091
+EXPOSE 8080
 CMD ["java", "-jar", "app.jar"]

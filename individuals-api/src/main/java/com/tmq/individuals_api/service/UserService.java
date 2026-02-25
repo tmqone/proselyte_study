@@ -3,7 +3,9 @@ package com.tmq.individuals_api.service;
 import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.*;
 import com.tmq.individuals_api.exception.ApiException;
+import com.tmq.individuals_api.metrics.AuthMetrics;
 import com.tmq.individuals_api.validator.UserValidator;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -24,8 +26,10 @@ public class UserService {
 
     private final KeycloakClient keycloakClient;
     private final TokenService tokenService;
+    private final AuthMetrics authMetrics;
 
     public Mono<TokenResponse> register(UserRegistrationRequest request) {
+        Timer.Sample sample = authMetrics.startRegistrationSample();
 
         return UserValidator.validateOnRegistration(
                         request.getEmail(),
@@ -52,20 +56,24 @@ public class UserService {
                                     keycloakClient.createNewUser(user, token.getAccessToken())
                                             .then(tokenService.getAccessToken(request.getEmail(), request.getPassword()))
                             )
-                            .doOnNext(tokenResponse -> {
-                                log.info("New user registered: {}", user);
-                            });
-                }));
+                            .doOnNext(ignored -> log.info("New user registered: {}", user));
+                }))
+                .doFinally(signal -> authMetrics.stopRegistrationTimer(sample))
+                .doOnNext(ignored -> authMetrics.recordRegistrationSuccess())
+                .doOnError(authMetrics::recordRegistrationError);
     }
 
     public Mono<TokenResponse> login(UserLoginRequest request) {
+        Timer.Sample sample = authMetrics.startLoginSample();
+
         return tokenService.getAccessToken(request.getEmail(), request.getPassword())
-                .doOnNext(tokenResponse -> {
-                    log.info("User {} just logged in", request.getEmail());
-                });
+                .doOnNext(ignored -> log.info("User {} just logged in", request.getEmail()))
+                .doFinally(signal -> authMetrics.stopLoginTimer(sample))
+                .doOnNext(ignored -> authMetrics.recordLoginSuccess())
+                .doOnError(ignored -> authMetrics.recordLoginError());
     }
 
-    public Mono<UserInfoResponse> getUserInfo(Authentication authentication){
+    public Mono<UserInfoResponse> getUserInfo(Authentication authentication) {
         if (authentication.getPrincipal() instanceof Jwt jwt) {
             return Mono.just(new UserInfoResponse())
                     .flatMap(userInfoResponse -> {
@@ -78,8 +86,10 @@ public class UserService {
                     })
                     .doOnNext(userInfoResponse -> {
                         log.info("User {} request info about himself", userInfoResponse.getEmail());
+                        authMetrics.recordUserInfoSuccess();
                     });
         } else {
+            authMetrics.recordUserInfoInvalidPrincipal();
             return Mono.error(new ApiException("Invalid user principal", "INVALID_JWT_TOKEN"));
         }
     }

@@ -5,21 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/controller/AuthRestControllerV1IntegrationTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/TokenServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/UserServiceTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.ai/mcp/mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/gradle.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/test-logback-spring.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/loki/loki-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/loki/loki-config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus/prometheus.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -159,6 +156,7 @@
     "Gradle.UserServiceTest.executor": "Run",
     "Gradle.proselyte_study [:individuals-api:bootJar].executor": "Run",
     "Gradle.proselyte_study [:individuals-api:bootTestRun].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:buildNeeded].executor": "Run",
     "Gradle.proselyte_study [:individuals-api:build].executor": "Run",
     "Gradle.proselyte_study [:individuals-api:clean].executor": "Run",
     "Gradle.proselyte_study [:individuals-api:openApiGenerate].executor": "Run",
@@ -172,8 +170,8 @@
     "Gradle.proselyte_study [testClasses].executor": "Run",
     "RequestMappingsPanelOrder0": "0",
     "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "674",
-    "RequestMappingsPanelWidth1": "673",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.MCP Project settings loaded": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
@@ -213,7 +211,7 @@
       <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\individuals-api" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.proselyte_study [:individuals-api:build]">
+  <component name="RunManager" selected="Spring Boot.IndividualsApiApplication">
     <configuration name="proselyte_study [:individuals-api:bootJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -239,7 +237,7 @@
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
     </configuration>
-    <configuration name="proselyte_study [:individuals-api:bootTestRun]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="proselyte_study [:individuals-api:buildNeeded]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -250,7 +248,7 @@
         </option>
         <option name="taskNames">
           <list>
-            <option value=":individuals-api:bootTestRun" />
+            <option value=":individuals-api:buildNeeded" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -359,7 +357,7 @@
     </configuration>
     <list>
       <item itemvalue="Gradle.proselyte_study [:individuals-api:bootJar]" />
-      <item itemvalue="Gradle.proselyte_study [:individuals-api:bootTestRun]" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:buildNeeded]" />
       <item itemvalue="Gradle.proselyte_study [:individuals-api:test]" />
       <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
       <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
@@ -367,11 +365,11 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
+        <item itemvalue="Gradle.proselyte_study [:individuals-api:buildNeeded]" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
+        <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:test]" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:bootJar]" />
-        <item itemvalue="Gradle.proselyte_study [:individuals-api:bootTestRun]" />
       </list>
     </recent_temporary>
   </component>
@@ -406,7 +404,7 @@
       <workItem from="1771855519287" duration="132000" />
       <workItem from="1771855660653" duration="125000" />
       <workItem from="1771948116832" duration="1918000" />
-      <workItem from="1772012919883" duration="11861000" />
+      <workItem from="1772012919883" duration="27281000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />

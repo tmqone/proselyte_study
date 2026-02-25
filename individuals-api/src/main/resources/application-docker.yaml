@@ -21,7 +21,7 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system
 server:
-  port: 8091
+  port: 8090
 
 keycloak:
   url: ${KEYCLOAK_HOST}
