@@ -5,14 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-microservice.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-microservice.puml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-uml.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/architecture/individuals-api.puml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/individuals-api/img.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/architecture/payment-system-architecture.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/architecture/payment-system-architecture.puml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -382,7 +378,7 @@
       <workItem from="1771855519287" duration="132000" />
       <workItem from="1771855660653" duration="125000" />
       <workItem from="1771948116832" duration="1918000" />
-      <workItem from="1772012919883" duration="3190000" />
+      <workItem from="1772012919883" duration="4371000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />
