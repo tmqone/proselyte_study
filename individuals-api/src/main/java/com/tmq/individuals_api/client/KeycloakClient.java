@@ -2,12 +2,13 @@ package com.tmq.individuals_api.client;
 
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.dto.TokenResponse;
-import com.tmq.individuals_api.dto.UserInfoResponse;
 import com.tmq.individuals_api.exception.KeycloakException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -41,7 +42,7 @@ public class KeycloakClient {
                         response -> response.bodyToMono(String.class)
                                 .doOnNext(body -> log.error("Keycloak token error {}: {}", response.statusCode(), body))
                                 .flatMap(body -> Mono.error(new KeycloakException(
-                                        "Keycloak token error: " + body, "KEYCLOAK_EXCEPTION"))))
+                                        body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class);
     }
 
@@ -56,7 +57,7 @@ public class KeycloakClient {
                 .bodyToMono(TokenResponse.class);
     }
 
-    public Mono<TokenResponse> refreshToken(String refreshToken){
+    public Mono<TokenResponse> refreshToken(String refreshToken) {
         return keycloakWebClient.post()
                 .uri("/realms/payment-system/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -65,6 +66,11 @@ public class KeycloakClient {
                         .with("client_secret", clientSecret)
                         .with("refresh_token", refreshToken))
                 .retrieve()
+                .onStatus(status -> status.isSameCodeAs(HttpStatus.BAD_REQUEST),
+                        response -> response.bodyToMono(String.class)
+                                .doOnNext(body -> log.error("Keycloak error {}: {}", response.statusCode(), body))
+                                .flatMap(body -> Mono.error(new KeycloakException(
+                                        body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class);
     }
 
@@ -80,7 +86,7 @@ public class KeycloakClient {
                         response -> response.bodyToMono(String.class)
                                 .doOnNext(body -> log.error("Keycloak error {}: {}", response.statusCode(), body))
                                 .flatMap(body -> Mono.error(new KeycloakException(
-                                        "Keycloak error: " + body, "KEYCLOAK_EXCEPTION"))))
+                                        body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class);
     }
 }

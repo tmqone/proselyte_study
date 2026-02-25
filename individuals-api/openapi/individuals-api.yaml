@@ -96,16 +96,6 @@ paths:
                 $ref: '#/components/schemas/UserInfoResponse'
         '401':
           description: Недействительный токен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '404':
-          description: Пользователь не найден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:

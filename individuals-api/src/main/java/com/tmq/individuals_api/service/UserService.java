@@ -2,19 +2,18 @@ package com.tmq.individuals_api.service;
 
 import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.*;
+import com.tmq.individuals_api.exception.ApiException;
 import com.tmq.individuals_api.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -52,12 +51,18 @@ public class UserService {
                             .flatMap(token ->
                                     keycloakClient.createNewUser(user, token.getAccessToken())
                                             .then(tokenService.getAccessToken(request.getEmail(), request.getPassword()))
-                            );
+                            )
+                            .doOnNext(tokenResponse -> {
+                                log.info("New user registered: {}", user);
+                            });
                 }));
     }
 
     public Mono<TokenResponse> login(UserLoginRequest request) {
-        return tokenService.getAccessToken(request.getEmail(), request.getPassword());
+        return tokenService.getAccessToken(request.getEmail(), request.getPassword())
+                .doOnNext(tokenResponse -> {
+                    log.info("User {} just logged in", request.getEmail());
+                });
     }
 
     public Mono<UserInfoResponse> getUserInfo(Authentication authentication){
@@ -70,9 +75,12 @@ public class UserService {
                         userInfoResponse.setCreatedAt(OffsetDateTime
                                 .of(LocalDateTime.parse(jwt.getClaim("created_at")), ZoneOffset.UTC));
                         return Mono.just(userInfoResponse);
+                    })
+                    .doOnNext(userInfoResponse -> {
+                        log.info("User {} request info about himself", userInfoResponse.getEmail());
                     });
         } else {
-            return Mono.error(new RuntimeException("Invalid user principal"));
+            return Mono.error(new ApiException("Invalid user principal", "INVALID_JWT_TOKEN"));
         }
     }
 }
