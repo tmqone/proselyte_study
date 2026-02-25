@@ -12,8 +12,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
     private String[] publicRoutes = {
             "/api/v1/auth/registration",
-            "api/v1/auth/login",
-            "api/v1/auth/refresh-token"
+            "/api/v1/auth/login",
+            "/api/v1/auth/refresh-token",
+            "/actuator/**"
     };
 
     @Bean

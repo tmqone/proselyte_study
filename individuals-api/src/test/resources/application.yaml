@@ -1,0 +1,18 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: individuals-api
+            client-secret: placeholder
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9999/realms/payment-system
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9999/realms/payment-system
+
+keycloak:
+  url: http://localhost
+  port: 9999

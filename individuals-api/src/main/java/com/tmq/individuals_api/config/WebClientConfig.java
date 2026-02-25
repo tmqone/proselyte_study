@@ -8,12 +8,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 public class WebClientConfig {
+    @Value("${keycloak.url}")
+    private String keycloakUrl;
+    @Value("${keycloak.port}")
+    private String keycloakPort;
 
     @Bean
     @Qualifier(value = "keycloakWebClient")
     WebClient keycloakWebClient () {
         return WebClient.builder()
-                .baseUrl("http://localhost:8080")
+                .baseUrl(String.format("%s:%s", keycloakUrl, keycloakPort))
                 .build();
     }
 }

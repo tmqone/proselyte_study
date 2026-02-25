@@ -1,8 +1,8 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '4.0.2'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id("org.openapi.generator") version "7.20.0"
+	id 'org.springframework.boot' version "${springBootVersion}"
+	id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+	id 'org.openapi.generator' version "${openApiGeneratorVersion}"
 }
 
 apply plugin: 'org.openapi.generator'
@@ -43,14 +43,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-webflux-test'
 	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
 	testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+	testImplementation "com.github.dasniko:testcontainers-keycloak:${testcontainersKeycloakVersion}"
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// OPEN API
-	implementation 'io.swagger.core.v3:swagger-annotations:2.2.41'
-	implementation 'io.swagger.core.v3:swagger-models:2.2.41'
-	implementation 'jakarta.validation:jakarta.validation-api:3.1.1'
-	implementation 'org.openapitools:jackson-databind-nullable:0.2.9'
-	compileOnly 'jakarta.servlet:jakarta.servlet-api:6.1.0'
+	implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
+	implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"
+	implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+	implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
+	compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
 }
 
 tasks.named('test') {
@@ -73,9 +74,18 @@ tasks.named('processResources') {
 	dependsOn 'openApiGenerate'
 }
 
+tasks.named('processTestResources'){
+	dependsOn 'openApiGenerate'
+}
+
 sourceSets {
 	main {
 		java.srcDir("$buildDir/generated/openapi/src/main/java")
 		resources.srcDir("$buildDir/generated/openapi/src/main/resources")
+	}
+
+	test {
+		java.srcDir("$buildDir/generated/openapi/src/test/java")
+		resources.srcDir("$buildDir/generated/openapi/src/test/resources")
 	}
 }

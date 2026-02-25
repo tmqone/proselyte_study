@@ -9,20 +9,20 @@ spring:
           keycloak:
             provider: keycloak
             client-id: individuals-api
-            client-secret: 981kw0IIALKHqQmrcdUOSs3VqelbsQ1D
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
             client-name: individuals-api
             authorization-grant-type: authorization_code
             scope: openid, profile, email
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/payment-system
-            token-uri: http://localhost:8080/realms/payment-system/openid-connect/token
+            issuer-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system
+            token-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system/openid-connect/token
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/payment-system
+          issuer-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system
 server:
-  port: 8090
+  port: 8091
 
 keycloak:
-  url: http://localhost
-  port: 8080
+  url: ${KEYCLOAK_HOST}
+  port: ${KEYCLOAK_PORT}

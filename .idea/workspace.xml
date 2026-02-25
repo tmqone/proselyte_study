@@ -5,10 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/architecture/payment-system-architecture.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/architecture/payment-system-architecture.puml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/controller/AuthRestControllerV1IntegrationTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/TokenServiceTest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/UserServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.ai/mcp/mcp.json" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/config/WebClientConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/dto/KeycloakCredentialRepresentation.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/exception/RestAdviceController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,6 +63,13 @@
                 <item name="proselyte_study" type="f1a62948:ProjectNode" />
                 <item name="individuals-api" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="application" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="proselyte_study" type="f1a62948:ProjectNode" />
+                <item name="individuals-api" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="build" type="c8890929:TasksNode$1" />
               </path>
               <path>
@@ -60,6 +78,13 @@
                 <item name="individuals-api" type="2d1252cf:ModuleNode" />
                 <item name="Tasks" type="e4a08cd1:TasksNode" />
                 <item name="openapi tools" type="c8890929:TasksNode$1" />
+              </path>
+              <path>
+                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
+                <item name="proselyte_study" type="f1a62948:ProjectNode" />
+                <item name="individuals-api" type="2d1252cf:ModuleNode" />
+                <item name="Tasks" type="e4a08cd1:TasksNode" />
+                <item name="verification" type="c8890929:TasksNode$1" />
               </path>
             </expand>
             <select />
@@ -118,56 +143,63 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;Gradle.Build proselyte_study.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EventRepositoryTest.deleteByIdTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EventRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EventRepositoryTest.findFileWithUserIdTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.EventRepositoryTest.getAllFilesTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.FileRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.UserRepositoryTest.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [:individuals-api:build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [:individuals-api:clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [:individuals-api:openApiGenerate].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [bootJar].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [build].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [clean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [flywayClean].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [flywayMigrate].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.proselyte_study [testClasses].executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;Spring Boot Application.Application.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.Application.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.IndividualsApiApplication.executor&quot;: &quot;Debug&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;payment-system&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/tmq/JavaProjects/proselyte_study/architecture&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "Gradle.AuthRestControllerV1IntegrationTest.executor": "Run",
+    "Gradle.Build proselyte_study.executor": "Run",
+    "Gradle.Download Sources.executor": "Run",
+    "Gradle.EventRepositoryTest.deleteByIdTest.executor": "Run",
+    "Gradle.EventRepositoryTest.executor": "Run",
+    "Gradle.EventRepositoryTest.findFileWithUserIdTest.executor": "Run",
+    "Gradle.EventRepositoryTest.getAllFilesTest.executor": "Run",
+    "Gradle.FileRepositoryTest.executor": "Run",
+    "Gradle.TokenServiceTest.executor": "Run",
+    "Gradle.UserRepositoryTest.executor": "Run",
+    "Gradle.UserServiceTest.executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:bootJar].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:bootTestRun].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:build].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:clean].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:openApiGenerate].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:testClasses].executor": "Run",
+    "Gradle.proselyte_study [:individuals-api:test].executor": "Run",
+    "Gradle.proselyte_study [bootJar].executor": "Run",
+    "Gradle.proselyte_study [build].executor": "Run",
+    "Gradle.proselyte_study [clean].executor": "Run",
+    "Gradle.proselyte_study [flywayClean].executor": "Run",
+    "Gradle.proselyte_study [flywayMigrate].executor": "Run",
+    "Gradle.proselyte_study [testClasses].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "674",
+    "RequestMappingsPanelWidth1": "673",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Spring Boot Application.Application.executor": "Run",
+    "Spring Boot.Application.executor": "Run",
+    "Spring Boot.IndividualsApiApplication.executor": "Run",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "payment-system",
+    "junie.onboarding.icon.badge.shown": "true",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/tmq/JavaProjects/proselyte_study/architecture",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReactorSettings">
     <option name="notificationShown" value="true" />
   </component>
@@ -182,56 +214,52 @@
     </key>
   </component>
   <component name="RunManager" selected="Gradle.proselyte_study [:individuals-api:build]">
-    <configuration name="KeycloakClientTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="proselyte_study [:individuals-api:bootJar]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value=":individuals-api:test" />
-            <option value="--tests" />
-            <option value="&quot;com.tmq.individuals_api.client.KeycloakClientTest&quot;" />
+            <option value=":individuals-api:bootJar" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
+      <RunAsTest>false</RunAsTest>
       <GradleProfilingDisabled>false</GradleProfilingDisabled>
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
     </configuration>
-    <configuration name="KeycloakClientTest.getUserToken" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="proselyte_study [:individuals-api:bootTestRun]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
         <option name="taskNames">
           <list>
-            <option value=":individuals-api:test" />
-            <option value="--tests" />
-            <option value="&quot;com.tmq.individuals_api.client.KeycloakClientTest.getUserToken&quot;" />
+            <option value=":individuals-api:bootTestRun" />
           </list>
         </option>
         <option name="vmOptions" />
       </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
       <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
       <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
       <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>true</RunAsTest>
+      <RunAsTest>false</RunAsTest>
       <GradleProfilingDisabled>false</GradleProfilingDisabled>
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
@@ -241,7 +269,7 @@
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" value="--stacktrace" />
+        <option name="scriptParameters" />
         <option name="taskDescriptions">
           <list />
         </option>
@@ -286,7 +314,7 @@
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
     </configuration>
-    <configuration name="proselyte_study [:individuals-api:openApiGenerate]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+    <configuration name="proselyte_study [:individuals-api:test]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
@@ -297,7 +325,7 @@
         </option>
         <option name="taskNames">
           <list>
-            <option value=":individuals-api:openApiGenerate" />
+            <option value=":individuals-api:test" />
           </list>
         </option>
         <option name="vmOptions" />
@@ -330,20 +358,20 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Gradle.KeycloakClientTest" />
-      <item itemvalue="Gradle.KeycloakClientTest.getUserToken" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:bootJar]" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:bootTestRun]" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:test]" />
       <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
       <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
-      <item itemvalue="Gradle.proselyte_study [:individuals-api:openApiGenerate]" />
       <item itemvalue="Spring Boot.IndividualsApiApplication" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
-        <item itemvalue="Gradle.KeycloakClientTest" />
-        <item itemvalue="Gradle.KeycloakClientTest.getUserToken" />
-        <item itemvalue="Gradle.proselyte_study [:individuals-api:openApiGenerate]" />
+        <item itemvalue="Gradle.proselyte_study [:individuals-api:test]" />
+        <item itemvalue="Gradle.proselyte_study [:individuals-api:bootJar]" />
+        <item itemvalue="Gradle.proselyte_study [:individuals-api:bootTestRun]" />
       </list>
     </recent_temporary>
   </component>
@@ -378,7 +406,7 @@
       <workItem from="1771855519287" duration="132000" />
       <workItem from="1771855660653" duration="125000" />
       <workItem from="1771948116832" duration="1918000" />
-      <workItem from="1772012919883" duration="4371000" />
+      <workItem from="1772012919883" duration="11861000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />
