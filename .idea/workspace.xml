@@ -4,7 +4,16 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added" />
+    <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
+      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-microservice.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-microservice.puml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/architecture/individuals-api-uml.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/architecture/individuals-api.puml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/individuals-api/img.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,8 +76,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Dockerfile" />
-        <option value="Record" />
         <option value="Class" />
+        <option value="Record" />
       </list>
     </option>
   </component>
@@ -101,6 +110,9 @@
   </component>
   <component name="OpenIdeProjectLocalState">
     <option name="firstOpen" value="false" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 3
@@ -141,12 +153,12 @@
     &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;Spring Boot Application.Application.executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.Application.executor&quot;: &quot;Run&quot;,
-    &quot;Spring Boot.IndividualsApiApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.IndividualsApiApplication.executor&quot;: &quot;Debug&quot;,
     &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;payment-system&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/tmq/OpenideProjects/proselyte_study/individuals-api&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/tmq/JavaProjects/proselyte_study/architecture&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -165,13 +177,69 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/architecture" />
+      <recent name="$PROJECT_DIR$/individuals-api/src/main/resources" />
       <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\individuals-api" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\individuals-api" />
     </key>
   </component>
-  <component name="RunManager" selected="Spring Boot.IndividualsApiApplication">
+  <component name="RunManager" selected="Gradle.proselyte_study [:individuals-api:build]">
+    <configuration name="KeycloakClientTest" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":individuals-api:test" />
+            <option value="--tests" />
+            <option value="&quot;com.tmq.individuals_api.client.KeycloakClientTest&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
+    <configuration name="KeycloakClientTest.getUserToken" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" value="" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list>
+            <option value=":individuals-api:test" />
+            <option value="--tests" />
+            <option value="&quot;com.tmq.individuals_api.client.KeycloakClientTest.getUserToken&quot;" />
+          </list>
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>false</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <RunAsTest>true</RunAsTest>
+      <GradleProfilingDisabled>false</GradleProfilingDisabled>
+      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+      <method v="2" />
+    </configuration>
     <configuration name="proselyte_study [:individuals-api:build]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -247,29 +315,15 @@
       <GradleCoverageDisabled>false</GradleCoverageDisabled>
       <method v="2" />
     </configuration>
-    <configuration name="proselyte_study [clean]" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
-      <ExternalSystemSettings>
-        <option name="executionName" />
-        <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="externalSystemIdString" value="GRADLE" />
-        <option name="scriptParameters" />
-        <option name="taskDescriptions">
-          <list />
-        </option>
-        <option name="taskNames">
-          <list>
-            <option value="clean" />
-          </list>
-        </option>
-        <option name="vmOptions" />
-      </ExternalSystemSettings>
-      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
-      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
-      <ExternalSystemDebugDisabled>false</ExternalSystemDebugDisabled>
-      <DebugAllEnabled>false</DebugAllEnabled>
-      <RunAsTest>false</RunAsTest>
-      <GradleProfilingDisabled>false</GradleProfilingDisabled>
-      <GradleCoverageDisabled>false</GradleCoverageDisabled>
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="com.tmq.module-2.5.main" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="com.tmq.module-2.5.main" />
+      <option name="filePath" />
       <method v="2" />
     </configuration>
     <configuration name="IndividualsApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
@@ -279,20 +333,29 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <list>
+      <item itemvalue="Gradle.KeycloakClientTest" />
+      <item itemvalue="Gradle.KeycloakClientTest.getUserToken" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
+      <item itemvalue="Gradle.proselyte_study [:individuals-api:openApiGenerate]" />
+      <item itemvalue="Spring Boot.IndividualsApiApplication" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Gradle.proselyte_study [:individuals-api:build]" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:clean]" />
+        <item itemvalue="Gradle.KeycloakClientTest" />
+        <item itemvalue="Gradle.KeycloakClientTest.getUserToken" />
         <item itemvalue="Gradle.proselyte_study [:individuals-api:openApiGenerate]" />
-        <item itemvalue="Gradle.proselyte_study [clean]" />
       </list>
     </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.31033.145" />
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.30387.90" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.30387.90" />
       </set>
     </attachedChunks>
   </component>
@@ -319,6 +382,7 @@
       <workItem from="1771855519287" duration="132000" />
       <workItem from="1771855660653" duration="125000" />
       <workItem from="1771948116832" duration="1918000" />
+      <workItem from="1772012919883" duration="3190000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />
@@ -339,15 +403,11 @@
     <option name="LAST_COMMIT_MESSAGE" value="event service logic added" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java</url>
-          <line>73</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="org.springframework.security.core.authority.SimpleGrantedAuthority" memberName="role" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
