@@ -11,7 +11,7 @@ scrape_configs:
   - job_name: individuals-api
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: [ 'individuals-api:8091' ]
+      - targets: [ 'individuals-api:8080' ]
 
   - job_name: keycloak
     metrics_path: /metrics

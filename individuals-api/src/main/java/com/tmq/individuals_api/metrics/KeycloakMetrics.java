@@ -16,13 +16,11 @@ public class KeycloakMetrics {
     public static final String OP_CREATE_USER     = "create_user";
 
     private static final String METRIC_REQUESTS = "keycloak.requests.total";
-    private static final String METRIC_DURATION = "keycloak.request.duration";
 
     private final MeterRegistry registry;
 
     private final Map<String, Counter> successCounters;
     private final Map<String, Counter> errorCounters;
-    private final Map<String, Timer>   timers;
 
     public KeycloakMetrics(MeterRegistry registry) {
         this.registry = registry;
@@ -40,21 +38,10 @@ public class KeycloakMetrics {
                 OP_REFRESH_TOKEN,   counter(OP_REFRESH_TOKEN,   "error"),
                 OP_CREATE_USER,     counter(OP_CREATE_USER,     "error")
         );
-
-        this.timers = Map.of(
-                OP_GET_USER_TOKEN,  timer(OP_GET_USER_TOKEN),
-                OP_GET_ADMIN_TOKEN, timer(OP_GET_ADMIN_TOKEN),
-                OP_REFRESH_TOKEN,   timer(OP_REFRESH_TOKEN),
-                OP_CREATE_USER,     timer(OP_CREATE_USER)
-        );
     }
 
     public Timer.Sample startSample() {
         return Timer.start(registry);
-    }
-
-    public void stopTimer(Timer.Sample sample, String operation) {
-        sample.stop(timers.get(operation));
     }
 
     public void recordSuccess(String operation) {
@@ -70,13 +57,6 @@ public class KeycloakMetrics {
                 .description("Total number of Keycloak HTTP requests")
                 .tag("operation", operation)
                 .tag("status", status)
-                .register(registry);
-    }
-
-    private Timer timer(String operation) {
-        return Timer.builder(METRIC_DURATION)
-                .description("Duration of Keycloak HTTP requests")
-                .tag("operation", operation)
                 .register(registry);
     }
 }

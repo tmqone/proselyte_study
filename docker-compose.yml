@@ -49,7 +49,7 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       KEYCLOAK_HOST: http://individuals-keycloak
       KEYCLOAK_PORT: 8080
-      KEYCLOAK_CLIENT_SECRET: 70hCY8WqDus3YIuJwcqH11Hp87bULE60
+      KEYCLOAK_CLIENT_SECRET: 6Y26alesiYGdlaGafX5QXSS8Yx76LV6R
     depends_on:
       keycloak:
         condition: service_healthy

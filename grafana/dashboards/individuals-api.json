@@ -1,755 +1,1261 @@
 {
-  "id": null,
-  "uid": "individuals-api",
-  "title": "Individuals API",
-  "description": "Auth & Keycloak metrics for individuals-api",
-  "tags": ["individuals-api", "spring-boot"],
-  "timezone": "browser",
-  "schemaVersion": 38,
-  "version": 1,
-  "refresh": "30s",
-  "time": { "from": "now-1h", "to": "now" },
-  "templating": { "list": [] },
-  "annotations": { "list": [] },
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": 4,
+  "links": [],
+  "liveNow": false,
   "panels": [
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
-      "type": "row",
-      "title": "Auth — Registrations",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 }
-    },
-    {
-      "id": 2,
-      "type": "stat",
-      "title": "Registrations — Success",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "auto" },
-      "fieldConfig": {
-        "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "short" }
-      },
-      "targets": [
-        {
-          "expr": "increase(auth_registrations_total{status=\"success\"}[1h])",
-          "legendFormat": "Success",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 3,
-      "type": "stat",
-      "title": "Registrations — Errors",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area", "orientation": "auto" },
-      "fieldConfig": {
-        "defaults": { "color": { "mode": "fixed", "fixedColor": "red" }, "unit": "short" }
-      },
-      "targets": [
-        {
-          "expr": "increase(auth_registrations_total{status!=\"success\"}[1h])",
-          "legendFormat": "Errors",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "type": "stat",
-      "title": "Registration Success Rate",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none", "orientation": "auto" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(auth_registrations_total{status=\"success\"}[5m]) / rate(auth_registrations_total[5m])",
-          "legendFormat": "Success rate",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 5,
-      "type": "timeseries",
-      "title": "Registration Rate by Status",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } }
-      },
-      "targets": [
-        {
-          "expr": "rate(auth_registrations_total{status=\"success\"}[1m])",
-          "legendFormat": "success",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(auth_registrations_total{status=\"validation_error\"}[1m])",
-          "legendFormat": "validation_error",
-          "refId": "B"
-        },
-        {
-          "expr": "rate(auth_registrations_total{status=\"user_already_exists\"}[1m])",
-          "legendFormat": "user_already_exists",
-          "refId": "C"
-        },
-        {
-          "expr": "rate(auth_registrations_total{status=\"keycloak_error\"}[1m])",
-          "legendFormat": "keycloak_error",
-          "refId": "D"
-        },
-        {
-          "expr": "rate(auth_registrations_total{status=\"error\"}[1m])",
-          "legendFormat": "error",
-          "refId": "E"
-        }
-      ]
-    },
-    {
-      "id": 6,
-      "type": "stat",
-      "title": "Registration p50 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.50, rate(auth_registration_duration_seconds_bucket[5m]))",
-          "legendFormat": "p50",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 7,
-      "type": "stat",
-      "title": "Registration p95 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(auth_registration_duration_seconds_bucket[5m]))",
-          "legendFormat": "p95",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 8,
-      "type": "stat",
-      "title": "Registration p99 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.99, rate(auth_registration_duration_seconds_bucket[5m]))",
-          "legendFormat": "p99",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 9,
-      "type": "row",
-      "title": "Auth — Logins",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 }
-    },
-    {
-      "id": 10,
-      "type": "stat",
-      "title": "Logins — Success",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 10 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "short" } },
-      "targets": [
-        {
-          "expr": "increase(auth_logins_total{status=\"success\"}[1h])",
-          "legendFormat": "Success",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 11,
-      "type": "stat",
-      "title": "Logins — Errors",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 10 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "red" }, "unit": "short" } },
-      "targets": [
-        {
-          "expr": "increase(auth_logins_total{status=\"error\"}[1h])",
-          "legendFormat": "Errors",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 12,
-      "type": "stat",
-      "title": "Login Success Rate",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 10 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(auth_logins_total{status=\"success\"}[5m]) / rate(auth_logins_total[5m])",
-          "legendFormat": "Success rate",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 13,
-      "type": "timeseries",
-      "title": "Login Rate by Status",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "rate(auth_logins_total{status=\"success\"}[1m])",
-          "legendFormat": "success",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(auth_logins_total{status=\"error\"}[1m])",
-          "legendFormat": "error",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "type": "stat",
-      "title": "Login p50 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 14 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.50, rate(auth_login_duration_seconds_bucket[5m]))",
-          "legendFormat": "p50",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 15,
-      "type": "stat",
-      "title": "Login p95 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 14 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(auth_login_duration_seconds_bucket[5m]))",
-          "legendFormat": "p95",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 16,
-      "type": "stat",
-      "title": "Login p99 Latency",
-      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 14 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": { "defaults": { "unit": "s" } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.99, rate(auth_login_duration_seconds_bucket[5m]))",
-          "legendFormat": "p99",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 17,
-      "type": "row",
-      "title": "Auth — User Info",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 18 }
-    },
-    {
-      "id": 18,
-      "type": "stat",
-      "title": "User Info — Success",
-      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 19 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "short" } },
-      "targets": [
-        {
-          "expr": "increase(auth_user_info_total{status=\"success\"}[1h])",
-          "legendFormat": "Success",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 19,
-      "type": "stat",
-      "title": "User Info — Invalid Principal",
-      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 19 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "orange" }, "unit": "short" } },
-      "targets": [
-        {
-          "expr": "increase(auth_user_info_total{status=\"invalid_principal\"}[1h])",
-          "legendFormat": "Invalid Principal",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 20,
-      "type": "timeseries",
-      "title": "User Info Rate by Status",
-      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 19 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "rate(auth_user_info_total{status=\"success\"}[1m])",
-          "legendFormat": "success",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(auth_user_info_total{status=\"invalid_principal\"}[1m])",
-          "legendFormat": "invalid_principal",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 21,
-      "type": "row",
-      "title": "Keycloak Client",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 27 }
-    },
-    {
-      "id": 22,
-      "type": "timeseries",
-      "title": "Keycloak Requests — Rate by Operation",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "rate(keycloak_requests_total{status=\"success\"}[1m])",
-          "legendFormat": "{{operation}} success",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(keycloak_requests_total{status=\"error\"}[1m])",
-          "legendFormat": "{{operation}} error",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 23,
-      "type": "timeseries",
-      "title": "Keycloak Request Latency by Operation (p95)",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(keycloak_request_duration_seconds_bucket[5m]))",
-          "legendFormat": "{{operation}} p95",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 24,
-      "type": "stat",
-      "title": "Keycloak get_user_token — Success Rate",
-      "gridPos": { "h": 3, "w": 6, "x": 0, "y": 36 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(keycloak_requests_total{operation=\"get_user_token\",status=\"success\"}[5m]) / rate(keycloak_requests_total{operation=\"get_user_token\"}[5m])",
-          "legendFormat": "get_user_token",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 25,
-      "type": "stat",
-      "title": "Keycloak get_admin_token — Success Rate",
-      "gridPos": { "h": 3, "w": 6, "x": 6, "y": 36 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(keycloak_requests_total{operation=\"get_admin_token\",status=\"success\"}[5m]) / rate(keycloak_requests_total{operation=\"get_admin_token\"}[5m])",
-          "legendFormat": "get_admin_token",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 26,
-      "type": "stat",
-      "title": "Keycloak refresh_token — Success Rate",
-      "gridPos": { "h": 3, "w": 6, "x": 12, "y": 36 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(keycloak_requests_total{operation=\"refresh_token\",status=\"success\"}[5m]) / rate(keycloak_requests_total{operation=\"refresh_token\"}[5m])",
-          "legendFormat": "refresh_token",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 27,
-      "type": "stat",
-      "title": "Keycloak create_user — Success Rate",
-      "gridPos": { "h": 3, "w": 6, "x": 18, "y": 36 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "none" },
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percentunit",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 0.8 },
-              { "color": "green", "value": 0.95 }
-            ]
-          },
-          "color": { "mode": "thresholds" }
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(keycloak_requests_total{operation=\"create_user\",status=\"success\"}[5m]) / rate(keycloak_requests_total{operation=\"create_user\"}[5m])",
-          "legendFormat": "create_user",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 28,
-      "type": "row",
-      "title": "HTTP Server",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 39 }
-    },
-    {
-      "id": 29,
-      "type": "timeseries",
-      "title": "HTTP Request Rate by Endpoint",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "reqps", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "rate(http_server_requests_seconds_count{job=\"individuals-api\"}[1m])",
-          "legendFormat": "{{method}} {{uri}} {{status}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 30,
-      "type": "timeseries",
-      "title": "HTTP p95 Latency by Endpoint",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "histogram_quantile(0.95, rate(http_server_requests_seconds_bucket{job=\"individuals-api\"}[5m]))",
-          "legendFormat": "{{method}} {{uri}} p95",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 31,
-      "type": "stat",
-      "title": "HTTP 4xx Rate",
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 48 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "fixed", "fixedColor": "orange" } } },
-      "targets": [
-        {
-          "expr": "rate(http_server_requests_seconds_count{job=\"individuals-api\",status=~\"4..\"}[1m])",
-          "legendFormat": "4xx",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 32,
-      "type": "stat",
-      "title": "HTTP 5xx Rate",
-      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 48 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "reduceOptions": { "calcs": ["lastNotNull"] }, "colorMode": "background", "graphMode": "area" },
-      "fieldConfig": { "defaults": { "unit": "reqps", "color": { "mode": "fixed", "fixedColor": "red" } } },
-      "targets": [
-        {
-          "expr": "rate(http_server_requests_seconds_count{job=\"individuals-api\",status=~\"5..\"}[1m])",
-          "legendFormat": "5xx",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 33,
-      "type": "row",
-      "title": "JVM & System",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 52 }
-    },
-    {
-      "id": 34,
-      "type": "timeseries",
-      "title": "JVM Heap Usage",
-      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 53 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "jvm_memory_used_bytes{job=\"individuals-api\",area=\"heap\"}",
-          "legendFormat": "{{id}} used",
-          "refId": "A"
-        },
-        {
-          "expr": "jvm_memory_committed_bytes{job=\"individuals-api\",area=\"heap\"}",
-          "legendFormat": "{{id}} committed",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 35,
-      "type": "timeseries",
-      "title": "JVM Threads",
-      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 53 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "short", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "jvm_threads_live_threads{job=\"individuals-api\"}",
-          "legendFormat": "live",
-          "refId": "A"
-        },
-        {
-          "expr": "jvm_threads_daemon_threads{job=\"individuals-api\"}",
-          "legendFormat": "daemon",
-          "refId": "B"
-        },
-        {
-          "expr": "jvm_threads_peak_threads{job=\"individuals-api\"}",
-          "legendFormat": "peak",
-          "refId": "C"
-        }
-      ]
-    },
-    {
-      "id": 36,
-      "type": "timeseries",
-      "title": "CPU Usage",
-      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 53 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "percentunit", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "process_cpu_usage{job=\"individuals-api\"}",
-          "legendFormat": "process CPU",
-          "refId": "A"
-        },
-        {
-          "expr": "system_cpu_usage{job=\"individuals-api\"}",
-          "legendFormat": "system CPU",
-          "refId": "B"
-        }
-      ]
-    },
-    {
-      "id": 37,
-      "type": "timeseries",
-      "title": "GC Pause Time",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 61 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "s", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "rate(jvm_gc_pause_seconds_sum{job=\"individuals-api\"}[1m])",
-          "legendFormat": "{{action}} {{cause}}",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 38,
-      "type": "timeseries",
-      "title": "JVM Non-Heap Usage",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 61 },
-      "datasource": { "type": "prometheus", "uid": "${datasource}" },
-      "options": { "legend": { "displayMode": "list", "placement": "bottom" } },
-      "fieldConfig": { "defaults": { "unit": "bytes", "custom": { "lineWidth": 2, "fillOpacity": 10 } } },
-      "targets": [
-        {
-          "expr": "jvm_memory_used_bytes{job=\"individuals-api\",area=\"nonheap\"}",
-          "legendFormat": "{{id}} used",
-          "refId": "A"
-        }
-      ]
-    },
-    {
-      "id": 39,
-      "type": "row",
-      "title": "Logs",
-      "collapsed": false,
-      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 69 }
-    },
-    {
-      "id": 40,
-      "type": "logs",
-      "title": "Application Logs",
-      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 70 },
-      "datasource": { "type": "loki", "uid": "loki" },
       "options": {
-        "dedupStrategy": "none",
-        "enableLogDetails": true,
-        "prettifyLogMessage": false,
-        "showCommonLabels": false,
-        "showLabels": false,
-        "showTime": true,
-        "sortOrder": "Descending",
-        "wrapLogMessage": true
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
       },
+      "pluginVersion": "10.3.1",
       "targets": [
         {
-          "datasource": { "type": "loki", "uid": "loki" },
-          "expr": "{app=\"individuals-api\"}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(auth_registrations_total{status=\"success\"})",
           "legendFormat": "",
           "refId": "A"
         }
-      ]
+      ],
+      "title": "Successful Registrations",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(auth_registrations_total{status!=\"success\"})",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Registration Errors",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(auth_logins_total{status=\"success\"})",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Successful Logins",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short",
+          "unitScale": true
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.3.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "expr": "sum(auth_logins_total{status=\"error\"})",
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Login Errors",
+      "type": "stat"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 5,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "req/s",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 5
+          },
+          "id": 6,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(rate(auth_registrations_total[5m])) by (status)",
+              "legendFormat": "{{status}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Registration Rate by Status",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "req/s",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 5
+          },
+          "id": 7,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(rate(auth_logins_total[5m])) by (status)",
+              "legendFormat": "{{status}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Login Rate by Status",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Auth Metrics",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 5
+      },
+      "id": 8,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                }
+              },
+              "mappings": [],
+              "unit": "short",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 6
+          },
+          "id": 9,
+          "options": {
+            "displayLabels": [
+              "name",
+              "percent"
+            ],
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true,
+              "values": [
+                "value",
+                "percent"
+              ]
+            },
+            "pieType": "donut",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "tooltip": {
+              "mode": "single",
+              "sort": "none"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(auth_registrations_total{status!=\"success\"}) by (status)",
+              "legendFormat": "{{status}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Registration Errors Breakdown",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 70
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 6
+          },
+          "id": 10,
+          "options": {
+            "minVizHeight": 75,
+            "minVizWidth": 75,
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showThresholdLabels": false,
+            "showThresholdMarkers": true,
+            "sizing": "auto"
+          },
+          "pluginVersion": "10.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(auth_registrations_total{status=\"success\"}) / sum(auth_registrations_total) * 100",
+              "legendFormat": "Registration Success Rate",
+              "refId": "A"
+            },
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(auth_logins_total{status=\"success\"}) / sum(auth_logins_total) * 100",
+              "legendFormat": "Login Success Rate",
+              "refId": "B"
+            }
+          ],
+          "title": "Auth Success Rates",
+          "type": "gauge"
+        }
+      ],
+      "title": "Registration Error Analysis",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 11,
+      "panels": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  }
+                ]
+              },
+              "unit": "short",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 0,
+            "y": 7
+          },
+          "id": 12,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "10.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(keycloak_requests_total{status=\"success\"})",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Successful Requests",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1
+                  },
+                  {
+                    "color": "red",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "short",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 6,
+            "y": 7
+          },
+          "id": 13,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "10.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(keycloak_requests_total{status=\"error\"})",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Failed Requests",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 70
+                  },
+                  {
+                    "color": "green",
+                    "value": 95
+                  }
+                ]
+              },
+              "unit": "percent",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 12,
+            "y": 7
+          },
+          "id": 14,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "10.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(keycloak_requests_total{status=\"success\"}) / sum(keycloak_requests_total) * 100",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Success Rate",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "thresholds"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "short",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 6,
+            "x": 18,
+            "y": 7
+          },
+          "id": 15,
+          "options": {
+            "colorMode": "background",
+            "graphMode": "area",
+            "justifyMode": "auto",
+            "orientation": "auto",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showPercentChange": false,
+            "textMode": "auto",
+            "wideLayout": true
+          },
+          "pluginVersion": "10.3.1",
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(keycloak_requests_total)",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "title": "Total Keycloak Requests",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "req/s",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 15,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 11
+          },
+          "id": 16,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(rate(keycloak_requests_total[5m])) by (operation, status)",
+              "legendFormat": "{{operation}} / {{status}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Request Rate by Operation & Status",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "req/s",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 19
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(rate(keycloak_requests_total{status=\"success\"}[5m])) by (operation)",
+              "legendFormat": "{{operation}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Success Rate by Operation",
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "fixedColor": "red",
+                "mode": "fixed"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "req/s",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "drawStyle": "line",
+                "fillOpacity": 20,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "smooth",
+                "lineWidth": 2,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "never",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "reqps",
+              "unitScale": true
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 19
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "sum"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "prometheus",
+                "uid": "prometheus"
+              },
+              "expr": "sum(rate(keycloak_requests_total{status=\"error\"}[5m])) by (operation)",
+              "legendFormat": "{{operation}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Keycloak Error Rate by Operation",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Keycloak Client Operations",
+      "type": "row"
     }
   ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": [
+    "individuals-api"
+  ],
   "templating": {
-    "list": [
-      {
-        "name": "datasource",
-        "type": "datasource",
-        "query": "prometheus",
-        "label": "Datasource",
-        "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
-        "hide": 0,
-        "refresh": 1,
-        "options": []
-      }
-    ]
-  }
+    "list": []
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Individuals API custom metrics",
+  "uid": "individuals-api",
+  "version": 54,
+  "weekStart": ""
 }

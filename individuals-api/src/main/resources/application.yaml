@@ -9,7 +9,7 @@ spring:
           keycloak:
             provider: keycloak
             client-id: individuals-api
-            client-secret: 70hCY8WqDus3YIuJwcqH11Hp87bULE60
+            client-secret: HcZuPeZ0H3sLFxjY2tEDq3lrcpY7tLoW
             client-name: individuals-api
             authorization-grant-type: authorization_code
             scope: openid, profile, email
@@ -29,6 +29,9 @@ keycloak:
   port: 8080
 
 management:
+  metrics:
+    tags:
+      application: individuals-api
   endpoint:
     prometheus:
       access: unrestricted

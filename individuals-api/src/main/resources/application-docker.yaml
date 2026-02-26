@@ -21,8 +21,20 @@ spring:
         jwt:
           issuer-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system
 server:
-  port: 8090
+  port: 8080
 
 keycloak:
   url: ${KEYCLOAK_HOST}
   port: ${KEYCLOAK_PORT}
+
+management:
+  metrics:
+    tags:
+      application: individuals-api
+  endpoint:
+    prometheus:
+      access: unrestricted
+  endpoints:
+    web:
+      exposure:
+        include: prometheus
