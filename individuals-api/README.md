@@ -33,10 +33,7 @@
 
 ## Запуск
 ````
-1. docker compose up -d keycloak keycloak-postgres
-2. Зайти в keycloak и скопировать client secret у клиента individuals-api
-3. Прописать client secret в docker compose в KEYCLOAK_CLIENT_SECRET
-4. docker compose up -d
+docker compose up -d
 ````
 
 ## Документация
