@@ -15,6 +15,9 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static com.tmq.individuals_api.metrics.KeycloakMetrics.*;
 
 @Component
@@ -30,6 +33,15 @@ public class KeycloakClient {
     private String clientSecret;
 
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final int TOKEN_EXPIRY_BUFFER_SECONDS = 30;
+
+    private record CachedToken(TokenResponse token, Instant expiresAt) {
+        boolean isValid() {
+            return Instant.now().isBefore(expiresAt);
+        }
+    }
+
+    private final AtomicReference<CachedToken> adminTokenCache = new AtomicReference<>();
 
     public Mono<TokenResponse> getUserToken(String email, String password) {
 
@@ -52,7 +64,17 @@ public class KeycloakClient {
     }
 
     public Mono<TokenResponse> getAdminToken() {
+        return Mono.defer(() -> {
+            CachedToken cached = adminTokenCache.get();
+            if (cached != null && cached.isValid()) {
+                log.info("Returning cached admin token, expires at {}", cached.expiresAt());
+                return Mono.just(cached.token());
+            }
+            return fetchAdminToken();
+        });
+    }
 
+    private Mono<TokenResponse> fetchAdminToken() {
         return keycloakWebClient.post()
                 .uri("/realms/payment-system/protocol/openid-connect/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -61,6 +83,14 @@ public class KeycloakClient {
                         .with("client_secret", clientSecret))
                 .retrieve()
                 .bodyToMono(TokenResponse.class)
+                .doOnNext(token -> {
+                    if (token.getExpiresIn() == null) {
+                        throw new KeycloakException("Admin token response missing expires_in", "KEYCLOAK_EXCEPTION");
+                    }
+                    Instant expiresAt = Instant.now().plusSeconds(token.getExpiresIn() - TOKEN_EXPIRY_BUFFER_SECONDS);
+                    adminTokenCache.set(new CachedToken(token, expiresAt));
+                    log.info("Admin token fetched and cached until {}", expiresAt);
+                })
                 .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_GET_ADMIN_TOKEN))
                 .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_ADMIN_TOKEN));
     }

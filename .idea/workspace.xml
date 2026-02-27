@@ -5,28 +5,44 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b72014ea-d950-43b3-9c22-96ae0105f0cd" name="Changes" comment="event service logic added">
-      <change afterPath="$PROJECT_DIR$/grafana/dashboards/jvm.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/architecture/individuals-api-microservice.png" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/architecture/individuals-api-microservice.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/architecture/individuals-api-microservice.puml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/architecture/individuals-api-microservice.puml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/architecture/individuals-api-uml.png" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/architecture/individuals-api-uml.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/architecture/individuals-api.puml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/architecture/individuals-api.puml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/grafana/dashboards/individuals-api.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/grafana/provisioning/datasources/datasources.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/grafana/provisioning/datasources/datasources.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/resources/realm-config.json" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/resources/realm-config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grafana/dashboards/individuals-api-logs.json" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/dashboards/individuals-api-logs.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grafana/dashboards/individuals-api.json" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/dashboards/individuals-api.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grafana/dashboards/jvm.json" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/dashboards/jvm.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grafana/provisioning/dashboards/dashboards.yml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/provisioning/dashboards/dashboards.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/grafana/provisioning/datasources/datasources.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/grafana/provisioning/datasources/datasources.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/build.gradle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/gradle.properties" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/gradle.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/IndividualsApiApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/client/KeycloakClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthRestControllerV1.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/controller/AuthRestControllerV1.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/metrics/AuthMetrics.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/metrics/AuthMetrics.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/metrics/KeycloakMetrics.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/metrics/KeycloakMetrics.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/validator/UserValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/java/com/tmq/individuals_api/validator/UserValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application-docker.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application-local.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/application.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/individuals-api/src/main/resources/logback-spring.xml" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/main/resources/logback-spring.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/prometheus/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/prometheus/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/controller/AuthRestControllerV1IntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/controller/AuthRestControllerV1IntegrationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/UserServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/individuals-api/src/test/java/com/tmq/individuals_api/service/UserServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/loki/loki-config.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/loki/loki-config.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/prometheus/prometheus.yml" beforeDir="false" afterPath="$PROJECT_DIR$/infrastructure/prometheus/prometheus.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
-  </component>
-  <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="73" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
@@ -41,51 +57,7 @@
         </task>
         <projects_view>
           <tree_state>
-            <expand>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="application" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="build" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="openapi tools" type="c8890929:TasksNode$1" />
-              </path>
-              <path>
-                <item name="" type="6a2764b6:ExternalProjectsStructure$RootNode" />
-                <item name="proselyte_study" type="f1a62948:ProjectNode" />
-                <item name="individuals-api" type="2d1252cf:ModuleNode" />
-                <item name="Tasks" type="e4a08cd1:TasksNode" />
-                <item name="verification" type="c8890929:TasksNode$1" />
-              </path>
-            </expand>
+            <expand />
             <select />
           </tree_state>
         </projects_view>
@@ -186,7 +158,7 @@
     &quot;git-widget-placeholder&quot;: &quot;payment-system&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/tmq/JavaProjects/proselyte_study/architecture&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/tmq/OpenideProjects/proselyte_study&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -195,7 +167,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -210,6 +182,8 @@
       <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\individuals-api" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\infrastructure" />
+      <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\architecture" />
       <recent name="C:\Users\tmq\OpenideProjects\proselyte_study\individuals-api" />
     </key>
   </component>
@@ -398,7 +372,10 @@
       <workItem from="1772012919883" duration="27281000" />
       <workItem from="1772122144077" duration="470000" />
       <workItem from="1772122624399" duration="576000" />
-      <workItem from="1772123212938" duration="5770000" />
+      <workItem from="1772123212938" duration="6816000" />
+      <workItem from="1772183800967" duration="214000" />
+      <workItem from="1772184021332" duration="2230000" />
+      <workItem from="1772190031887" duration="2050000" />
     </task>
     <task id="LOCAL-00001" summary="event service logic added">
       <option name="closed" value="true" />

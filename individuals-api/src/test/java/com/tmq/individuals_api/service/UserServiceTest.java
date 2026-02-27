@@ -1,12 +1,16 @@
 package com.tmq.individuals_api.service;
 
 import com.tmq.individuals_api.client.KeycloakClient;
+import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.dto.TokenResponse;
 import com.tmq.individuals_api.dto.UserInfoResponse;
 import com.tmq.individuals_api.dto.UserLoginRequest;
 import com.tmq.individuals_api.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.exception.ApiException;
 import com.tmq.individuals_api.exception.ValidationException;
+import com.tmq.individuals_api.mapper.KeycloakUserMapper;
+import com.tmq.individuals_api.metrics.AuthMetrics;
+import com.tmq.individuals_api.validator.UserValidator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -23,6 +27,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,6 +40,15 @@ class UserServiceTest {
     @Mock
     private TokenService tokenService;
 
+    @Mock
+    private AuthMetrics authMetrics;
+
+    @Mock
+    private UserValidator userValidator;
+
+    @Mock
+    private KeycloakUserMapper keycloakUserMapper;
+
     @InjectMocks
     private UserService userService;
 
@@ -46,6 +60,17 @@ class UserServiceTest {
         TokenResponse adminToken = new TokenResponse().accessToken("admin-token");
         TokenResponse userToken  = new TokenResponse().accessToken("user-token").refreshToken("refresh");
 
+        when(userValidator.validateOnRegistration(any(), any(), any())).thenReturn(Mono.empty());
+        when(keycloakUserMapper.toKeycloakUser(any())).thenReturn(
+                KeycloakUserRepresentation.builder()
+                        .email("user@example.com")
+                        .emailVerified(true)
+                        .enabled(true)
+                        .requiredActions(List.of())
+                        .credentials(List.of())
+                        .build()
+        );
+        doNothing().when(authMetrics).recordRegistrationSuccess();
         when(tokenService.getAdminToken()).thenReturn(Mono.just(adminToken));
         when(keycloakClient.createNewUser(any(), eq("admin-token"))).thenReturn(Mono.just(new TokenResponse()));
         when(tokenService.getAccessToken("user@example.com", "password123")).thenReturn(Mono.just(userToken));
@@ -60,6 +85,10 @@ class UserServiceTest {
         UserRegistrationRequest request =
                 new UserRegistrationRequest("", "password123", "password123");
 
+        when(userValidator.validateOnRegistration(any(), any(), any()))
+                .thenReturn(Mono.error(new ValidationException("Email is required")));
+        doNothing().when(authMetrics).recordRegistrationError(any(Throwable.class));
+
         StepVerifier.create(userService.register(request))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ValidationException.class);
@@ -72,6 +101,10 @@ class UserServiceTest {
     void register_emailNull_throwsValidationException() {
         UserRegistrationRequest request =
                 new UserRegistrationRequest(null, "password123", "password123");
+
+        when(userValidator.validateOnRegistration(any(), any(), any()))
+                .thenReturn(Mono.error(new ValidationException("Email is required")));
+        doNothing().when(authMetrics).recordRegistrationError(any(Throwable.class));
 
         StepVerifier.create(userService.register(request))
                 .expectErrorSatisfies(e -> {
@@ -86,6 +119,10 @@ class UserServiceTest {
         UserRegistrationRequest request =
                 new UserRegistrationRequest("user@example.com", "", "");
 
+        when(userValidator.validateOnRegistration(any(), any(), any()))
+                .thenReturn(Mono.error(new ValidationException("Password is required")));
+        doNothing().when(authMetrics).recordRegistrationError(any(Throwable.class));
+
         StepVerifier.create(userService.register(request))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ValidationException.class);
@@ -99,6 +136,10 @@ class UserServiceTest {
         UserRegistrationRequest request =
                 new UserRegistrationRequest("user@example.com", "password123", "different");
 
+        when(userValidator.validateOnRegistration(any(), any(), any()))
+                .thenReturn(Mono.error(new ValidationException("Passwords do not match")));
+        doNothing().when(authMetrics).recordRegistrationError(any(Throwable.class));
+
         StepVerifier.create(userService.register(request))
                 .expectErrorSatisfies(e -> {
                     assertThat(e).isInstanceOf(ValidationException.class);
@@ -111,6 +152,10 @@ class UserServiceTest {
     void register_invalidEmailFormat_throwsValidationException() {
         UserRegistrationRequest request =
                 new UserRegistrationRequest("not-an-email", "password123", "password123");
+
+        when(userValidator.validateOnRegistration(any(), any(), any()))
+                .thenReturn(Mono.error(new ValidationException("Email is not valid")));
+        doNothing().when(authMetrics).recordRegistrationError(any(Throwable.class));
 
         StepVerifier.create(userService.register(request))
                 .expectErrorSatisfies(e -> {
@@ -127,6 +172,7 @@ class UserServiceTest {
 
         when(tokenService.getAccessToken("user@example.com", "password123"))
                 .thenReturn(Mono.just(expected));
+        doNothing().when(authMetrics).recordLoginSuccess();
 
         StepVerifier.create(userService.login(request))
                 .expectNext(expected)
@@ -139,6 +185,7 @@ class UserServiceTest {
 
         when(tokenService.getAccessToken("user@example.com", "wrong-password"))
                 .thenReturn(Mono.error(new RuntimeException("401 Unauthorized")));
+        doNothing().when(authMetrics).recordLoginError();
 
         StepVerifier.create(userService.login(request))
                 .expectError(RuntimeException.class)

@@ -1,11 +1,10 @@
 package com.tmq.individuals_api.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tmq.individuals_api.dto.TokenRefreshRequest;
 import com.tmq.individuals_api.dto.TokenResponse;
 import com.tmq.individuals_api.dto.UserLoginRequest;
 import com.tmq.individuals_api.dto.UserRegistrationRequest;
-import dasniko.testcontainers.keycloak.KeycloakContainer;
+import com.tmq.individuals_api.support.KeycloakContainerSupport;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -15,38 +14,21 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AuthRestControllerV1IntegrationTest {
-
-    private static final String REALM = "payment-system";
-
-    private static final String CLIENT_UUID = "e70d7d14-3756-488f-9abc-245aa788995c";
+class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
 
     private static final String TEST_EMAIL = "test." + UUID.randomUUID() + "@example.com";
     private static final String TEST_PASSWORD = "Test1234!";
 
     private static String accessToken;
     private static String refreshToken;
-
-    @Container
-    static final KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:26.2")
-            .withRealmImportFile("realm-config.json");
 
     @LocalServerPort
     private int port;
@@ -58,56 +40,6 @@ class AuthRestControllerV1IntegrationTest {
         webTestClient = WebTestClient.bindToServer()
                 .baseUrl("http://localhost:" + port)
                 .build();
-    }
-
-    @DynamicPropertySource
-    static void configureKeycloakProperties(DynamicPropertyRegistry registry) {
-        String baseUrl = keycloak.getAuthServerUrl();
-        String clientSecret = regenerateClientSecret(baseUrl);
-
-        registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri",
-                () -> baseUrl + "/realms/" + REALM);
-        registry.add("spring.security.oauth2.client.provider.keycloak.issuer-uri",
-                () -> baseUrl + "/realms/" + REALM);
-        registry.add("spring.security.oauth2.client.registration.keycloak.client-secret",
-                () -> clientSecret);
-        registry.add("keycloak.url", () -> "http://" + keycloak.getHost());
-        registry.add("keycloak.port", () -> String.valueOf(keycloak.getMappedPort(8080)));
-    }
-
-    private static String regenerateClientSecret(String keycloakBaseUrl) {
-        try {
-            var http = HttpClient.newHttpClient();
-            var mapper = new ObjectMapper();
-
-            String formBody = "grant_type=password&client_id=admin-cli&username=%s&password=%s"
-                    .formatted(keycloak.getAdminUsername(), keycloak.getAdminPassword());
-
-            var tokenResp = http.send(
-                    HttpRequest.newBuilder()
-                            .uri(URI.create(keycloakBaseUrl + "/realms/master/protocol/openid-connect/token"))
-                            .header("Content-Type", "application/x-www-form-urlencoded")
-                            .POST(HttpRequest.BodyPublishers.ofString(formBody))
-                            .build(),
-                    HttpResponse.BodyHandlers.ofString()
-            );
-
-            String adminToken = mapper.readTree(tokenResp.body()).get("access_token").asText();
-
-            var secretResp = http.send(
-                    HttpRequest.newBuilder()
-                            .uri(URI.create(keycloakBaseUrl + "/admin/realms/" + REALM
-                                    + "/clients/" + CLIENT_UUID + "/client-secret"))
-                            .header("Authorization", "Bearer " + adminToken)
-                            .POST(HttpRequest.BodyPublishers.noBody())
-                            .build(),
-                    HttpResponse.BodyHandlers.ofString()
-            );
-
-            return mapper.readTree(secretResp.body()).get("value").asText();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to regenerate Keycloak client secret", e);
-        }
     }
 
 
@@ -130,6 +62,14 @@ class AuthRestControllerV1IntegrationTest {
 
         accessToken = result.getAccessToken();
         refreshToken = result.getRefreshToken();
+
+        webTestClient.get()
+                .uri("/api/v1/auth/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
     }
 
     @Test
@@ -176,15 +116,27 @@ class AuthRestControllerV1IntegrationTest {
     @Test
     @Order(2)
     void login_validCredentials_returns200WithTokens() {
-        webTestClient.post()
+        TokenResponse result = webTestClient.post()
                 .uri("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserLoginRequest(TEST_EMAIL, TEST_PASSWORD))
                 .exchange()
                 .expectStatus().isOk()
+                .expectBody(TokenResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getAccessToken()).isNotBlank();
+        assertThat(result.getRefreshToken()).isNotBlank();
+
+        webTestClient.get()
+                .uri("/api/v1/auth/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getAccessToken())
+                .exchange()
+                .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.access_token").isNotEmpty()
-                .jsonPath("$.refresh_token").isNotEmpty();
+                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
     }
 
     @Test
@@ -203,15 +155,27 @@ class AuthRestControllerV1IntegrationTest {
     @Test
     @Order(3)
     void refreshToken_validToken_returns200WithNewTokens() {
-        webTestClient.post()
+        TokenResponse result = webTestClient.post()
                 .uri("/api/v1/auth/refresh-token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new TokenRefreshRequest(refreshToken))
                 .exchange()
                 .expectStatus().isOk()
+                .expectBody(TokenResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getAccessToken()).isNotBlank();
+        assertThat(result.getRefreshToken()).isNotBlank();
+
+        webTestClient.get()
+                .uri("/api/v1/auth/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.getAccessToken())
+                .exchange()
+                .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.access_token").isNotEmpty()
-                .jsonPath("$.refresh_token").isNotEmpty();
+                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
     }
 
     @Test

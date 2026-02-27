@@ -3,6 +3,7 @@ package com.tmq.individuals_api.service;
 import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.*;
 import com.tmq.individuals_api.exception.ApiException;
+import com.tmq.individuals_api.mapper.KeycloakUserMapper;
 import com.tmq.individuals_api.metrics.AuthMetrics;
 import com.tmq.individuals_api.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,6 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,27 +25,17 @@ public class UserService {
     private final KeycloakClient keycloakClient;
     private final TokenService tokenService;
     private final AuthMetrics authMetrics;
+    private final UserValidator userValidator;
+    private final KeycloakUserMapper keycloakUserMapper;
 
     public Mono<TokenResponse> register(UserRegistrationRequest request) {
-        return UserValidator.validateOnRegistration(
+        return userValidator.validateOnRegistration(
                         request.getEmail(),
                         request.getPassword(),
                         request.getConfirmPassword()
                 )
                 .then(Mono.defer(() -> {
-                    KeycloakUserRepresentation user = KeycloakUserRepresentation.builder()
-                            .email(request.getEmail())
-                            .emailVerified(true)
-                            .enabled(true)
-                            .requiredActions(List.of())
-                            .attributes(Map.of("created_at", LocalDateTime.now().toString()))
-                            .credentials(
-                                    List.of(KeycloakCredentialRepresentation.builder()
-                                            .type("password")
-                                            .value(request.getPassword())
-                                            .temporary(false)
-                                            .build())
-                            ).build();
+                    KeycloakUserRepresentation user = keycloakUserMapper.toKeycloakUser(request);
 
                     return tokenService.getAdminToken()
                             .flatMap(token ->

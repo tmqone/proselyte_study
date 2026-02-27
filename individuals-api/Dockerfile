@@ -7,7 +7,7 @@ COPY openapi ./openapi
 
 RUN gradle --no-daemon clean bootJar
 
-FROM eclipse-temurin:25
+FROM eclipse-temurin:25.0.2_10-jre
 
 RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 

@@ -47,7 +47,7 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
 	// LOKI
-	implementation 'com.github.loki4j:loki-logback-appender:2.0.3'
+	implementation "com.github.loki4j:loki-logback-appender:${lokiLogbackAppenderVersion}"
 
 	// OPEN API
 	implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
@@ -68,7 +68,9 @@ openApiGenerate {
 	apiPackage.set("com.tmq.individuals_api.api")
 	modelPackage.set("com.tmq.individuals_api.dto")
 	configOptions = [useSpringBoot4: "true",
-					"interfaceOnly": "true"]
+					"interfaceOnly": "true",
+					"skipDefaultInterface": "true",
+					"reactive": "true"]
 }
 
 compileJava.dependsOn('openApiGenerate')

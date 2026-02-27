@@ -39,11 +39,6 @@ public class AuthMetrics {
 
     }
 
-    public Timer.Sample startRegistrationSample() {
-        return Timer.start(registry);
-    }
-
-
     public void recordRegistrationSuccess() {
         registrationSuccess.increment();
     }
@@ -51,11 +46,6 @@ public class AuthMetrics {
     public void recordRegistrationError(Throwable e) {
         resolveRegistrationErrorCounter(e).increment();
     }
-
-    public Timer.Sample startLoginSample() {
-        return Timer.start(registry);
-    }
-
 
     public void recordLoginSuccess() {
         loginSuccess.increment();
