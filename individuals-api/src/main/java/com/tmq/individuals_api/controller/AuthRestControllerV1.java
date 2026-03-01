@@ -1,7 +1,7 @@
 package com.tmq.individuals_api.controller;
 
-import com.tmq.individuals_api.api.AuthApi;
-import com.tmq.individuals_api.dto.*;
+import com.tmq.common.dto.*;
+import com.tmq.common.api.individuals_api.*;
 import com.tmq.individuals_api.service.TokenService;
 import com.tmq.individuals_api.service.UserService;
 import lombok.RequiredArgsConstructor;

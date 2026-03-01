@@ -1,8 +1,8 @@
 package com.tmq.individuals_api.mapper;
 
+import com.tmq.common.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.dto.KeycloakCredentialRepresentation;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
-import com.tmq.individuals_api.dto.UserRegistrationRequest;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

@@ -1,7 +1,7 @@
 package com.tmq.individuals_api.client;
 
+import com.tmq.common.dto.TokenResponse;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
-import com.tmq.individuals_api.dto.TokenResponse;
 import com.tmq.individuals_api.exception.KeycloakException;
 import com.tmq.individuals_api.metrics.KeycloakMetrics;
 import lombok.RequiredArgsConstructor;

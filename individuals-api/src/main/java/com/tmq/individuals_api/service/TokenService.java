@@ -1,7 +1,7 @@
 package com.tmq.individuals_api.service;
 
+import com.tmq.common.dto.TokenResponse;
 import com.tmq.individuals_api.client.KeycloakClient;
-import com.tmq.individuals_api.dto.TokenResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

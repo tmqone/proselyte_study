@@ -1,7 +1,7 @@
 package com.tmq.individuals_api.service;
 
+import com.tmq.common.dto.TokenResponse;
 import com.tmq.individuals_api.client.KeycloakClient;
-import com.tmq.individuals_api.dto.TokenResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

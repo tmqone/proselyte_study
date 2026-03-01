@@ -1,0 +1,157 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${springDependencyManagementVersion}"
+    id 'org.openapi.generator' version "${openApiGeneratorVersion}"
+}
+
+group = 'com.tmq'
+version = '1.0.0'
+description = 'common'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-webclient'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    // OPEN API
+    implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
+    implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"
+    implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+    implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
+    compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
+}
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+// OPEN API
+
+def swaggerList = []
+
+def dir = new File("$rootDir/openapi/".toString())
+dir.eachFileRecurse(groovy.io.FileType.FILES) { file ->
+    if (file.getName().endsWith(".yaml"))
+        swaggerList << file
+}
+
+def openApiTaskList = []
+
+swaggerList.sort(Comparator.naturalOrder())
+swaggerList.each {
+    println it.path
+    def apiName = it.getName().replace(".yaml", "");
+
+    def task = tasks.register("openApiGenerate" + apiName.capitalize(), GenerateTask.class, {
+        generatorName.set("spring")
+        inputSpec.set("$projectDir/openapi/${apiName}.yaml")
+        outputDir.set("$buildDir/generated/openapi")
+        apiPackage.set("com.tmq.common.api." + "${apiName}")
+        modelPackage.set("com.tmq.common.dto")
+        if (apiName == 'individuals-api') {
+            configOptions = [
+                    "useSpringBoot4"      : "true",
+                    "useBeanValidation"   : "true",
+                    "openApiNullable"     : "true",
+                    "interfaceOnly"       : "true",
+                    "skipDefaultInterface": "true",
+                    "reactive"            : "true"]
+        } else {
+            configOptions = [
+                    "library": "spring-cloud",
+                    "useSpringBoot4": "true",
+                    "useBeanValidation" : "true",
+                    "openApiNullable" : "true",
+                    "skipDefaultInterface": "true",
+                    "useFeignClientUrl" : "true",]
+        }
+    })
+    openApiTaskList << task
+}
+
+compileJava.dependsOn(openApiTaskList)
+
+tasks.named('processResources') {
+    dependsOn(openApiTaskList)
+}
+
+tasks.named('processTestResources') {
+    dependsOn(openApiTaskList)
+}
+
+
+//openApiGenerate {
+//    generatorName.set("spring")
+//    inputSpec.set("$projectDir/openapi/individuals-api.yaml")
+//    outputDir.set("$buildDir/generated/openapi")
+//    apiPackage.set("com.tmq.common.api.individuals-api")
+//    modelPackage.set("com.tmq.common.dto.individuals-api")
+//    configOptions = [useSpringBoot4        : "true",
+//                     "interfaceOnly"       : "true",
+//                     "skipDefaultInterface": "true",
+//                     "reactive"            : "true"]
+//}
+
+//openApiGenerate {
+//    generatorName.set("spring")
+//    inputSpec.set("$projectDir/openapi/person-api.yaml")
+//    outputDir.set("$buildDir/generated/openapi")
+//    apiPackage.set("com.tmq.common.api.person-api")
+//    modelPackage.set("com.tmq.common.dto.person-api")
+//    configOptions = [useSpringBoot4        : "true",
+//                     "interfaceOnly"       : "true",
+//                     "skipDefaultInterface": "true",
+//                     "reactive"            : "false"]
+//}
+//
+//compileJava.dependsOn('openApiGenerate')
+//
+//tasks.named('processResources') {
+//    dependsOn 'openApiGenerate'
+//}
+//
+//tasks.named('processTestResources') {
+//    dependsOn 'openApiGenerate'
+//}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
+sourceSets {
+    main {
+        java.srcDir("$buildDir/generated/openapi/src/main/java")
+        resources.srcDir("$buildDir/generated/openapi/src/main/resources")
+    }
+
+    test {
+        java.srcDir("$buildDir/generated/openapi/src/test/java")
+        resources.srcDir("$buildDir/generated/openapi/src/test/resources")
+    }
+}

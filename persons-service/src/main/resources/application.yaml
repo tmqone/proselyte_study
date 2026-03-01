@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: person-api
+  datasource:
+    url: jdbc:postgresql://localhost:5434/person
+    username: person
+    password: person
+    hikari:
+      schema: person
+
+
+  flyway:
+    url: jdbc:postgresql://localhost:5434/person
+    user: person
+    password: person
+    default-schema: person
+    create-schemas: true
+    baseline-on-migrate: true
+
+server:
+  port: 8091

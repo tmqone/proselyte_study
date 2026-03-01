@@ -1,12 +1,16 @@
 package com.tmq.individuals_api.exception;
 
-import com.tmq.individuals_api.dto.ErrorResponse;
+import com.tmq.common.dto.ErrorResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import reactor.core.publisher.Mono;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 @Slf4j
@@ -19,6 +23,28 @@ public class RestAdviceController {
             errorResponse.setStatus(500);
             return Mono.just(ResponseEntity.internalServerError().body(errorResponse));
         });
+    }
+
+    @ExceptionHandler(WebExchangeBindException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleWebExchangeBindException(WebExchangeBindException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(message);
+        errorResponse.setStatus(400);
+        return Mono.just(ResponseEntity.badRequest().body(errorResponse));
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Mono<ResponseEntity<ErrorResponse>> handleConstraintViolationException(ConstraintViolationException e) {
+        String message = e.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(message);
+        errorResponse.setStatus(400);
+        return Mono.just(ResponseEntity.badRequest().body(errorResponse));
     }
 
     @ExceptionHandler(ValidationException.class)

@@ -39,3 +39,7 @@ management:
     web:
       exposure:
         include: prometheus
+
+persons:
+  name: persons
+  url: http://localhost:8091

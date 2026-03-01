@@ -27,6 +27,10 @@ keycloak:
   url: ${KEYCLOAK_HOST}
   port: ${KEYCLOAK_PORT}
 
+persons:
+  name: persons
+  url: ${PERSONS_SERVICE_HOST}
+
 management:
   metrics:
     tags:

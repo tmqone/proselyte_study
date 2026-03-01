@@ -1,9 +1,9 @@
 package com.tmq.individuals_api.controller;
 
-import com.tmq.individuals_api.dto.TokenRefreshRequest;
-import com.tmq.individuals_api.dto.TokenResponse;
-import com.tmq.individuals_api.dto.UserLoginRequest;
-import com.tmq.individuals_api.dto.UserRegistrationRequest;
+import com.tmq.common.dto.TokenRefreshRequest;
+import com.tmq.common.dto.TokenResponse;
+import com.tmq.common.dto.UserLoginRequest;
+import com.tmq.common.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.support.KeycloakContainerSupport;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
