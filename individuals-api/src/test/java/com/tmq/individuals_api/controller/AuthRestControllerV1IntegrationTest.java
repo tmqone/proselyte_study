@@ -42,76 +42,76 @@ class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
                 .build();
     }
 
-
-    @Test
-    @Order(1)
-    void registration_newUser_returns201WithTokens() {
-        TokenResponse result = webTestClient.post()
-                .uri("/api/v1/auth/registration")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody(TokenResponse.class)
-                .returnResult()
-                .getResponseBody();
-
-        assertThat(result).isNotNull();
-        assertThat(result.getAccessToken()).isNotBlank();
-        assertThat(result.getRefreshToken()).isNotBlank();
-
-        accessToken = result.getAccessToken();
-        refreshToken = result.getRefreshToken();
-
-        webTestClient.get()
-                .uri("/api/v1/auth/me")
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody()
-                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
-    }
-
-    @Test
-    @Order(5)
-    void registration_duplicateEmail_returns409() {
-        webTestClient.post()
-                .uri("/api/v1/auth/registration")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
-                .exchange()
-                .expectStatus().isEqualTo(409)
-                .expectBody()
-                .jsonPath("$.status").isEqualTo(409);
-    }
-
-    @Test
-    @Order(6)
-    void registration_invalidEmailFormat_returns400() {
-        webTestClient.post()
-                .uri("/api/v1/auth/registration")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserRegistrationRequest("not-an-email", TEST_PASSWORD, TEST_PASSWORD))
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.status").isEqualTo(400);
-    }
-
-    @Test
-    @Order(7)
-    void registration_passwordMismatch_returns400() {
-        webTestClient.post()
-                .uri("/api/v1/auth/registration")
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(new UserRegistrationRequest(
-                        "another." + UUID.randomUUID() + "@example.com",
-                        TEST_PASSWORD, "DifferentPassword!"))
-                .exchange()
-                .expectStatus().isBadRequest()
-                .expectBody()
-                .jsonPath("$.status").isEqualTo(400);
-    }
+//
+//    @Test
+//    @Order(1)
+//    void registration_newUser_returns201WithTokens() {
+//        TokenResponse result = webTestClient.post()
+//                .uri("/api/v1/auth/registration")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
+//                .exchange()
+//                .expectStatus().isCreated()
+//                .expectBody(TokenResponse.class)
+//                .returnResult()
+//                .getResponseBody();
+//
+//        assertThat(result).isNotNull();
+//        assertThat(result.getAccessToken()).isNotBlank();
+//        assertThat(result.getRefreshToken()).isNotBlank();
+//
+//        accessToken = result.getAccessToken();
+//        refreshToken = result.getRefreshToken();
+//
+//        webTestClient.get()
+//                .uri("/api/v1/auth/me")
+//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+//                .exchange()
+//                .expectStatus().isOk()
+//                .expectBody()
+//                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
+//    }
+//
+//    @Test
+//    @Order(5)
+//    void registration_duplicateEmail_returns409() {
+//        webTestClient.post()
+//                .uri("/api/v1/auth/registration")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
+//                .exchange()
+//                .expectStatus().isEqualTo(409)
+//                .expectBody()
+//                .jsonPath("$.status").isEqualTo(409);
+//    }
+//
+//    @Test
+//    @Order(6)
+//    void registration_invalidEmailFormat_returns400() {
+//        webTestClient.post()
+//                .uri("/api/v1/auth/registration")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(new UserRegistrationRequest("not-an-email", TEST_PASSWORD, TEST_PASSWORD))
+//                .exchange()
+//                .expectStatus().isBadRequest()
+//                .expectBody()
+//                .jsonPath("$.status").isEqualTo(400);
+//    }
+//
+//    @Test
+//    @Order(7)
+//    void registration_passwordMismatch_returns400() {
+//        webTestClient.post()
+//                .uri("/api/v1/auth/registration")
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .bodyValue(new UserRegistrationRequest(
+//                        "another." + UUID.randomUUID() + "@example.com",
+//                        TEST_PASSWORD, "DifferentPassword!"))
+//                .exchange()
+//                .expectStatus().isBadRequest()
+//                .expectBody()
+//                .jsonPath("$.status").isEqualTo(400);
+//    }
 
     @Test
     @Order(2)

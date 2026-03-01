@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Persons API
+  title: /persons API
   description: REST API для взаимодействия с Person сервисом.
   version: 1.0.0
 servers:
@@ -12,7 +12,7 @@ paths:
       summary: Регистрация пользователя
       operationId: "registration"
       tags:
-        - persons-api
+        - Person
       requestBody:
         required: true
         content:
@@ -26,11 +26,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualWriteResponseDto'
+        '400':
+          description: Некорректное тело запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     get:
       summary: Get /persons
       operationId: "findAllByEmail"
       tags:
-        - persons-api
+        - Person
       parameters:
         - in: query
           name: email
@@ -41,19 +47,22 @@ paths:
               type: string
               format: email
       responses:
-        '201':
+        '200':
           description: Successfully found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualPageDto'
 
+        '404':
+          description: Users not found
+
   /persons/{id}:
     get:
       summary: Get person by id
       operationId: "findById"
       tags:
-        - persons-api
+        - Person
       parameters:
         - in: path
           name: id
@@ -62,17 +71,20 @@ paths:
             type: string
             format: uuid
       responses:
-          '201':
-            description: Successfully found
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/IndividualDto'
+        '200':
+          description: Successfully found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IndividualDto'
+
+        '404':
+          description: User not found
     put:
       summary: Update individual
       operationId: "update"
       tags:
-        - persons-api
+        - Person
       parameters:
         - in: path
           name: id
@@ -93,11 +105,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualWriteResponseDto'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: soft delete person by id
       operationId: "delete"
       tags:
-        - persons-api
+        - Person
       parameters:
         - in: path
           name: id
@@ -114,7 +132,7 @@ paths:
       summary: compensate-registration, hard delete person by id
       operationId: "compensateRegistration"
       tags:
-        - persons-api
+        - Person
       parameters:
         - in: path
           name: id
@@ -145,8 +163,6 @@ components:
         passport_number,
         phone_number,
         address,
-        password,
-        confirm_password
       ]
       properties:
         firstName:
@@ -167,8 +183,6 @@ components:
       type: object
       required: [ ]
       properties:
-        state:
-          type: string
         address:
           type: string
         zip_code:
@@ -226,3 +240,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IndividualDto'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        status:
+          type: integer

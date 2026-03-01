@@ -21,7 +21,7 @@ spring:
         jwt:
           issuer-uri: http://localhost:8080/realms/payment-system
 server:
-  port: 8085
+  port: 8090
 
 
 keycloak:
@@ -42,4 +42,4 @@ management:
 
 persons:
   name: persons
-  url: http://localhost:8091
+  url: http://localhost:8091/api/v1

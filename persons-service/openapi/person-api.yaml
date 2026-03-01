@@ -26,6 +26,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualWriteResponseDto'
+        '400':
+          description: Некорректное тело запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     get:
       summary: Get /persons
       operationId: "findAllByEmail"
@@ -41,12 +47,15 @@ paths:
               type: string
               format: email
       responses:
-        '201':
+        '200':
           description: Successfully found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualPageDto'
+
+        '404':
+          description: Users not found
 
   /persons/{id}:
     get:
@@ -62,12 +71,15 @@ paths:
             type: string
             format: uuid
       responses:
-          '201':
+          '200':
             description: Successfully found
             content:
               application/json:
                 schema:
                   $ref: '#/components/schemas/IndividualDto'
+
+          '404':
+            description: User not found
     put:
       summary: Update individual
       operationId: "update"
@@ -93,6 +105,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IndividualWriteResponseDto'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
     delete:
       summary: soft delete person by id
       operationId: "delete"
@@ -224,3 +242,11 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/IndividualDto'
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        status:
+          type: integer

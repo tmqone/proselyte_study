@@ -7,6 +7,7 @@ import com.tmq.common.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.exception.ApiException;
+import com.tmq.individuals_api.mapper.IndividualWriteMapper;
 import com.tmq.individuals_api.mapper.KeycloakUserMapper;
 import com.tmq.individuals_api.metrics.AuthMetrics;
 import com.tmq.individuals_api.validator.UserValidator;
@@ -20,17 +21,20 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserService {
 
+    private final PersonService personService;
     private final KeycloakClient keycloakClient;
     private final TokenService tokenService;
     private final AuthMetrics authMetrics;
     private final UserValidator userValidator;
     private final KeycloakUserMapper keycloakUserMapper;
+    private final IndividualWriteMapper individualWriteMapper;
 
     public Mono<TokenResponse> register(UserRegistrationRequest request) {
         return userValidator.validateOnRegistration(
@@ -39,18 +43,26 @@ public class UserService {
                         request.getConfirmPassword()
                 )
                 .then(Mono.defer(() -> {
-                    KeycloakUserRepresentation user = keycloakUserMapper.toKeycloakUser(request);
+                    return personService.register(individualWriteMapper.toIndividualWriteDto(request));
+                }))
+                .flatMap(uuid -> {
+                    KeycloakUserRepresentation user = keycloakUserMapper.toKeycloakUser(request, uuid);
 
                     return tokenService.getAdminToken()
                             .flatMap(token ->
                                     keycloakClient.createNewUser(user, token.getAccessToken())
                                             .doOnNext(ignored -> log.info("New user registered: {}", user))
+                                            .doOnError((e) -> {
+                                                personService.compensateRegistration(UUID.fromString(uuid));
+                                            })
                                             .then(tokenService.getAccessToken(request.getEmail(), request.getPassword()))
                             );
-
-                }))
+                })
                 .doOnNext(ignored -> authMetrics.recordRegistrationSuccess())
-                .doOnError(authMetrics::recordRegistrationError);
+                .doOnError(ignored -> {
+                    log.error("Failed to register user: {}", request.getEmail());
+                    authMetrics.recordRegistrationError(ignored);
+                });
     }
 
     public Mono<TokenResponse> login(UserLoginRequest request) {
