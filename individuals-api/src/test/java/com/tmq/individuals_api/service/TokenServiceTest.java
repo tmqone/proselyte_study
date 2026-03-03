@@ -2,10 +2,12 @@ package com.tmq.individuals_api.service;
 
 import com.tmq.common.dto.TokenResponse;
 import com.tmq.individuals_api.client.KeycloakClient;
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -17,6 +19,9 @@ class TokenServiceTest {
 
     @Mock
     private KeycloakClient keycloakClient;
+
+    @Spy
+    private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
 
     @InjectMocks
     private TokenService tokenService;

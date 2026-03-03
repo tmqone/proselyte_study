@@ -13,7 +13,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 @Testcontainers
-public abstract class KeycloakContainerSupport {
+public abstract class KeycloakContainerSupport extends BaseIntegrationSupport {
 
     protected static final String REALM = "payment-system";
     protected static final String CLIENT_UUID = "e70d7d14-3756-488f-9abc-245aa788995c";

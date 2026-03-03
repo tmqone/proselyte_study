@@ -1,19 +1,24 @@
 package com.tmq.individuals_api.controller;
 
+import com.tmq.common.dto.AddressWriteDto;
 import com.tmq.common.dto.TokenRefreshRequest;
 import com.tmq.common.dto.TokenResponse;
 import com.tmq.common.dto.UserLoginRequest;
 import com.tmq.common.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.support.KeycloakContainerSupport;
+import com.tmq.individuals_api.support.PersonServiceWireMockSupport;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
@@ -26,6 +31,19 @@ class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
 
     private static final String TEST_EMAIL = "test." + UUID.randomUUID() + "@example.com";
     private static final String TEST_PASSWORD = "Test1234!";
+
+    @DynamicPropertySource
+    static void configurePersonServiceProperties(DynamicPropertyRegistry registry) {
+        registry.add("persons.name", () -> "persons");
+        registry.add("persons.contextId", () -> "persons");
+        registry.add("persons.url",
+                () -> "http://localhost:" + PersonServiceWireMockSupport.getPort() + "/api/v1");
+    }
+
+    @AfterAll
+    static void stopPersonServiceMock() {
+        PersonServiceWireMockSupport.stop();
+    }
 
     private static String accessToken;
     private static String refreshToken;
@@ -40,78 +58,109 @@ class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
         webTestClient = WebTestClient.bindToServer()
                 .baseUrl("http://localhost:" + port)
                 .build();
+
+        PersonServiceWireMockSupport.setupDefaultStubs();
     }
 
-//
-//    @Test
-//    @Order(1)
-//    void registration_newUser_returns201WithTokens() {
-//        TokenResponse result = webTestClient.post()
-//                .uri("/api/v1/auth/registration")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
-//                .exchange()
-//                .expectStatus().isCreated()
-//                .expectBody(TokenResponse.class)
-//                .returnResult()
-//                .getResponseBody();
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result.getAccessToken()).isNotBlank();
-//        assertThat(result.getRefreshToken()).isNotBlank();
-//
-//        accessToken = result.getAccessToken();
-//        refreshToken = result.getRefreshToken();
-//
-//        webTestClient.get()
-//                .uri("/api/v1/auth/me")
-//                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
-//                .exchange()
-//                .expectStatus().isOk()
-//                .expectBody()
-//                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
-//    }
-//
-//    @Test
-//    @Order(5)
-//    void registration_duplicateEmail_returns409() {
-//        webTestClient.post()
-//                .uri("/api/v1/auth/registration")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(new UserRegistrationRequest(TEST_EMAIL, TEST_PASSWORD, TEST_PASSWORD))
-//                .exchange()
-//                .expectStatus().isEqualTo(409)
-//                .expectBody()
-//                .jsonPath("$.status").isEqualTo(409);
-//    }
-//
-//    @Test
-//    @Order(6)
-//    void registration_invalidEmailFormat_returns400() {
-//        webTestClient.post()
-//                .uri("/api/v1/auth/registration")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(new UserRegistrationRequest("not-an-email", TEST_PASSWORD, TEST_PASSWORD))
-//                .exchange()
-//                .expectStatus().isBadRequest()
-//                .expectBody()
-//                .jsonPath("$.status").isEqualTo(400);
-//    }
-//
-//    @Test
-//    @Order(7)
-//    void registration_passwordMismatch_returns400() {
-//        webTestClient.post()
-//                .uri("/api/v1/auth/registration")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .bodyValue(new UserRegistrationRequest(
-//                        "another." + UUID.randomUUID() + "@example.com",
-//                        TEST_PASSWORD, "DifferentPassword!"))
-//                .exchange()
-//                .expectStatus().isBadRequest()
-//                .expectBody()
-//                .jsonPath("$.status").isEqualTo(400);
-//    }
+    @Test
+    @Order(1)
+    void registration_newUser_returns201WithTokens() {
+        TokenResponse result = webTestClient.post()
+                .uri("/api/v1/auth/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserRegistrationRequest()
+                        .firstName("Test")
+                        .lastName("User")
+                        .email(TEST_EMAIL)
+                        .password(TEST_PASSWORD)
+                        .confirmPassword(TEST_PASSWORD)
+                        .passportNumber("AB123456")
+                        .phoneNumber("+1234567890")
+                        .address(new AddressWriteDto()))
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(TokenResponse.class)
+                .returnResult()
+                .getResponseBody();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getAccessToken()).isNotBlank();
+        assertThat(result.getRefreshToken()).isNotBlank();
+
+        accessToken = result.getAccessToken();
+        refreshToken = result.getRefreshToken();
+
+        webTestClient.get()
+                .uri("/api/v1/auth/me")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.email").isEqualTo(TEST_EMAIL);
+    }
+
+    @Test
+    @Order(5)
+    void registration_duplicateEmail_returns409() {
+        webTestClient.post()
+                .uri("/api/v1/auth/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserRegistrationRequest()
+                        .firstName("Test")
+                        .lastName("User")
+                        .email(TEST_EMAIL)
+                        .password(TEST_PASSWORD)
+                        .confirmPassword(TEST_PASSWORD)
+                        .passportNumber("AB123456")
+                        .phoneNumber("+1234567890")
+                        .address(new AddressWriteDto()))
+                .exchange()
+                .expectStatus().isEqualTo(409)
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(409);
+    }
+
+    @Test
+    @Order(6)
+    void registration_invalidEmailFormat_returns400() {
+        webTestClient.post()
+                .uri("/api/v1/auth/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserRegistrationRequest()
+                        .firstName("Test")
+                        .lastName("User")
+                        .email("not-an-email")
+                        .password(TEST_PASSWORD)
+                        .confirmPassword(TEST_PASSWORD)
+                        .passportNumber("AB123456")
+                        .phoneNumber("+1234567890")
+                        .address(new AddressWriteDto()))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(400);
+    }
+
+    @Test
+    @Order(7)
+    void registration_passwordMismatch_returns400() {
+        webTestClient.post()
+                .uri("/api/v1/auth/registration")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(new UserRegistrationRequest()
+                        .firstName("Test")
+                        .lastName("User")
+                        .email("another." + UUID.randomUUID() + "@example.com")
+                        .password(TEST_PASSWORD)
+                        .confirmPassword("DifferentPassword!")
+                        .passportNumber("AB123456")
+                        .phoneNumber("+1234567890")
+                        .address(new AddressWriteDto()))
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.status").isEqualTo(400);
+    }
 
     @Test
     @Order(2)
@@ -129,6 +178,9 @@ class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
         assertThat(result).isNotNull();
         assertThat(result.getAccessToken()).isNotBlank();
         assertThat(result.getRefreshToken()).isNotBlank();
+
+        accessToken = result.getAccessToken();
+        refreshToken = result.getRefreshToken();
 
         webTestClient.get()
                 .uri("/api/v1/auth/me")

@@ -1,5 +1,7 @@
 package com.tmq.individuals_api.service;
 
+import com.tmq.common.dto.AddressWriteDto;
+import com.tmq.common.dto.IndividualWriteDto;
 import com.tmq.common.dto.TokenResponse;
 import com.tmq.common.dto.UserInfoResponse;
 import com.tmq.common.dto.UserLoginRequest;
@@ -8,13 +10,16 @@ import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.exception.ApiException;
 import com.tmq.individuals_api.exception.ValidationException;
+import com.tmq.individuals_api.mapper.IndividualWriteMapper;
 import com.tmq.individuals_api.mapper.KeycloakUserMapper;
 import com.tmq.individuals_api.metrics.AuthMetrics;
 import com.tmq.individuals_api.validator.UserValidator;
+import io.micrometer.observation.ObservationRegistry;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -38,6 +43,9 @@ class UserServiceTest {
     private KeycloakClient keycloakClient;
 
     @Mock
+    private PersonService personService;
+
+    @Mock
     private TokenService tokenService;
 
     @Mock
@@ -49,19 +57,38 @@ class UserServiceTest {
     @Mock
     private KeycloakUserMapper keycloakUserMapper;
 
+    @Mock
+    private IndividualWriteMapper individualWriteMapper;
+
+    @Spy
+    private ObservationRegistry observationRegistry = ObservationRegistry.NOOP;
+
     @InjectMocks
     private UserService userService;
 
+    private UserRegistrationRequest validRequest() {
+        return new UserRegistrationRequest()
+                .firstName("John")
+                .lastName("Doe")
+                .email("user@example.com")
+                .password("password123")
+                .confirmPassword("password123")
+                .passportNumber("AB123456")
+                .phoneNumber("+1234567890")
+                .address(new AddressWriteDto());
+    }
+
     @Test
     void register_validRequest_returnsUserToken() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest("user@example.com", "password123", "password123");
+        UserRegistrationRequest request = validRequest();
 
         TokenResponse adminToken = new TokenResponse().accessToken("admin-token");
         TokenResponse userToken  = new TokenResponse().accessToken("user-token").refreshToken("refresh");
 
         when(userValidator.validateOnRegistration(any(), any(), any())).thenReturn(Mono.empty());
-        when(keycloakUserMapper.toKeycloakUser(any())).thenReturn(
+        when(individualWriteMapper.toIndividualWriteDto(any())).thenReturn(new IndividualWriteDto());
+        when(personService.register(any())).thenReturn(Mono.just("user-uuid"));
+        when(keycloakUserMapper.toKeycloakUser(any(), any())).thenReturn(
                 KeycloakUserRepresentation.builder()
                         .email("user@example.com")
                         .emailVerified(true)
@@ -82,8 +109,7 @@ class UserServiceTest {
 
     @Test
     void register_emailBlank_throwsValidationException() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest("", "password123", "password123");
+        UserRegistrationRequest request = validRequest().email("");
 
         when(userValidator.validateOnRegistration(any(), any(), any()))
                 .thenReturn(Mono.error(new ValidationException("Email is required")));
@@ -99,8 +125,7 @@ class UserServiceTest {
 
     @Test
     void register_emailNull_throwsValidationException() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest(null, "password123", "password123");
+        UserRegistrationRequest request = validRequest().email(null);
 
         when(userValidator.validateOnRegistration(any(), any(), any()))
                 .thenReturn(Mono.error(new ValidationException("Email is required")));
@@ -116,8 +141,7 @@ class UserServiceTest {
 
     @Test
     void register_passwordBlank_throwsValidationException() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest("user@example.com", "", "");
+        UserRegistrationRequest request = validRequest().password("").confirmPassword("");
 
         when(userValidator.validateOnRegistration(any(), any(), any()))
                 .thenReturn(Mono.error(new ValidationException("Password is required")));
@@ -133,8 +157,7 @@ class UserServiceTest {
 
     @Test
     void register_passwordsDoNotMatch_throwsValidationException() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest("user@example.com", "password123", "different");
+        UserRegistrationRequest request = validRequest().confirmPassword("different");
 
         when(userValidator.validateOnRegistration(any(), any(), any()))
                 .thenReturn(Mono.error(new ValidationException("Passwords do not match")));
@@ -150,8 +173,7 @@ class UserServiceTest {
 
     @Test
     void register_invalidEmailFormat_throwsValidationException() {
-        UserRegistrationRequest request =
-                new UserRegistrationRequest("not-an-email", "password123", "password123");
+        UserRegistrationRequest request = validRequest().email("not-an-email");
 
         when(userValidator.validateOnRegistration(any(), any(), any()))
                 .thenReturn(Mono.error(new ValidationException("Email is not valid")));
@@ -191,7 +213,6 @@ class UserServiceTest {
                 .expectError(RuntimeException.class)
                 .verify();
     }
-
 
     @Test
     void getUserInfo_withJwtPrincipal_returnsUserInfo() {
