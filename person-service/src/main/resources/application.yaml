@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: person-api
+  datasource:
+    url: ${DATASOURCE_URL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    hikari:
+      schema: ${DATASOURCE_SCHEMA}
+
+  flyway:
+    url: ${DATASOURCE_URL}
+    user: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    default-schema: ${DATASOURCE_SCHEMA}
+    create-schemas: true
+    baseline-on-migrate: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: ${SERVER_PORT}
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: ${ALLOY_OTLP_METRICS_URL}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          transport: grpc
+          endpoint: ${ALLOY_OTLP_URL}
+    logging:
+      export:
+        otlp:
+          endpoint: ${ALLOY_OTLP_URL}
+          transport: grpc
+  prometheus:
+    metrics:
+      export:
+        enabled: true

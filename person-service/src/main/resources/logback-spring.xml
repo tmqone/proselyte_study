@@ -11,7 +11,7 @@
         <captureMdcAttributes>*</captureMdcAttributes>
     </appender>
 
-    <logger name="com.tmq.individuals_api" level="DEBUG"/>
+    <logger name="com.tmq.personapi" level="DEBUG"/>
 
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>

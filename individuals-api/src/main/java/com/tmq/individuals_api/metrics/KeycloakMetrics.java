@@ -2,7 +2,6 @@ package com.tmq.individuals_api.metrics;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -38,10 +37,6 @@ public class KeycloakMetrics {
                 OP_REFRESH_TOKEN,   counter(OP_REFRESH_TOKEN,   "error"),
                 OP_CREATE_USER,     counter(OP_CREATE_USER,     "error")
         );
-    }
-
-    public Timer.Sample startSample() {
-        return Timer.start(registry);
     }
 
     public void recordSuccess(String operation) {

@@ -1,8 +1,10 @@
 package com.tmq.individuals_api.config;
 
+import io.micrometer.tracing.Tracer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
@@ -18,7 +20,7 @@ public class SecurityConfig {
     };
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain (ServerHttpSecurity http) {
+    public SecurityWebFilterChain securityWebFilterChain (ServerHttpSecurity http, Tracer tracer) {
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> {

@@ -15,8 +15,8 @@ public class WebClientConfig {
 
     @Bean
     @Qualifier(value = "keycloakWebClient")
-    WebClient keycloakWebClient () {
-        return WebClient.builder()
+    WebClient keycloakWebClient(WebClient.Builder builder) {
+        return builder
                 .baseUrl(String.format("%s:%s", keycloakUrl, keycloakPort))
                 .build();
     }

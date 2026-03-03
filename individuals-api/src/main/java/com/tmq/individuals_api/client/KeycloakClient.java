@@ -4,6 +4,7 @@ import com.tmq.common.dto.TokenResponse;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.exception.KeycloakException;
 import com.tmq.individuals_api.metrics.KeycloakMetrics;
+import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.observability.micrometer.Micrometer;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
@@ -26,6 +28,7 @@ import static com.tmq.individuals_api.metrics.KeycloakMetrics.*;
 public class KeycloakClient {
     private final WebClient keycloakWebClient;
     private final KeycloakMetrics keycloakMetrics;
+    private final ObservationRegistry observationRegistry;
 
     @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
     private String clientId;
@@ -60,7 +63,9 @@ public class KeycloakClient {
                                 .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class)
                 .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_GET_USER_TOKEN))
-                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_USER_TOKEN));
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_USER_TOKEN))
+                .name("keycloak.getUserToken")
+                .tap(Micrometer.observation(observationRegistry));
     }
 
     public Mono<TokenResponse> getAdminToken() {
@@ -92,7 +97,9 @@ public class KeycloakClient {
                     log.info("Admin token fetched and cached until {}", expiresAt);
                 })
                 .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_GET_ADMIN_TOKEN))
-                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_ADMIN_TOKEN));
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_GET_ADMIN_TOKEN))
+                .name("keycloak.getAdminToken")
+                .tap(Micrometer.observation(observationRegistry));
     }
 
     public Mono<TokenResponse> refreshToken(String refreshToken) {
@@ -111,7 +118,9 @@ public class KeycloakClient {
                                 .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class)
                 .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_REFRESH_TOKEN))
-                .doOnError(ignored -> keycloakMetrics.recordError(OP_REFRESH_TOKEN));
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_REFRESH_TOKEN))
+                .name("keycloak.refreshToken")
+                .tap(Micrometer.observation(observationRegistry));
     }
 
     public Mono<TokenResponse> createNewUser(KeycloakUserRepresentation user, String token) {
@@ -129,6 +138,8 @@ public class KeycloakClient {
                                 .flatMap(body -> Mono.error(new KeycloakException(body, "KEYCLOAK_EXCEPTION"))))
                 .bodyToMono(TokenResponse.class)
                 .doOnNext(ignored -> keycloakMetrics.recordSuccess(OP_CREATE_USER))
-                .doOnError(ignored -> keycloakMetrics.recordError(OP_CREATE_USER));
+                .doOnError(ignored -> keycloakMetrics.recordError(OP_CREATE_USER))
+                .name("keycloak.createUser")
+                .tap(Micrometer.observation(observationRegistry));
     }
 }

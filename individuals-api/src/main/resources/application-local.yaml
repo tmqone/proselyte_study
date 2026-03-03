@@ -23,22 +23,31 @@ spring:
 server:
   port: 8090
 
-
 keycloak:
   url: http://localhost
   port: 8080
 
 management:
-  metrics:
-    tags:
-      application: individuals-api
-  endpoint:
-    prometheus:
-      access: unrestricted
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
+  tracing:
+    sampling:
+      probability: 1.0
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 5s
+  opentelemetry:
+    logging:
+      export:
+        otlp:
+          transport: grpc
+          endpoint: http://localhost:4317
+    tracing:
+      export:
+        otlp:
+          transport: grpc
+          endpoint: http://localhost:4317
+
 
 persons:
   name: persons

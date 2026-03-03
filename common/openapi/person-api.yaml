@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: /persons API
+  title: Person API
   description: REST API для взаимодействия с Person сервисом.
   version: 1.0.0
 servers:

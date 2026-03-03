@@ -11,6 +11,8 @@ import com.tmq.individuals_api.mapper.IndividualWriteMapper;
 import com.tmq.individuals_api.mapper.KeycloakUserMapper;
 import com.tmq.individuals_api.metrics.AuthMetrics;
 import com.tmq.individuals_api.validator.UserValidator;
+import io.micrometer.observation.ObservationRegistry;
+import reactor.core.observability.micrometer.Micrometer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -35,6 +37,7 @@ public class UserService {
     private final UserValidator userValidator;
     private final KeycloakUserMapper keycloakUserMapper;
     private final IndividualWriteMapper individualWriteMapper;
+    private final ObservationRegistry observationRegistry;
 
     public Mono<TokenResponse> register(UserRegistrationRequest request) {
         return userValidator.validateOnRegistration(
@@ -62,14 +65,18 @@ public class UserService {
                 .doOnError(ignored -> {
                     log.error("Failed to register user: {}", request.getEmail());
                     authMetrics.recordRegistrationError(ignored);
-                });
+                })
+                .name("user.register")
+                .tap(Micrometer.observation(observationRegistry));
     }
 
     public Mono<TokenResponse> login(UserLoginRequest request) {
         return tokenService.getAccessToken(request.getEmail(), request.getPassword())
                 .doOnNext(ignored -> log.info("User {} just logged in", request.getEmail()))
                 .doOnNext(ignored -> authMetrics.recordLoginSuccess())
-                .doOnError(ignored -> authMetrics.recordLoginError());
+                .doOnError(ignored -> authMetrics.recordLoginError())
+                .name("user.login")
+                .tap(Micrometer.observation(observationRegistry));
     }
 
     public Mono<UserInfoResponse> getUserInfo(Authentication authentication) {
@@ -83,7 +90,9 @@ public class UserService {
                                 .of(LocalDateTime.parse(jwt.getClaim("created_at")), ZoneOffset.UTC));
                         return Mono.just(userInfoResponse);
                     })
-                    .doOnNext(userInfoResponse -> log.info("User {} request info about himself", userInfoResponse.getEmail()));
+                    .doOnNext(userInfoResponse -> log.info("User {} request info about himself", userInfoResponse.getEmail()))
+                    .name("user.getInfo")
+                    .tap(Micrometer.observation(observationRegistry));
         } else {
             return Mono.error(new ApiException("Invalid user principal", "INVALID_JWT_TOKEN"));
         }

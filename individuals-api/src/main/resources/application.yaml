@@ -20,6 +20,14 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: ${KEYCLOAK_HOST}:${KEYCLOAK_PORT}/realms/payment-system
+#  cloud:
+#    openfeign:
+#      client:
+#        config:
+#          default:
+#            connect-timeout: 5000
+#            read-timeout: 30000
+
 server:
   port: ${SERVER_PORT}
 
@@ -29,16 +37,25 @@ keycloak:
 
 persons:
   name: persons
-  url: ${PERSONS_SERVICE_HOST}
+  url: ${PERSON_SERVICE_HOST}
 
 management:
-  metrics:
-    tags:
-      application: individuals-api
-  endpoint:
-    prometheus:
-      access: unrestricted
-  endpoints:
-    web:
-      exposure:
-        include: prometheus
+  otlp:
+    metrics:
+      export:
+        url: ${ALLOY_OTLP_METRICS_URL}
+  opentelemetry:
+    logging:
+      export:
+        otlp:
+          transport: grpc
+          endpoint: ${ALLOY_OTLP_URL}
+    tracing:
+      export:
+        otlp:
+          transport: grpc
+          endpoint: ${ALLOY_OTLP_URL}
+  prometheus:
+    metrics:
+      export:
+        enabled: true

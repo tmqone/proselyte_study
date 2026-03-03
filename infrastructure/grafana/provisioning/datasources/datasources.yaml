@@ -4,13 +4,52 @@ datasources:
   - name: Prometheus
     type: prometheus
     uid: prometheus
-    access: proxy
     url: http://prometheus:9090
+    access: proxy
     isDefault: true
+    jsonData:
+      timeInterval: "15s"
+      exemplarTraceIdDestinations:
+        - name: traceId
+          datasourceUid: tempo
+
   - name: Loki
     type: loki
     uid: loki
-    access: proxy
     url: http://loki:3100
-    isDefault: false
-    editable: true
+    access: proxy
+    jsonData:
+      derivedFields:
+        - name: TraceID
+          matcherRegex: '"traceId"\s*:\s*"([a-f0-9]+)"'
+          url: "$${__value.raw}"
+          datasourceUid: tempo
+
+  - name: Tempo
+    type: tempo
+    uid: tempo
+    url: http://tempo:3200
+    access: proxy
+    jsonData:
+      tracesToLogsV2:
+        datasourceUid: loki
+        spanStartTimeShift: "-1m"
+        spanEndTimeShift: "1m"
+        filterByTraceID: true
+        filterBySpanID: false
+        customQuery: false
+      tracesToMetrics:
+        datasourceUid: prometheus
+        spanStartTimeShift: "-1m"
+        spanEndTimeShift: "1m"
+        tags:
+          - key: service.name
+            value: job
+      serviceMap:
+        datasourceUid: prometheus
+      nodeGraph:
+        enabled: true
+      search:
+        hide: false
+      lokiSearch:
+        datasourceUid: loki
