@@ -26,11 +26,11 @@
 ````
 
 ## Архитектура системы
-![architecture/person-service.png](./architecture/individuals-api-uml.png)
+![architecture/person-service.png](./architecture/person-service.png)
 
 ## Внутренняя архитектура сервиса
 
-![architecture/person-service-microservice.png](./architecture/individuals-api-microservice.png)
+![architecture/person-service-microservice.png](./architecture/person-service-microservice.png)
 
 ## Запуск
 ````
