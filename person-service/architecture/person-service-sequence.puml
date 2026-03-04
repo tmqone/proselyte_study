@@ -1,0 +1,53 @@
+actor Client
+participant API
+participant DB
+
+group Get user profile
+  alt User exists
+    Client -> API: GET /v1/persons
+    API -> DB: User(s) entity(-ies) request
+    DB --> API: User(s) found
+    API --> Client: User entity(-ies)
+  end
+  alt User not found
+    Client -> API: GET /v1/persons
+    API -> DB: User entity(-ies) request
+    DB --> API: User entity(-ies) not found
+    API --> Client: 404 Not found
+  end
+end
+
+group Create user profile
+Client -> API: POST /v1/persons
+API -> DB: Create individuals
+DB --> API: Individuals entity
+API --> Client: Individuals entity
+end
+
+group Update user profile
+  alt User exists
+    Client -> API: PUT /v1/persons
+    API -> DB: User entity request
+    DB --> API: User found
+    API -> DB: User update
+    API --> Client: User entity
+  end
+  alt User not found
+    Client -> API: PUT /v1/persons
+    API -> DB: User entity request
+    DB --> API: User entity not found
+    API --> Client: 404 Not found
+  end
+end
+
+group Compensate registration
+Client -> API: POST /v1/persons/compensate-registration
+API -> DB: Delete individuals
+API --> Client: Success
+end
+
+group Soft delete
+Client -> API: DELETE /v1/persons
+API -> DB: Change individuals to blocked
+API --> Client: Success
+end
