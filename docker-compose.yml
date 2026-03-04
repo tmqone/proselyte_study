@@ -192,7 +192,7 @@ services:
     image: grafana/alloy:latest
     container_name: alloy
     ports:
-      - "12345:12345"  # Alloy UI / self-metrics
+      - "12345:12345"  # Alloy UI
       - "4317:4317"    # OLTP GRPC
       - "4318:4318"    # OLTP HTTP
     command:

@@ -1,0 +1,19 @@
+@startuml
+
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container(indApi, "person-service", "Spring Boot MVC")
+
+Component(personController, "PersonController", "REST Controller", "Обрабатывает HTTP-запросы клиента")
+Component(individualsService, "IndividualsService", "Сервис", "Работает с сущностью пользователя")
+Component(countryService, "CountryService", "Сервис", "Работает с сущностью страны")
+Component(individualsRepository, "IndividualsRepository", "Репозиторий", "Работа с пользователями в БД")
+Component(countryRepository, "CountryRepository", "Репозиторий", "Работа со странами в БД")
+Component(dto, "DTO (сгенерированные)", "OpenAPI DTO", "Сгенерированные модели запросов/ответов")
+
+Rel(personController, individualsService, "вызов")
+Rel(countryService, countryRepository, "вызов")
+Rel(individualsService, countryService, "вызов")
+Rel(personController, dto, "использует")
+Rel(individualsService, individualsRepository, "вызов")
+@enduml

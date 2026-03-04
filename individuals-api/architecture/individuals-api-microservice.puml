@@ -8,10 +8,15 @@ Component(userService, "UserService", "Сервис", "Оркестрация р
 Component(tokenService, "TokenService", "Сервис", "Работа с токенами и refresh-флоу")
 Component(keycloakClient, "KeycloakClient", "WebClient Adapter", "Взаимодействует с Keycloak REST API")
 Component(dto, "DTO (сгенерированные)", "OpenAPI DTO", "Сгенерированные модели запросов/ответов")
+Component(personService, "PersonService", "Сервис", "Создание и компенсация профиля в person-service")
+
+Container_Ext(personSvc, "person-service", "Spring Boot MVC", "REST API управления профилями пользователей")
 
 Rel(authController, userService, "вызов")
 Rel(userService, tokenService, "вызов")
 Rel(userService, keycloakClient, "вызов")
 Rel(tokenService, keycloakClient, "вызов")
 Rel(authController, dto, "использует")
+Rel(userService, personService, "register(), compensateRegistration()")
+Rel(personService, personSvc, "POST /persons, DELETE /compensate-registration/{id}", "HTTP (Feign)")
 @enduml

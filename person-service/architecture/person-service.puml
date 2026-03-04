@@ -1,0 +1,32 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+Person(client, "Client", "Клиент, взаимодействующий с Person Service")
+
+  System_Boundary(appBoundary, "Person Service") {
+      Container(personService, "PersonService", "Spring Boot MVC", "Управление профилями: хранение данных (имя, адрес, паспорт), REST API")
+      Container(postgres, "PostgreSQL", "PostgreSQL + Flyway", "Хранение данных профилей  и audit-таблиц Envers")
+  }
+
+  System_Boundary(obsBoundary, "Observability") {
+      Container(alloy, "Alloy", "OTLP Collector", "Приём метрик, логов и трейсов от сервисов; маршрутизация в Prometheus, Loki, Tempo")
+      Container(prometheus, "Prometheus", "Monitoring", "Хранение и агрегация метрик")
+      Container(loki, "Loki", "Logging", "Хранение логов")
+      Container(tempo, "Tempo", "Tracing", "Хранение распределённых трейсов")
+      Container(grafana, "Grafana", "Visualization", "Отображение метрик, логов и трейсов в дашбордах")
+  }
+
+  Rel(client, personService, "HTTP запросы (CRUD профилей)", "JSON / REST")
+  Rel(personService, postgres, "Чтение и запись данных", "JPA + Flyway")
+
+  Rel(personService, alloy, "Метрики", "OTLP HTTP")
+  Rel(personService, alloy, "Логи и трейсы", "OTLP gRPC")
+
+  Rel(alloy, prometheus, "Отправка метрик", "Remote write")
+  Rel(alloy, loki, "Отправка логов", "OTLP")
+  Rel(alloy, tempo, "Отправка трейсов", "OTLP gRPC")
+
+  Rel(grafana, prometheus, "Чтение метрик", "PromQL")
+  Rel(grafana, loki, "Чтение логов", "LogQL")
+  Rel(grafana, tempo, "Чтение трейсов", "TraceQL")
+
+ @enduml

@@ -79,6 +79,8 @@ dependencies {
     testImplementation "org.testcontainers:testcontainers-grafana"
     testImplementation "org.testcontainers:testcontainers-junit-jupiter"
     testImplementation "org.testcontainers:testcontainers-postgresql"
+    testImplementation "org.springframework.boot:spring-boot-resttestclient"
+    runtimeOnly "org.springframework.boot:spring-boot-restclient"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     // open api

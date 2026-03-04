@@ -1,22 +1,45 @@
 @startuml
 !includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-Person(dev, "External Client", "Пользователь, взаимодействующий с Individuals API")
+Person(client, "Client", "Пользователь, взаимодействующий с Individuals API")
 
-System_Boundary(indSystem, "Individuals Auth System") {
-    Container(indApi, "individuals-api", "Spring Boot WebFlux", "Оркестратор: регистрация, логин, обновление токена, получение данных")
-    Container(keycloak, "Keycloak", "Keycloak 24", "Управление пользователями, токены, роли, авторизация")
-    Container(postgres, "Keycloak Postgres", "PostgreSQL", "Хранение данных пользователей Keycloak")
-    Container(prometheus, "Prometheus", "Monitoring", "Сбор метрик с сервисов")
-    Container(loki, "Loki", "Logging", "Сбор логов из stdout")
-    Container(grafana, "Grafana", "Visualization", "Отображение логов и метрик в дэшбордах")
+System_Boundary(appBoundary, "Individuals API") {
+    Container(indApi, "individuals-api", "Spring Boot WebFlux", "Оркестратор аутентификации: регистрация, логин, refresh-token")
 }
 
-Rel(dev, indApi, "HTTP запросы (регистрация, логин, /me)", "JSON/REST")
-Rel(indApi, keycloak, "REST-запросы в Keycloak Admin/Token API", "HTTP")
-Rel(keycloak, postgres, "JDBC", "SQL")
-Rel(indApi, prometheus, "Отправка метрик", "Micrometer")
-Rel(indApi, loki, "Отправка логов", "stdout -> Docker -> Loki")
-Rel(grafana, prometheus, "Чтение метрик")
-Rel(grafana, loki, "Чтение логов")
+System_Boundary(keycloakBoundary, "Keycloak") {
+    Container(keycloak, "Keycloak", "Keycloak 24", "Управление пользователями, токены, роли, авторизация (realm: payment-system)")
+    ContainerDb(keycloakDb, "Keycloak PostgreSQL", "PostgreSQL", "Хранение пользователей, ролей и сессий Keycloak")
+}
+
+System_Boundary(personBoundary, "Person Service") {
+    Container(personService, "person-service", "Spring Boot MVC", "Хранение бизнес-профилей пользователей")
+}
+
+System_Boundary(obsBoundary, "Observability") {
+    Container(alloy, "Alloy", "OTLP Collector", "Приём метрик, логов и трейсов; маршрутизация в Prometheus, Loki, Tempo")
+    Container(prometheus, "Prometheus", "Monitoring", "Хранение и агрегация метрик")
+    Container(loki, "Loki", "Logging", "Хранение логов")
+    Container(tempo, "Tempo", "Tracing", "Хранение распределённых трейсов")
+    Container(grafana, "Grafana", "Visualization", "Отображение метрик, логов и трейсов в дашбордах")
+}
+
+Rel(client, indApi, "Обрабатывает HTTP-запросы клиента", "JSON / REST")
+
+Rel(indApi, keycloak, "Создание пользователя/Получение и обновление токенов", "HTTP WebClient")
+Rel(keycloak, keycloakDb, "Чтение и запись данных", "JDBC")
+
+Rel(indApi, personService, "Создание профиля при регистрации", "HTTP (Feign сlient)")
+
+Rel(indApi, alloy, "Метрики", "OTLP HTTP")
+Rel(indApi, alloy, "Логи и трейсы", "OTLP gRPC")
+
+Rel(alloy, prometheus, "Отправка метрик", "Remote write")
+Rel(alloy, loki, "Отправка логов", "OTLP")
+Rel(alloy, tempo, "Отправка трейсов", "OTLP gRPC")
+
+Rel(grafana, prometheus, "Чтение метрик", "PromQL")
+Rel(grafana, loki, "Чтение логов", "LogQL")
+Rel(grafana, tempo, "Чтение трейсов", "TraceQL")
+
 @enduml
