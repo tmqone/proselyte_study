@@ -43,9 +43,6 @@ dependencyManagement {
 }
 
 dependencies {
-    // com.tmq
-    implementation "com.tmq:common:1.0.0"
-
     //spring web + data
     implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
     implementation "org.springframework.boot:spring-boot-starter-data-jpa"
@@ -95,6 +92,45 @@ flyway {
     cleanDisabled = false
 }
 
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$projectDir/openapi/person-api.yaml")
+    outputDir.set("$buildDir/generated/openapi")
+    apiPackage.set("com.tmq.person.service.api")
+    modelPackage.set("com.tmq.person.service.dto")
+    configOptions = [
+            "useSpringBoot4"      : "true",
+            "useBeanValidation"   : "true",
+            "openApiNullable"     : "true",
+            "interfaceOnly"       : "true",
+            "skipDefaultInterface": "true",
+            "feignClient"            : "true"]
+}
+
+sourceSets {
+    main {
+        java.srcDir("$buildDir/generated/openapi/src/main/java")
+        resources.srcDir("$buildDir/generated/openapi/src/main/resources")
+    }
+
+    test {
+        java.srcDir("$buildDir/generated/openapi/src/test/java")
+        resources.srcDir("$buildDir/generated/openapi/src/test/resources")
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn('openApiGenerate')
+}
+
+tasks.named('processTestResources') {
+    dependsOn('openApiGenerate')
+}
+
+tasks.named('compileJava') {
+    dependsOn('openApiGenerate')
+}
+
 
 
 publishing {
@@ -106,14 +142,16 @@ publishing {
     repositories {
         maven {
             name = "nexus"
-            def nexusHost = project.findProperty("nexusHost") ?: "http://localhost:9081"
+            def nexusHost = System.getenv("NEXUS_URL") ?: "http://localhost:9081"
+            def nexusUsername = System.getenv("NEXUS_USERNAME") ?: "admin"
+            def nexusPassword = System.getenv("NEXUS_PASSWORD") ?: "admin"
             url = version.endsWith("SNAPSHOT")
                     ? "${nexusHost}/repository/maven-snapshots/"
                     : "${nexusHost}/repository/maven-releases/"
             allowInsecureProtocol = true
             credentials {
-                username = project.findProperty("nexusUsername") ?: "admin"
-                password = project.findProperty("nexusPassword") ?: "admin"
+                username = nexusUsername
+                password = nexusPassword
             }
         }
     }
