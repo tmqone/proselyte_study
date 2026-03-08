@@ -82,6 +82,10 @@ dependencies {
 
     // open api
     implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
+    implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"
+    implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+    implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
+    compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
 }
 
 flyway {
@@ -99,12 +103,12 @@ openApiGenerate {
     apiPackage.set("com.tmq.person.service.api")
     modelPackage.set("com.tmq.person.service.dto")
     configOptions = [
-            "useSpringBoot4"      : "true",
-            "useBeanValidation"   : "true",
-            "openApiNullable"     : "true",
-            "interfaceOnly"       : "true",
+            "library": "spring-cloud",
+            "useSpringBoot4": "true",
+            "useBeanValidation" : "true",
+            "openApiNullable" : "true",
             "skipDefaultInterface": "true",
-            "feignClient"            : "true"]
+            "useFeignClientUrl" : "true"]
 }
 
 sourceSets {
@@ -155,6 +159,10 @@ publishing {
             }
         }
     }
+}
+
+tasks.named("bootJar") {
+    dependsOn("publish")
 }
 
 tasks.named("test") {

@@ -44,6 +44,8 @@ services:
     build:
       context: .
       dockerfile: individuals-api/Dockerfile
+      args:
+        - NEXUS_URL=${NEXUS_URL:-http://host.docker.internal:9081}
     container_name: individuals-api
     ports:
       - "8090:8080"
@@ -77,6 +79,8 @@ services:
     build:
       context: .
       dockerfile: person-service/Dockerfile
+      args:
+        - NEXUS_URL=${NEXUS_URL:-http://host.docker.internal:9081}
     container_name: person-service
     ports:
       - "8091:8080"

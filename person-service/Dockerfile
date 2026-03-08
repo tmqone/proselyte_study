@@ -1,7 +1,8 @@
 FROM gradle:9.3.1-jdk25 AS build
 WORKDIR /home/gradle/project
 
-COPY ./common ./common/
+ENV NEXUS_URL=${NEXUS_DOCKER_URL}
+
 COPY ./person-service ./person-service/
 
 WORKDIR /home/gradle/project/person-service

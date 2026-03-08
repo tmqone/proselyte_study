@@ -1,6 +1,8 @@
 spring:
   application:
     name: individuals-api
+  main:
+    web-application-type: reactive
 
   security:
     oauth2:
