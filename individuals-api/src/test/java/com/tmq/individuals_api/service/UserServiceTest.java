@@ -1,11 +1,11 @@
 package com.tmq.individuals_api.service;
 
-import com.tmq.common.dto.AddressWriteDto;
-import com.tmq.common.dto.IndividualWriteDto;
-import com.tmq.common.dto.TokenResponse;
-import com.tmq.common.dto.UserInfoResponse;
-import com.tmq.common.dto.UserLoginRequest;
-import com.tmq.common.dto.UserRegistrationRequest;
+import com.tmq.individuals.dto.AddressWriteDto;
+import com.tmq.person.dto.IndividualWriteDto;
+import com.tmq.individuals.dto.TokenResponse;
+import com.tmq.individuals.dto.UserInfoResponse;
+import com.tmq.individuals.dto.UserLoginRequest;
+import com.tmq.individuals.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.client.KeycloakClient;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import com.tmq.individuals_api.exception.ApiException;

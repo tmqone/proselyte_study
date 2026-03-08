@@ -4,7 +4,7 @@ info:
   description: REST API для регистрации, логина, обновления токена и получения информации о пользователе через Keycloak.
   version: 1.0.0
 servers:
-  - url: http://localhost:8081/v1
+  - url: http://localhost:8081/api/v1
 
 paths:
   /auth/registration:
@@ -107,14 +107,48 @@ components:
   schemas:
     UserRegistrationRequest:
       type: object
-      required: [email, password, confirm_password]
+      required: [
+        email,
+        firstName,
+        lastName,
+        passport_number,
+        phone_number,
+        address,
+        password,
+        confirm_password
+      ]
       properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
         email:
           type: string
           format: email
         password:
           type: string
         confirm_password:
+          type: string
+        passport_number:
+          type: string
+        phone_number:
+          type: string
+        address:
+          $ref: '#/components/schemas/AddressWriteDto'
+
+    AddressWriteDto:
+      type: object
+      required: [ ]
+      properties:
+        state:
+          type: string
+        address:
+          type: string
+        zip_code:
+          type: string
+        city:
+          type: string
+        country_code:
           type: string
 
     UserLoginRequest:

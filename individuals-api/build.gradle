@@ -23,13 +23,61 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$projectDir/openapi/individuals-api.yaml")
+    outputDir.set("$buildDir/generated/openapi")
+    apiPackage.set("com.tmq.individuals.api")
+    modelPackage.set("com.tmq.individuals.dto")
+    configOptions = [
+            "useSpringBoot4"      : "true",
+            "useBeanValidation"   : "true",
+            "openApiNullable"     : "true",
+            "interfaceOnly"       : "true",
+            "skipDefaultInterface": "true",
+            "reactive"            : "true"]
 }
 
+sourceSets {
+    main {
+        java.srcDir("$buildDir/generated/openapi/src/main/java")
+        resources.srcDir("$buildDir/generated/openapi/src/main/resources")
+    }
+
+    test {
+        java.srcDir("$buildDir/generated/openapi/src/test/java")
+        resources.srcDir("$buildDir/generated/openapi/src/test/resources")
+    }
+}
+
+tasks.named('processResources') {
+    dependsOn('openApiGenerate')
+}
+
+tasks.named('processTestResources') {
+    dependsOn('openApiGenerate')
+}
+
+tasks.named('compileJava') {
+    dependsOn('openApiGenerate')
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        url = uri("http://localhost:9081/repository/maven-releases/")
+        allowInsecureProtocol = true
+        credentials {
+            username = 'admin'
+            password = 'admin'
+        }
+    }
+}
+
+
+
 dependencies {
-    // common
-    implementation 'com.tmq:common:1.0.0'
+    implementation 'com.tmq:person-service:1.0.3'
 
     //spring web + data
     implementation 'org.springframework.boot:spring-boot-starter-webclient'
@@ -49,7 +97,7 @@ dependencies {
     implementation 'io.github.openfeign:feign-micrometer'
 
     //aop
-    implementation 'org.springframework.boot:spring-boot-starter-aop:4.0.0-M2'
+    implementation 'org.springframework.boot:spring-boot-starter-aop:4.0.0-M2' //TODO вынести версии
 
     //reactor micrometer bridge
     implementation 'io.projectreactor:reactor-core-micrometer'
@@ -70,8 +118,12 @@ dependencies {
     testImplementation 'org.wiremock:wiremock-standalone:3.10.0'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // OPEN API
+    // open api
     implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
+    implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"
+    implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+    implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
+    compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
 }
 dependencyManagement {
     imports {

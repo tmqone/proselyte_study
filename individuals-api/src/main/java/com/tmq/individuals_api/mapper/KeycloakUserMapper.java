@@ -1,6 +1,6 @@
 package com.tmq.individuals_api.mapper;
 
-import com.tmq.common.dto.UserRegistrationRequest;
+import com.tmq.individuals.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.dto.KeycloakCredentialRepresentation;
 import com.tmq.individuals_api.dto.KeycloakUserRepresentation;
 import org.springframework.stereotype.Component;

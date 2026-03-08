@@ -1,10 +1,10 @@
 package com.tmq.individuals_api.controller;
 
-import com.tmq.common.dto.AddressWriteDto;
-import com.tmq.common.dto.TokenRefreshRequest;
-import com.tmq.common.dto.TokenResponse;
-import com.tmq.common.dto.UserLoginRequest;
-import com.tmq.common.dto.UserRegistrationRequest;
+import com.tmq.individuals.dto.AddressWriteDto;
+import com.tmq.individuals.dto.TokenRefreshRequest;
+import com.tmq.individuals.dto.TokenResponse;
+import com.tmq.individuals.dto.UserLoginRequest;
+import com.tmq.individuals.dto.UserRegistrationRequest;
 import com.tmq.individuals_api.support.KeycloakContainerSupport;
 import com.tmq.individuals_api.support.PersonServiceWireMockSupport;
 import org.junit.jupiter.api.AfterAll;
@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport {
+class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport { // TODO Убрать наследование
 
     private static final String TEST_EMAIL = "test." + UUID.randomUUID() + "@example.com";
     private static final String TEST_PASSWORD = "Test1234!";

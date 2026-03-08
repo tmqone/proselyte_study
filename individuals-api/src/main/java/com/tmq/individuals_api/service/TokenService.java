@@ -1,6 +1,6 @@
 package com.tmq.individuals_api.service;
 
-import com.tmq.common.dto.TokenResponse;
+import com.tmq.individuals.dto.TokenResponse;
 import com.tmq.individuals_api.client.KeycloakClient;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;

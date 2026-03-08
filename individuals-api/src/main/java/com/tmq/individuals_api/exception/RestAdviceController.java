@@ -1,6 +1,6 @@
 package com.tmq.individuals_api.exception;
 
-import com.tmq.common.dto.ErrorResponse;
+import com.tmq.individuals.dto.ErrorResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -1,7 +1,7 @@
 package com.tmq.individuals_api.service;
 
-import com.tmq.common.api.person_api.PersonsApiClient;
-import com.tmq.common.dto.IndividualWriteDto;
+import com.tmq.person.api.PersonsApiClient;
+import com.tmq.person.dto.IndividualWriteDto;
 import io.micrometer.observation.ObservationRegistry;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
