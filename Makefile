@@ -1,6 +1,6 @@
 DOCKER_COMPOSE = docker compose
-NEXUS_URL ?= http://localhost:9081
-NEXUS_DOCKER_URL = http://nexus:8081
+NEXUS_URL = http://localhost:9081
+NEXUS_URL_DOCKER = http://nexus:8081
 
 .PHONY: all up build start
 
@@ -31,9 +31,9 @@ up:
 
 build:
 	@echo "Building person-service image..."
-	NEXUS_URL=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build person-service
+	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build person-service
 	@echo "Building individuals-api image..."
-	NEXUS_URL=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build individuals-api
+	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build individuals-api
 
 start:
 	@echo "Starting all services..."

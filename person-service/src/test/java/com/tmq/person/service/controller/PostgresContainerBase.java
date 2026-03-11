@@ -13,8 +13,12 @@ public abstract class PostgresContainerBase {
     protected static final PostgreSQLContainer<?> postgres =
             new PostgreSQLContainer<>("postgres:16-alpine");
 
+    static {
+        postgres.start();
+    }
+
     @DynamicPropertySource
-    static void configureProperties(DynamicPropertyRegistry registry) {
+    public static void configureProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url",                postgres::getJdbcUrl);
         registry.add("spring.datasource.username",           postgres::getUsername);
         registry.add("spring.datasource.password",           postgres::getPassword);

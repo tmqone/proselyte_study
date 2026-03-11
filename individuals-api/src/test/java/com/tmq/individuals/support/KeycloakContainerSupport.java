@@ -19,11 +19,11 @@ public abstract class KeycloakContainerSupport extends BaseIntegrationSupport {
     protected static final String CLIENT_UUID = "e70d7d14-3756-488f-9abc-245aa788995c";
 
     @Container
-    protected static final KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:26.2")
+    public static final KeycloakContainer keycloak = new KeycloakContainer("quay.io/keycloak/keycloak:26.2")
             .withRealmImportFile("realm-config.json");
 
     @DynamicPropertySource
-    static void configureKeycloakProperties(DynamicPropertyRegistry registry) {
+    public static void configureKeycloakProperties(DynamicPropertyRegistry registry) {
         String baseUrl = keycloak.getAuthServerUrl();
         String clientSecret = regenerateClientSecret(baseUrl);
 
@@ -70,5 +70,9 @@ public abstract class KeycloakContainerSupport extends BaseIntegrationSupport {
         } catch (Exception e) {
             throw new RuntimeException("Failed to regenerate Keycloak client secret", e);
         }
+    }
+
+    static {
+        keycloak.start();
     }
 }

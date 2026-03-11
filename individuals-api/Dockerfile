@@ -1,7 +1,8 @@
 FROM gradle:9.3.1-jdk25 AS build
 WORKDIR /home/gradle/project
 
-ENV NEXUS_URL=${NEXUS_DOCKER_URL}
+ARG NEXUS_URL
+ENV NEXUS_URL=${NEXUS_URL}
 
 COPY ./individuals-api ./individuals-api/
 

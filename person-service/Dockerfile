@@ -1,7 +1,7 @@
 FROM gradle:9.3.1-jdk25 AS build
 WORKDIR /home/gradle/project
 
-ARG NEXUS_URL=http://host.docker.internal:9081
+ARG NEXUS_URL
 ENV NEXUS_URL=${NEXUS_URL}
 
 COPY ./person-service ./person-service/

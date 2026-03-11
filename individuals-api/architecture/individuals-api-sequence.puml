@@ -1,0 +1,118 @@
+@startuml Payment System — Sequence Diagram
+
+actor Client
+
+box "individuals-api"
+    participant AuthController as "AuthRestControllerV1\n/api/v1/auth"
+    participant UserService
+    participant UserValidator
+    participant TokenService
+    participant PersonService
+    participant KeycloakClient
+end box
+
+participant "person-service" as PersonServiceApp
+database Keycloak
+
+
+Client -> AuthController : POST /registration\n{firstName, lastName, email, password,\nconfirmPassword, passportNumber, phoneNumber, address}
+AuthController -> UserService : register(UserRegistrationRequest)
+UserService -> UserValidator : validateOnRegistration(email, password, confirmPassword)
+
+alt validation failed
+    UserValidator --> UserService : ValidationException
+    UserService --> AuthController : ValidationException
+    AuthController --> Client : 400 Bad Request
+else validation ok
+    UserValidator --> UserService : ok
+    UserService -> PersonService : register(IndividualWriteDto)
+    PersonService -> PersonServiceApp : POST /api/v1/persons
+    alt person-service error
+        PersonServiceApp --> PersonService : 400 Bad Request
+        PersonService --> UserService : exception
+        UserService --> AuthController : exception
+        AuthController --> Client : 400 Bad Request
+    else person created
+        PersonServiceApp --> PersonService : 201 Created {id}
+        PersonService --> UserService : personId (UUID)
+        UserService -> KeycloakClient : getAdminToken()
+        KeycloakClient -> Keycloak : POST /realms/payment-system/protocol/openid-connect/token\ngrant_type=client_credentials
+        Keycloak --> KeycloakClient : adminToken
+        KeycloakClient --> UserService : adminToken
+        UserService -> KeycloakClient : createNewUser(KeycloakUserRepresentation, adminToken)
+        KeycloakClient -> Keycloak : POST /admin/realms/payment-system/users
+        alt user already exists
+            Keycloak --> KeycloakClient : 409 Conflict
+            KeycloakClient --> UserService : KeycloakException
+            UserService -> PersonService : compensateRegistration(personId)
+            PersonService -> PersonServiceApp : DELETE /api/v1/persons/compensate-registration/{id}
+            PersonServiceApp --> PersonService : 200 OK
+            PersonService --> UserService : ok
+            UserService --> AuthController : KeycloakException
+            AuthController --> Client : 409 Conflict
+        else user created
+            Keycloak --> KeycloakClient : 201 Created
+            KeycloakClient --> UserService : ok
+            UserService -> TokenService : getAccessToken(email, password)
+            TokenService -> KeycloakClient : getUserToken(email, password)
+            KeycloakClient -> Keycloak : POST /realms/payment-system/protocol/openid-connect/token\ngrant_type=password
+            Keycloak --> KeycloakClient : {access_token, refresh_token, expires_in}
+            KeycloakClient --> TokenService : TokenResponse
+            TokenService --> UserService : TokenResponse
+            UserService --> AuthController : TokenResponse
+            AuthController --> Client : 201 Created\n{access_token, refresh_token, expires_in, token_type}
+        end
+    end
+end
+
+
+Client -> AuthController : POST /login\n{email, password}
+AuthController -> UserService : login(UserLoginRequest)
+UserService -> TokenService : getAccessToken(email, password)
+TokenService -> KeycloakClient : getUserToken(email, password)
+KeycloakClient -> Keycloak : POST /realms/payment-system/protocol/openid-connect/token\ngrant_type=password
+
+alt invalid credentials
+    Keycloak --> KeycloakClient : 401 Unauthorized
+    KeycloakClient --> TokenService : KeycloakException
+    TokenService --> UserService : KeycloakException
+    UserService --> AuthController : KeycloakException
+    AuthController --> Client : 401 Unauthorized
+else credentials valid
+    Keycloak --> KeycloakClient : {access_token, refresh_token, expires_in}
+    KeycloakClient --> TokenService : TokenResponse
+    TokenService --> UserService : TokenResponse
+    UserService --> AuthController : TokenResponse
+    AuthController --> Client : 200 OK\n{access_token, refresh_token, expires_in, token_type}
+end
+
+
+Client -> AuthController : POST /refresh-token\n{refresh_token}
+AuthController -> TokenService : refreshToken(refreshToken)
+TokenService -> KeycloakClient : refreshToken(refreshToken)
+KeycloakClient -> Keycloak : POST /realms/payment-system/protocol/openid-connect/token\ngrant_type=refresh_token
+
+alt token invalid or expired
+    Keycloak --> KeycloakClient : 401 Unauthorized
+    KeycloakClient --> TokenService : KeycloakException
+    TokenService --> AuthController : KeycloakException
+    AuthController --> Client : 401 Unauthorized
+else token valid
+    Keycloak --> KeycloakClient : {access_token, refresh_token, expires_in}
+    KeycloakClient --> TokenService : TokenResponse
+    TokenService --> AuthController : TokenResponse
+    AuthController --> Client : 200 OK\n{access_token, refresh_token, expires_in, token_type}
+end
+
+
+Client -> AuthController : GET /me\nAuthorization: Bearer <access_token>
+
+alt token missing or invalid
+    AuthController --> Client : 401 Unauthorized
+else token valid
+    AuthController -> UserService : getUserInfo(Authentication)
+    UserService --> AuthController : UserInfoResponse
+    AuthController --> Client : 200 OK\n{id, email, roles[], created_at}
+end
+
+@enduml

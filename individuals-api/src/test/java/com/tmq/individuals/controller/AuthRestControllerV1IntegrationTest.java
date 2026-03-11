@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
@@ -27,13 +28,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class AuthRestControllerV1IntegrationTest extends KeycloakContainerSupport { // TODO Убрать наследование
+@Testcontainers
+class AuthRestControllerV1IntegrationTest {
 
     private static final String TEST_EMAIL = "test." + UUID.randomUUID() + "@example.com";
     private static final String TEST_PASSWORD = "Test1234!";
 
     @DynamicPropertySource
-    static void configurePersonServiceProperties(DynamicPropertyRegistry registry) {
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        KeycloakContainerSupport.configureKeycloakProperties(registry);
         registry.add("persons.name", () -> "persons");
         registry.add("persons.contextId", () -> "persons");
         registry.add("persons.url",

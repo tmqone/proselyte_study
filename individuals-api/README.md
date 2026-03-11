@@ -25,11 +25,14 @@
 ````
 
 ## Архитектура системы
-![architecture/individuals-api-uml.png](./architecture/individuals-api-uml.png)
+![architecture/individuals-api-uml.png](./architecture/individuals-api.png)
 
 ## Внутренняя архитектура сервиса
 
 ![architecture/individuals-api-uml.png](./architecture/individuals-api-microservice.png)
+
+## Диаграмма последовательности
+![architecture/individuals-api-sequence.png](./architecture/individuals-api-sequence.png)
 
 ## Запуск
 ````
