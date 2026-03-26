@@ -1,0 +1,138 @@
+plugins {
+	id "java"
+	id "org.springframework.boot" version "${springBootVersion}"
+	id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+	id "org.openapi.generator" version "${openApiGeneratorVersion}"
+	id "maven-publish"
+}
+
+group = 'com.tmq'
+version = '1.0.0'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(25)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	//spring
+	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
+	implementation 'org.springframework.boot:spring-boot-starter-kafka'
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-flyway"
+	implementation "org.springframework.boot:spring-boot-starter-webmvc"
+	implementation "org.flywaydb:flyway-database-postgresql"
+
+	//observability
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation "org.springframework.boot:spring-boot-starter-aop:${springStarterAopVersion}"
+	implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
+	implementation "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:${opentelemetryLogbackAppenderVersion}"
+	implementation 'io.github.openfeign:feign-micrometer'
+
+	//helpers
+	implementation "org.springframework.boot:spring-boot-starter-validation"
+	implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+	compileOnly "org.projectlombok:lombok"
+	annotationProcessor "org.projectlombok:lombok"
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	implementation "org.hibernate.orm:hibernate-envers:${hibernateEnversVersion}"
+	runtimeOnly "org.postgresql:postgresql"
+	implementation 'org.apache.shardingsphere:shardingsphere-jdbc:5.5.3'
+
+	//test
+	testImplementation "org.springframework.boot:spring-boot-starter-actuator-test"
+	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
+	testImplementation "org.springframework.boot:spring-boot-starter-flyway-test"
+	testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
+	testImplementation "org.springframework.boot:spring-boot-testcontainers"
+	testImplementation "org.testcontainers:testcontainers-grafana"
+	testImplementation "org.testcontainers:testcontainers-junit-jupiter"
+	testImplementation "org.testcontainers:testcontainers-postgresql"
+	testImplementation "org.springframework.boot:spring-boot-resttestclient"
+	runtimeOnly "org.springframework.boot:spring-boot-restclient"
+	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
+	testImplementation 'org.testcontainers:testcontainers-kafka'
+
+	// open api
+	implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
+	implementation "io.swagger.core.v3:swagger-models:${swaggerModelsVersion}"
+	implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
+	implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
+	compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
+}
+
+openApiGenerate {
+	generatorName.set("spring")
+	inputSpec.set("$projectDir/openapi/transaction-service.yaml")
+	outputDir.set("$buildDir/generated/openapi")
+	apiPackage.set("com.tmq.person.service.api")
+	modelPackage.set("com.tmq.person.service.dto")
+	configOptions = [
+			"library": "spring-cloud",
+			"useSpringBoot4": "true",
+			"useBeanValidation" : "true",
+			"openApiNullable" : "true",
+			"skipDefaultInterface": "true",
+			"useFeignClientUrl" : "true"]
+}
+
+sourceSets {
+	main {
+		java.srcDir("$buildDir/generated/openapi/src/main/java")
+		resources.srcDir("$buildDir/generated/openapi/src/main/resources")
+	}
+
+	test {
+		java.srcDir("$buildDir/generated/openapi/src/test/java")
+		resources.srcDir("$buildDir/generated/openapi/src/test/resources")
+	}
+}
+
+tasks.named('processResources') {
+	dependsOn('openApiGenerate')
+}
+
+tasks.named('processTestResources') {
+	dependsOn('openApiGenerate')
+}
+
+tasks.named('compileJava') {
+	dependsOn('openApiGenerate')
+}
+
+
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+		}
+	}
+	repositories {
+		maven {
+			name = "nexus"
+			def nexusHost = System.getenv("NEXUS_URL") ?: "http://localhost:9081"
+			def nexusUsername = System.getenv("NEXUS_USERNAME") ?: "admin"
+			def nexusPassword = System.getenv("NEXUS_PASSWORD") ?: "admin"
+			url = version.endsWith("SNAPSHOT")
+					? "${nexusHost}/repository/maven-snapshots/"
+					: "${nexusHost}/repository/maven-releases/"
+			allowInsecureProtocol = true
+			credentials {
+				username = nexusUsername
+				password = nexusPassword
+			}
+		}
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

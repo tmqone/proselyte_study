@@ -32,6 +32,8 @@ up:
 build:
 	@echo "Building person-service image..."
 	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build person-service
+	@echo "Building transaction-service image..."
+    NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build transaction-service
 	@echo "Building individuals-api image..."
 	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build individuals-api
 
