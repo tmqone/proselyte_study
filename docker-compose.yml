@@ -44,8 +44,10 @@ services:
     build:
       context: .
       dockerfile: individuals-api/Dockerfile
+      extra_hosts:
+        - "host.docker.internal:host-gateway"
       args:
-        - NEXUS_URL=${NEXUS_URL:-http://host.docker.internal:9081}
+        - NEXUS_URL=http://host.docker.internal:9081
     container_name: individuals-api
     ports:
       - "8090:8080"
@@ -80,7 +82,7 @@ services:
       context: .
       dockerfile: person-service/Dockerfile
       args:
-        - NEXUS_URL=${NEXUS_URL:-http://host.docker.internal:9081}
+        - NEXUS_URL=${NEXUS_URL:-http://localhost:9081}
     container_name: person-service
     ports:
       - "8091:8080"
@@ -122,15 +124,30 @@ services:
       timeout: 5s
       retries: 5
 
-  transaction-service-postgres:
+  transaction-service-postgres-shard-first:
     image: postgres:17
-    container_name: transaction-service-postgres
+    container_name: transaction-service-postgres-shard-first
     environment:
       POSTGRES_DB: transaction
       POSTGRES_USER: transaction
       POSTGRES_PASSWORD: transaction
     ports:
       - "5436:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U transaction" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  transaction-service-postgres-shard-second:
+    image: postgres:17
+    container_name: transaction-service-postgres-shard-second
+    environment:
+      POSTGRES_DB: transaction
+      POSTGRES_USER: transaction
+      POSTGRES_PASSWORD: transaction
+    ports:
+      - "5437:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U transaction" ]
       interval: 10s

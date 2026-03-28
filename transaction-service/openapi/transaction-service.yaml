@@ -10,6 +10,7 @@ paths:
   /wallets:
     post:
       summary: Создание кошелька пользователя
+      operationId: createWallet
       requestBody:
         required: true
         content:
@@ -33,12 +34,14 @@ paths:
   /wallets/{walletUid}:
     get:
       summary: Получение информации о кошельке
+      operationId: getWalletByUid
       parameters:
         - name: walletUid
           in: path
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Данные кошелька
@@ -56,12 +59,14 @@ paths:
   /wallets/user/{userUid}:
     get:
       summary: Получение всех кошельков пользователя
+      operationId: getWalletsByUserUid
       parameters:
         - name: userUid
           in: path
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Список кошельков пользователя
@@ -71,18 +76,24 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/WalletResponse'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   # Transactions
   /transactions/{type}/init:
     post:
-      summary: Инициализация транзакции (без создания)
+      summary: Инициализация транзакции — создаёт транзакцию со статусом new
+      operationId: initTransaction
       parameters:
         - name: type
           in: path
           required: true
           schema:
-            type: string
-            enum: [deposit, withdrawal, transfer]
+            $ref: '#/components/schemas/PaymentType'
       requestBody:
         required: true
         content:
@@ -94,7 +105,7 @@ paths:
                 - $ref: '#/components/schemas/TransferInitRequest'
       responses:
         '200':
-          description: Условия транзакции
+          description: Транзакция создана со статусом new
           content:
             application/json:
               schema:
@@ -108,14 +119,14 @@ paths:
 
   /transactions/{type}/confirm:
     post:
-      summary: Подтверждение и запуск транзакции
+      summary: Подтверждение транзакции — переводит статус из new в pending
+      operationId: confirmTransaction
       parameters:
         - name: type
           in: path
           required: true
           schema:
-            type: string
-            enum: [deposit, withdrawal, transfer]
+            $ref: '#/components/schemas/PaymentType'
       requestBody:
         required: true
         content:
@@ -127,7 +138,7 @@ paths:
                 - $ref: '#/components/schemas/TransferConfirmRequest'
       responses:
         '200':
-          description: Транзакция подтверждена
+          description: Транзакция переведена в статус pending
           content:
             application/json:
               schema:
@@ -139,22 +150,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /transactions/{transactionId}/status:
+  /transactions/{transactionUid}/status:
     get:
       summary: Получение статуса транзакции
+      operationId: getTransactionStatus
       parameters:
-        - name: transactionId
+        - name: transactionUid
           in: path
           required: true
           schema:
             type: string
+            format: uuid
       responses:
         '200':
           description: Статус и детали транзакции
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransactionStatusResponse'
+                $ref: '#/components/schemas/TransactionResponse'
         '404':
           description: Транзакция не найдена
           content:
@@ -165,24 +178,21 @@ paths:
   /transactions:
     get:
       summary: Поиск транзакций по фильтрам с пагинацией
+      operationId: getTransactions
       parameters:
-        - in: query
-          name: userUid
-          schema:
-            type: string
         - in: query
           name: walletUid
           schema:
             type: string
+            format: uuid
         - in: query
           name: type
           schema:
-            type: string
-            enum: [deposit, withdrawal, transfer]
+            $ref: '#/components/schemas/PaymentType'
         - in: query
           name: status
           schema:
-            type: string
+            $ref: '#/components/schemas/TransactionStatus'
         - in: query
           name: dateFrom
           schema:
@@ -205,17 +215,264 @@ paths:
             default: 20
       responses:
         '200':
-          description: Список транзакций
+          description: Страница транзакций
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TransactionStatusResponse'
+                $ref: '#/components/schemas/TransactionPage'
+
 components:
   schemas:
+
+    PaymentType:
+      type: string
+      enum: [deposit, withdrawal, transfer]
+
+    WalletStatus:
+      type: string
+      enum: [active, blocked, archived]
+
+    TransactionStatus:
+      type: string
+      enum: [new, pending, completed, failed, cancelled]
+
     CreateWalletRequest:
       type: object
+      required:
+        - wallet_type_uid
+        - name
+        - user_id
       properties:
+        wallet_type_uid:
+          type: string
+          format: uuid
         name:
           type: string
+          maxLength: 32
+        user_id:
+          type: string
+          format: uuid
+
+    WalletResponse:
+      type: object
+      properties:
+        uid:
+          type: string
+          format: uuid
+        user_uid:
+          type: string
+          format: uuid
+        wallet_type_uid:
+          type: string
+          format: uuid
+        name:
+          type: string
+        status:
+          $ref: '#/components/schemas/WalletStatus'
+        balance:
+          type: number
+          multipleOf: 0.01
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+        archived_at:
+          type: string
+          format: date-time
+
+    DepositInitRequest:
+      type: object
+      required:
+        - wallet_uid
+        - amount
+      properties:
+        wallet_uid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          multipleOf: 0.01
+        payment_method_id:
+          type: integer
+          format: int64
+        comment:
+          type: string
+          maxLength: 256
+
+    WithdrawalInitRequest:
+      type: object
+      required:
+        - wallet_uid
+        - amount
+      properties:
+        wallet_uid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          multipleOf: 0.01
+        payment_method_id:
+          type: integer
+          format: int64
+        comment:
+          type: string
+          maxLength: 256
+
+    TransferInitRequest:
+      type: object
+      required:
+        - source_wallet_uid
+        - target_wallet_uid
+        - amount
+      properties:
+        source_wallet_uid:
+          type: string
+          format: uuid
+        target_wallet_uid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          multipleOf: 0.01
+        comment:
+          type: string
+          maxLength: 256
+
+    DepositConfirmRequest:
+      type: object
+      required:
+        - transaction_uid
+      properties:
+        transaction_uid:
+          type: string
+          format: uuid
+
+    WithdrawalConfirmRequest:
+      type: object
+      required:
+        - transaction_uid
+      properties:
+        transaction_uid:
+          type: string
+          format: uuid
+
+    TransferConfirmRequest:
+      type: object
+      required:
+        - transaction_uid
+      properties:
+        transaction_uid:
+          type: string
+          format: uuid
+
+    TransactionInitResponse:
+      type: object
+      properties:
+        transaction_uid:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/PaymentType'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        wallet_uid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          multipleOf: 0.01
+        fee:
+          type: number
+          multipleOf: 0.01
+        comment:
+          type: string
+
+    TransactionConfirmResponse:
+      type: object
+      properties:
+        transaction_uid:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/PaymentType'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        wallet_uid:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          multipleOf: 0.01
+        fee:
+          type: number
+          multipleOf: 0.01
+        failure_reason:
+          type: string
+
+    TransactionResponse:
+      type: object
+      properties:
+        uid:
+          type: string
+          format: uuid
+        user_uid:
+          type: string
+          format: uuid
+        wallet_uid:
+          type: string
+          format: uuid
+        target_wallet_uid:
+          type: string
+          format: uuid
+        payment_method_id:
+          type: integer
+          format: int64
+        type:
+          $ref: '#/components/schemas/PaymentType'
+        status:
+          $ref: '#/components/schemas/TransactionStatus'
+        amount:
+          type: number
+          multipleOf: 0.01
+        fee:
+          type: number
+          multipleOf: 0.01
+        comment:
+          type: string
+        failure_reason:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        modified_at:
+          type: string
+          format: date-time
+          
+    TransactionPage:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/TransactionResponse'
+        total_elements:
+          type: integer
+          format: int64
+        total_pages:
+          type: integer
+        page:
+          type: integer
+        size:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer

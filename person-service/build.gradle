@@ -143,9 +143,6 @@ publishing {
     }
 }
 
-tasks.named("bootJar") {
-    dependsOn("publish")
-}
 
 tasks.named("test") {
     useJUnitPlatform()

@@ -1,10 +1,9 @@
 DOCKER_COMPOSE = docker compose
 NEXUS_URL = http://localhost:9081
-NEXUS_URL_DOCKER = http://nexus:8081
 
-.PHONY: all up build start
+.PHONY: all up publish build start
 
-all: up build start
+all: up publish build start
 
 ifeq ($(OS),Windows_NT)
 WAIT_NEXUS = powershell -Command "while ($$true) { \
@@ -29,13 +28,17 @@ up:
 	@$(WAIT_NEXUS)
 	@echo "Nexus is healthy!"
 
+publish:
+	@echo "Publishing person-service to Nexus..."
+	cd person-service && NEXUS_URL=$(NEXUS_URL) ./gradlew publish
+
 build:
 	@echo "Building person-service image..."
-	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build person-service
-	@echo "Building transaction-service image..."
-    NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build transaction-service
+	$(DOCKER_COMPOSE) build person-service
+# 	@echo "Building transaction-service image..."
+#     $(DOCKER_COMPOSE) build transaction-service
 	@echo "Building individuals-api image..."
-	NEXUS_URL_DOCKER=$(NEXUS_URL_DOCKER) $(DOCKER_COMPOSE) build individuals-api
+	$(DOCKER_COMPOSE) build individuals-api
 
 start:
 	@echo "Starting all services..."

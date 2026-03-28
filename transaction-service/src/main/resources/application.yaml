@@ -2,44 +2,54 @@ spring:
   application:
     name: transaction-service
   datasource:
-    url: jdbc:postgresql://localhost:5436/transaction
+    url: jdbc:shardingsphere:classpath:sharding-config.yaml
     username: transaction
     password: transaction
     hikari:
       schema: transaction
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
 
-    flyway:
-      url: jdbc:postgresql://localhost:5436/transaction
-      user: transaction
-      password: transaction
-      default-schema: transaction
-      create-schemas: true
-      baseline-on-migrate: true
+  flyway:
+    url: jdbc:shardingsphere:classpath:sharding-config.yaml
+    user: transaction
+    password: transaction
+    default-schema: transaction
+    create-schemas: true
+    baseline-on-migrate: true
+    driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
 
-    jpa:
-      hibernate:
-        ddl-auto: update
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:29092,localhost:39092,localhost:49092}
+    admin:
+      fail-fast: true
+server:
+  port: 8092
 
-  server:
-    port: 8091
+logging:
+  level:
+    org.apache.kafka.clients: INFO
+    org.springframework.kafka: INFO
 
-  management:
-    tracing:
-      sampling:
-        probability: 1.0
-    otlp:
-      metrics:
-        export:
-          url: http://localhost:4318/v1/metrics
-          step: 5s
-    opentelemetry:
-      tracing:
-        export:
-          otlp:
-            transport: grpc
-            endpoint: http://localhost:4317
-      logging:
-        export:
-          otlp:
-            transport: grpc
-            endpoint: http://localhost:4317
+#management:
+#  tracing:
+#    sampling:
+#      probability: 1.0
+#  otlp:
+#    metrics:
+#      export:
+#        url: http://localhost:4318/v1/metrics
+#        step: 5s
+#  opentelemetry:
+#    tracing:
+#      export:
+#        otlp:
+#          transport: grpc
+#          endpoint: http://localhost:4317
+#    logging:
+#      export:
+#        otlp:
+#          transport: grpc
+#          endpoint: http://localhost:4317
