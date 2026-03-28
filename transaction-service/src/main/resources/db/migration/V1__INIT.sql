@@ -1,4 +1,7 @@
-CREATE TABLE wallet_types (
+CREATE SCHEMA IF NOT EXISTS transaction;
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE transaction.wallet_types (
                               uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                               created_at TIMESTAMP NOT NULL DEFAULT now(),
                               modified_at TIMESTAMP,
@@ -11,7 +14,7 @@ CREATE TABLE wallet_types (
                               modifier VARCHAR(255)
 );
 
-CREATE TABLE wallets (
+CREATE TABLE transaction.wallets (
                          uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                          created_at TIMESTAMP NOT NULL DEFAULT now(),
                          modified_at TIMESTAMP,
@@ -23,8 +26,8 @@ CREATE TABLE wallets (
                          archived_at TIMESTAMP
 );
 
-CREATE TYPE payment_type AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER');
-CREATE TABLE transactions (
+CREATE TYPE transaction.payment_type AS ENUM ('DEPOSIT', 'WITHDRAWAL', 'TRANSFER');
+CREATE TABLE transaction.transactions (
                               uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
                               created_at TIMESTAMP NOT NULL DEFAULT now(),
                               modified_at TIMESTAMP,
