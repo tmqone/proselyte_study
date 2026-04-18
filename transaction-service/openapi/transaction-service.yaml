@@ -3,7 +3,7 @@ info:
   title: Transaction Service API
   version: 1.1.1
 servers:
-  - url: http://localhost:8082/api/v1
+  - url: http://localhost:8092/api/v1
 
 paths:
   # Wallets
@@ -100,8 +100,7 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/DepositInitRequest'
-                - $ref: '#/components/schemas/WithdrawalInitRequest'
+                - $ref: '#/components/schemas/DepositOrWithdrawalInitRequest'
                 - $ref: '#/components/schemas/TransferInitRequest'
       responses:
         '200':
@@ -133,9 +132,7 @@ paths:
           application/json:
             schema:
               oneOf:
-                - $ref: '#/components/schemas/DepositConfirmRequest'
-                - $ref: '#/components/schemas/WithdrawalConfirmRequest'
-                - $ref: '#/components/schemas/TransferConfirmRequest'
+                - $ref: '#/components/schemas/TransactionConfirmRequest'
       responses:
         '200':
           description: Транзакция переведена в статус pending
@@ -282,31 +279,16 @@ components:
           type: string
           format: date-time
 
-    DepositInitRequest:
+    DepositOrWithdrawalInitRequest:
       type: object
       required:
+        - user_id
         - wallet_uid
         - amount
       properties:
-        wallet_uid:
+        user_id:
           type: string
           format: uuid
-        amount:
-          type: number
-          multipleOf: 0.01
-        payment_method_id:
-          type: integer
-          format: int64
-        comment:
-          type: string
-          maxLength: 256
-
-    WithdrawalInitRequest:
-      type: object
-      required:
-        - wallet_uid
-        - amount
-      properties:
         wallet_uid:
           type: string
           format: uuid
@@ -323,10 +305,14 @@ components:
     TransferInitRequest:
       type: object
       required:
+        - user_id
         - source_wallet_uid
         - target_wallet_uid
         - amount
       properties:
+        user_id:
+          type: string
+          format: uuid
         source_wallet_uid:
           type: string
           format: uuid
@@ -340,25 +326,7 @@ components:
           type: string
           maxLength: 256
 
-    DepositConfirmRequest:
-      type: object
-      required:
-        - transaction_uid
-      properties:
-        transaction_uid:
-          type: string
-          format: uuid
-
-    WithdrawalConfirmRequest:
-      type: object
-      required:
-        - transaction_uid
-      properties:
-        transaction_uid:
-          type: string
-          format: uuid
-
-    TransferConfirmRequest:
+    TransactionConfirmRequest:
       type: object
       required:
         - transaction_uid

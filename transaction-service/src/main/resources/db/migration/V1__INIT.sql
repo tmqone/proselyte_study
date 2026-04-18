@@ -42,3 +42,12 @@ CREATE TABLE transaction.transactions (
                               payment_method_id BIGINT,       -- для deposit/withdrawal
                               failure_reason VARCHAR(256)
 );
+
+CREATE TABLE transaction.transaction_outbox (
+    uid UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    processed_at TIMESTAMP NOT NULL DEFAULT now(),
+    status VARCHAR(32) NOT NULL,
+    event_type VARCHAR(32) NOT NULL,
+    payload jsonb
+)

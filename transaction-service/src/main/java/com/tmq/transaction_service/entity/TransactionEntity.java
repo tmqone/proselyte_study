@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -39,11 +41,13 @@ public class TransactionEntity {
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
     private PaymentTypeEntity paymentType;
 
     @Column(name = "status", nullable = false, length = 32)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private TransactionStatusEntity status;
 
     @Column(name = "comment", length = 256)
     private String comment;

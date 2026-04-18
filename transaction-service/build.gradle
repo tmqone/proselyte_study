@@ -19,52 +19,35 @@ repositories {
 	mavenCentral()
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
-}
-
 dependencies {
 	//spring
-	implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
-	implementation 'org.springframework.boot:spring-boot-starter-kafka'
-	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-	implementation "org.flywaydb:flyway-core"
-	implementation "org.springframework.boot:spring-boot-starter-webmvc"
-	implementation "org.flywaydb:flyway-database-postgresql"
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.kafka:spring-kafka'
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+	//database
+	implementation "org.postgresql:postgresql:${postgresDriverVersion}"
+	implementation 'org.flywaydb:flyway-core:12.4.0'
+	runtimeOnly 'org.flywaydb:flyway-database-postgresql:12.4.0'
+//	implementation 'org.apache.shardingsphere:shardingsphere-jdbc:5.5.3'
+//	implementation 'org.apache.shardingsphere:shardingsphere-infra-url-classpath:5.5.3'
 
 	//observability
+	runtimeOnly 'io.micrometer:micrometer-registry-otlp'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation "org.springframework.boot:spring-boot-starter-aop:${springStarterAopVersion}"
-	implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
-	implementation "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:${opentelemetryLogbackAppenderVersion}"
-	implementation "io.github.openfeign:feign-micrometer:${feignMicrometerVersion}"
+	implementation "io.opentelemetry.instrumentation:opentelemetry-logback-appender-1.0:${otlpLogbackAppenderVersion}"
+	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+	runtimeOnly 'io.opentelemetry:opentelemetry-exporter-otlp'
+	implementation 'io.projectreactor:reactor-core-micrometer'
 
 	//helpers
-	implementation "org.springframework.boot:spring-boot-starter-validation"
-	implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
-	compileOnly "org.projectlombok:lombok"
-	annotationProcessor "org.projectlombok:lombok"
+	implementation 'org.jspecify:jspecify:1.0.0'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-	implementation "org.hibernate.orm:hibernate-envers:${hibernateEnversVersion}"
-	runtimeOnly "org.postgresql:postgresql"
-	implementation 'org.apache.shardingsphere:shardingsphere-jdbc:5.5.3'
-
-	//test
-	testImplementation "org.springframework.boot:spring-boot-starter-actuator-test"
-	testImplementation "org.springframework.boot:spring-boot-starter-data-jpa-test"
-	testImplementation "org.springframework.boot:spring-boot-starter-flyway-test"
-	testImplementation "org.springframework.boot:spring-boot-starter-webmvc-test"
-	testImplementation "org.springframework.boot:spring-boot-testcontainers"
-	testImplementation "org.testcontainers:testcontainers-grafana"
-	testImplementation "org.testcontainers:testcontainers-junit-jupiter"
-	testImplementation "org.testcontainers:testcontainers-postgresql"
-	testImplementation "org.springframework.boot:spring-boot-resttestclient"
-	runtimeOnly "org.springframework.boot:spring-boot-restclient"
-	testRuntimeOnly "org.junit.platform:junit-platform-launcher"
-	testImplementation 'org.testcontainers:testcontainers-kafka'
 
 	// open api
 	implementation "io.swagger.core.v3:swagger-annotations:${swaggerAnnotationsVersion}"
@@ -72,6 +55,9 @@ dependencies {
 	implementation "jakarta.validation:jakarta.validation-api:${jakartaValidationApiVersion}"
 	implementation "org.openapitools:jackson-databind-nullable:${jacksonDatabindNullableVersion}"
 	compileOnly "jakarta.servlet:jakarta.servlet-api:${jakartaServletApiVersion}"
+
+	//test
+	testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
 
 openApiGenerate {
@@ -138,7 +124,16 @@ publishing {
 		}
 	}
 }
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
+	}
+}
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named('bootJar') {
+	requiresUnpack '**/shardingsphere*.jar'
 }
